@@ -177,6 +177,12 @@ SECTIONS
     . = ALIGN(8);
   } >DTCMRAM
 
+
+	  .RAM_D1 :
+  {
+        KEEP(*(.RAM_D1)) 
+  } >RAM_D1
+  
   
 /*from https://community.st.com/message/171291-re-stm32h7stm32h743-adc-with-dma?commentID=171291#comment-171291*/
 	  .RAM_D2 :

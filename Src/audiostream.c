@@ -49,7 +49,8 @@ tNoise noise;
 
 tCycle mySine[6];
 
-
+#define MEM_SIZE 500000
+char memory[MEM_SIZE] __ATTR_RAM_D1;
 
 
 /**********************************************/
@@ -64,7 +65,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, &randomNumber);
+	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, memory, MEM_SIZE, &randomNumber);
 
 
 	for (int i = 0; i < 6; i++)
