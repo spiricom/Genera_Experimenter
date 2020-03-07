@@ -68,6 +68,7 @@ void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
+void SDRAM_Initialization_sequence(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -142,6 +143,10 @@ int main(void)
 	}
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
+
+  SDRAM_Initialization_sequence();
+  HAL_Delay(100);
+
   audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
@@ -233,7 +238,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
   PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
-  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
+  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
@@ -254,6 +259,89 @@ void SystemClock_Config(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	;
+}
+
+
+#define SDRAM_TIMEOUT ((uint32_t)0xFFFF)
+
+#define SDRAM_MODEREG_BURST_LENGTH_1             ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_LENGTH_2             ((uint16_t)0x0001)
+#define SDRAM_MODEREG_BURST_LENGTH_4             ((uint16_t)0x0002)
+#define SDRAM_MODEREG_BURST_LENGTH_8             ((uint16_t)0x0003)
+#define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL      ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_TYPE_INTERLEAVED     ((uint16_t)0x0008)
+#define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
+#define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
+#define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
+#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000)
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
+
+//#define SDRAM_REFRESH_COUNT                   	 ((uint32_t)956)// 7.9us in cycles of 8.333333ns + 20 cycles as recommended by datasheet page 866/3289 for STM32H743
+#define SDRAM_REFRESH_COUNT                   	 ((uint32_t)0x0569)// 7.9us in cycles of 8.333333ns + 20 cycles as recommended by datasheet page 866/3289 for STM32H743
+void SDRAM_Initialization_sequence(void)
+{
+    __IO uint32_t tmpmrd = 0;
+    FMC_SDRAM_CommandTypeDef Command;
+    /* Step 1: Configure a clock configuration enable command */
+    Command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
+    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+    Command.AutoRefreshNumber = 1;
+    Command.ModeRegisterDefinition = 0;
+
+    /* Send the command */
+    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+
+    /* Step 2: Insert 100 us minimum delay */
+    /* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
+    HAL_Delay(1);
+
+    /* Step 3: Configure a PALL (precharge all) command */
+    Command.CommandMode = FMC_SDRAM_CMD_PALL;
+    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+    Command.AutoRefreshNumber = 1;
+    Command.ModeRegisterDefinition = 0;
+
+    /* Send the command */
+    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+
+    /* Step 5: Program the external memory mode register */
+    tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_4 | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
+        | SDRAM_MODEREG_CAS_LATENCY_2 | SDRAM_MODEREG_OPERATING_MODE_STANDARD
+        | SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+
+    Command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
+    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+    Command.AutoRefreshNumber = 1;
+    Command.ModeRegisterDefinition = tmpmrd;
+
+    /* Send the command */
+    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+
+    /* Step 4: Configure the 1st Auto Refresh command */
+    Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+    Command.AutoRefreshNumber = 8;
+    Command.ModeRegisterDefinition = 0;
+
+    /* Send the command */
+    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+
+    /* Step 2: Insert 100 us minimum delay */
+    /* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
+    HAL_Delay(1);
+
+    /* Step 5: Configure the 2nd Auto Refresh command */
+    Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+    Command.AutoRefreshNumber = 8;
+    Command.ModeRegisterDefinition = 0;
+
+    /* Send the command */
+    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+
+    /* Step 6: Set the refresh rate counter */
+    /* Set the device refresh rate */
+    HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT);
 }
 
 
