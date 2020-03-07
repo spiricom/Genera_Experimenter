@@ -70,6 +70,7 @@
 "Src/usb_host.o"
 "Src/usbh_conf.o"
 "Src/usbh_platform.o"
+"leaf/Examples/basic-oscillators.o"
 "leaf/LEAF/Externals/d_fft_mayer.o"
 "leaf/LEAF/Src/leaf-analysis.o"
 "leaf/LEAF/Src/leaf-delay.o"

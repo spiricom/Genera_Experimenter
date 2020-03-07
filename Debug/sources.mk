@@ -21,6 +21,7 @@ Middlewares/ST/STM32_USB_Host_Library/Core/Src \
 Middlewares/Third_Party/FatFs/src \
 Middlewares/Third_Party/FatFs/src/option \
 Src \
+leaf/Examples \
 leaf/LEAF/Externals \
 leaf/LEAF/Src \
 startup \

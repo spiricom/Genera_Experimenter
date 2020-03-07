@@ -44,13 +44,22 @@ uint16_t frameCounter = 0;
 
 //audio objects
 tRamp adc[6];
-
 tNoise noise;
-
 tCycle mySine[6];
 
-#define MEM_SIZE 500000
-char memory[MEM_SIZE] __ATTR_RAM_D1;
+
+//MEMPOOLS
+#define SMALL_MEM_SIZE 5000
+char smallMemory[SMALL_MEM_SIZE];
+
+#define MEDIUM_MEM_SIZE 500000
+char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
+
+#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
+char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
+
+tMempool smallPool;
+tMempool largePool;
 
 
 /**********************************************/
@@ -65,18 +74,20 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, memory, MEM_SIZE, &randomNumber);
+	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
 
+	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
+	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
 	for (int i = 0; i < 6; i++)
 	{
-		tRamp_init(&adc[i],7.0f, 1); //set all ramps for knobs to be 7ms ramp time and let the init function know they will be ticked every sample
+		tRamp_initToPool(&adc[i],7.0f, 1, &smallPool); //set all ramps for knobs to be 7ms ramp time and let the init function know they will be ticked every sample
 
 	}
-	tNoise_init(&noise, WhiteNoise);
+	tNoise_initToPool(&noise, WhiteNoise, &smallPool);
 	for (int i = 0; i < 6; i++)
 	{
-		tCycle_init(&mySine[i]);
+		tCycle_initToPool(&mySine[i], &smallPool);
 		tCycle_setFreq(&mySine[i], 440.0f);
 	}
 

@@ -11,6 +11,7 @@ RM := rm -rf
 -include startup/subdir.mk
 -include leaf/LEAF/Src/subdir.mk
 -include leaf/LEAF/Externals/subdir.mk
+-include leaf/Examples/subdir.mk
 -include Src/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/option/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/subdir.mk
