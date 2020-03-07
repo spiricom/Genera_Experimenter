@@ -30,7 +30,7 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_otg.h"
+#include "usb_host.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -64,6 +64,8 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_USB_HOST_Process(void);
+
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
 /* USER CODE END PFP */
@@ -116,7 +118,6 @@ int main(void)
   MX_I2C2_Init();
   MX_SDMMC1_SD_Init();
   MX_SPI1_Init();
-  MX_USB_OTG_FS_HCD_Init();
   MX_FATFS_Init();
   MX_SAI1_Init();
   MX_TIM3_Init();
@@ -125,6 +126,7 @@ int main(void)
   MX_TIM1_Init();
   MX_USART6_UART_Init();
   MX_RNG_Init();
+  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
   //pull reset pin on audio codec low to make sure it's stable
@@ -144,6 +146,8 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
   /* USER CODE END 2 */
+ 
+ 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -151,6 +155,7 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   }
@@ -172,7 +177,7 @@ void SystemClock_Config(void)
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
   /** Configure the main internal regulator output voltage 
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
   /** Macro to configure the PLL clock source 
@@ -186,7 +191,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 5;
-  RCC_OscInitStruct.PLL.PLLN = 160;
+  RCC_OscInitStruct.PLL.PLLN = 192;
   RCC_OscInitStruct.PLL.PLLP = 2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
@@ -210,7 +215,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }

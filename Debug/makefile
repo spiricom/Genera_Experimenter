@@ -14,11 +14,16 @@ RM := rm -rf
 -include Src/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/option/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/subdir.mk
+-include Middlewares/ST/STM32_USB_Host_Library/Core/Src/subdir.mk
+-include Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
 -include subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(S_UPPER_DEPS)),)
+-include $(S_UPPER_DEPS)
+endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
 endif
@@ -27,51 +32,31 @@ endif
 -include ../makefile.defs
 
 # Add inputs and outputs from these tool invocations to the build variables 
-EXECUTABLES += \
-cube_for_new_genera_brain4.elf \
-
-SIZE_OUTPUT += \
-default.size.stdout \
-
-OBJDUMP_LIST += \
-cube_for_new_genera_brain4.list \
-
-OBJCOPY_HEX += \
-cube_for_new_genera_brain4.hex \
-
 
 # All Target
-all: cube_for_new_genera_brain4.elf secondary-outputs
+all: cube_for_new_genera_brain4.elf
 
 # Tool invocations
 cube_for_new_genera_brain4.elf: $(OBJS) $(USER_OBJS) ../STM32H743ZITx_FLASH.ld
-	arm-none-eabi-gcc -o "cube_for_new_genera_brain4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"../STM32H743ZITx_FLASH.ld" --specs=nosys.specs -Wl,-Map="cube_for_new_genera_brain4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	@echo 'Building target: $@'
+	@echo 'Invoking: MCU GCC Linker'
+	arm-none-eabi-gcc -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -specs=nosys.specs -specs=nano.specs -T"../STM32H743ZITx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "cube_for_new_genera_brain4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
-
-default.size.stdout: $(EXECUTABLES)
-	arm-none-eabi-size  $(EXECUTABLES)
-	@echo 'Finished building: $@'
-	@echo ' '
-
-cube_for_new_genera_brain4.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "cube_for_new_genera_brain4.list"
-	@echo 'Finished building: $@'
-	@echo ' '
-
-cube_for_new_genera_brain4.hex: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "cube_for_new_genera_brain4.hex"
-	@echo 'Finished building: $@'
-	@echo ' '
+	$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
+post-build:
+	-@echo 'Generating hex and Printing size information:'
+	arm-none-eabi-objcopy -O ihex "cube_for_new_genera_brain4.elf" "cube_for_new_genera_brain4.hex"
+	arm-none-eabi-size "cube_for_new_genera_brain4.elf"
+	-@echo ' '
 
 .PHONY: all clean dependents
-.SECONDARY:
+.SECONDARY: post-build
 
 -include ../makefile.targets

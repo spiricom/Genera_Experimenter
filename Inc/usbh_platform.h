@@ -1,12 +1,12 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : USB_OTG.h
-  * Description        : This file provides code for the configuration
-  *                      of the USB_OTG instances.
+  * @file           : usbh_platform.h
+  * @brief          : Header for usbh_platform.c file.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -16,43 +16,29 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usb_otg_H
-#define __usb_otg_H
+#ifndef __USBH_PLATFORM_H__
+#define __USBH_PLATFORM_H__
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "usb_host.h"
 
-/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN INCLUDE */
 
-/* USER CODE END Includes */
+/* USER CODE END INCLUDE */
 
-extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
-
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
-
-void MX_USB_OTG_FS_HCD_Init(void);
-
-/* USER CODE BEGIN Prototypes */
-
-/* USER CODE END Prototypes */
+void MX_DriverVbusFS(uint8_t state); 
 
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ usb_otg_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __USBH_PLATFORM_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
