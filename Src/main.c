@@ -73,7 +73,9 @@ void SDRAM_Initialization_sequence(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t SPI_TX[16] __ATTR_RAM_D2;
+uint8_t SPI_RX[16] __ATTR_RAM_D2;
+uint8_t counter;
 /* USER CODE END 0 */
 
 /**
@@ -127,6 +129,7 @@ int main(void)
   MX_TIM1_Init();
   MX_USART6_UART_Init();
   MX_RNG_Init();
+  MX_SPI2_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
@@ -141,6 +144,13 @@ int main(void)
 	{
 	  Error_Handler();
 	}
+
+  for (int i = 0; i < 16; i++)
+  {
+	  SPI_TX[i] = counter++;
+  }
+
+  HAL_SPI_TransmitReceive_DMA(&hspi2, &SPI_TX, &SPI_RX, 16);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
@@ -225,10 +235,10 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6|RCC_PERIPHCLK_RNG
-                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SAI1
-                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C2
-                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_USB
-                              |RCC_PERIPHCLK_FMC;
+                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SPI2
+                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SDMMC
+                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_ADC
+                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_FMC;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 344;
   PeriphClkInitStruct.PLL2.PLL2P = 7;

@@ -79,11 +79,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
 	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
-	for (int i = 0; i < 6; i++)
-	{
-		tRamp_initToPool(&adc[i],7.0f, 1, &smallPool); //set all ramps for knobs to be 7ms ramp time and let the init function know they will be ticked every sample
 
-	}
 	tNoise_initToPool(&noise, WhiteNoise, &smallPool);
 	for (int i = 0; i < 6; i++)
 	{
@@ -120,20 +116,6 @@ void audioFrame(uint16_t buffer_offset)
 	int i;
 	int32_t current_sample = 0;
 
-	frameCounter++;
-	if (frameCounter > 1)
-	{
-		frameCounter = 0;
-		buttonCheck();
-	}
-
-	//read the analog inputs and smooth them with ramps
-	for (i = 0; i < 6; i++)
-	{
-		tRamp_setDest(&adc[i], (ADC_values[i] * INV_TWO_TO_16));
-	}
-
-
 	//if the codec isn't ready, keep the buffer as all zeros
 	//otherwise, start computing audio!
 
@@ -160,13 +142,9 @@ float rightIn = 0.0f;
 float audioTickL(float audioIn)
 {
 
-	sample = 0.0f;
-	for (int i = 0; i < 6; i = i+2) // even numbered knobs (left side of board)
-	{
-		tCycle_setFreq(&mySine[i], (tRamp_tick(&adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i]); // tick the oscillator
-	}
-	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
+	sample = audioIn;
+	tCycle_setFreq(&mySine[0],220.0f);
+	sample = tCycle_tick(&mySine[0]); // tick the oscillator
 
 	return sample;
 }
@@ -176,22 +154,8 @@ uint32_t myCounter = 0;
 
 float audioTickR(float audioIn)
 {
-	rightIn = audioIn;
-
-	sample = 0.0f;
-
-
-
-	for (int i = 0; i < 6; i = i+2) // odd numbered knobs (right side of board)
-	{
-		tCycle_setFreq(&mySine[i+1], (tRamp_tick(&adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i+1]); // tick the oscillator
-	}
-	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
-
-
-	//sample = tNoise_tick(&noise); // or uncomment this to try white noise
-
+	sample = audioIn;
+	//sample = tCycle_tick(&mySine[1]); // tick the oscillator
 	return sample;
 }
 

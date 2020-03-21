@@ -64,7 +64,8 @@ float randomNumber(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-
+extern uint8_t SPI_TX[16];
+extern uint8_t SPI_RX[16];
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
