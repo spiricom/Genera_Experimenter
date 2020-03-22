@@ -11,11 +11,6 @@
 #include "main.h"
 #include "leaf.h"
 #include "codec.h"
-#include "tim.h"
-#include "ui.h"
-
-#define NUM_BUTTONS 3
-
 
 //the audio buffers are put in the D2 RAM area because that is a memory location that the DMA has access to.
 int32_t audioOutBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
@@ -24,28 +19,52 @@ int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
 void audioFrame(uint16_t buffer_offset);
 float audioTickL(float audioIn);
 float audioTickR(float audioIn);
-void buttonCheck(void);
+float map(float value, float istart, float istop, float ostart, float ostop);
+float processString(int whichString, float input);
 
 HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
 
 
+
+int whichBoard = 0;
+
+
 uint8_t codecReady = 0;
-
-uint8_t buttonValues[NUM_BUTTONS];
-uint8_t buttonValuesPrev[NUM_BUTTONS];
-uint32_t buttonCounters[NUM_BUTTONS];
-uint32_t buttonPressed[NUM_BUTTONS];
-
-
 float sample = 0.0f;
+float rightIn = 0.0f;
 
-uint16_t frameCounter = 0;
 
-//audio objects
-tRamp adc[6];
-tNoise noise;
-tCycle mySine[6];
+tSawtooth mySaw[2];
+tHighpass dcBlock[2];
+tEnvelopeFollower myFollower[2];
+
+uint16_t stringPositions[2];
+float stringMappedPositions[2];
+float stringFrequencies[2];
+float stringMIDIVersionOfFrequencies[2];
+uint32_t currentMIDInotes[2];
+uint32_t previousMIDInotes[2];
+uint8_t stringTouchLH[2] = {0,0};
+uint8_t stringTouchRH[2] = {0,0};
+float openStringFrequencies[4] = {41.204f, 55.0f, 73.416f, 97.999f};
+// frets are measured at 3 7 12 and 19
+
+
+float fretMeasurements[4][4] ={
+		{25002.0f, 25727.0f, 25485.0f, 25291.0f},
+		{17560.0f, 18006.0f, 17776.0f, 17704.0f},
+		{10071.0f, 10314.0f, 10075.0f, 10063.0f},
+		{2864.0f, 2689.0f, 2610.0f, 2529.0f}
+	};
+
+
+float fretScaling[4] = {0.9f, 0.66666666666f, 0.5f, 0.25f};
+
+
+
+
+
 
 
 //MEMPOOLS
@@ -74,18 +93,12 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
+	whichBoard = whichBoard * 2; // get the correct board offset (2 strings per board)
+
 	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
 
 	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
 	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
-
-
-	tNoise_initToPool(&noise, WhiteNoise, &smallPool);
-	for (int i = 0; i < 6; i++)
-	{
-		tCycle_initToPool(&mySine[i], &smallPool);
-		tCycle_setFreq(&mySine[i], 440.0f);
-	}
 
 	HAL_Delay(10);
 
@@ -94,8 +107,9 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		audioOutBuffer[i] = 0;
 	}
 
-
-
+	tSawtooth_init(&mySaw);
+	tEnvelopeFollower_init(&myFollower, 0.01f, 0.9999f);
+	tHighpass_init(&dcBlock, 250.0f);
 	HAL_Delay(1);
 
 	// set up the I2S driver to send audio data to the codec (and retrieve input as well)
@@ -114,119 +128,63 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 void audioFrame(uint16_t buffer_offset)
 {
 	int i;
-	int32_t current_sample = 0;
 
 	//if the codec isn't ready, keep the buffer as all zeros
 	//otherwise, start computing audio!
 
 	if (codecReady)
 	{
-		for (i = 0; i < (HALF_BUFFER_SIZE); i++)
-		{
-			if ((i & 1) == 0)
-			{
-				current_sample = (int32_t)(audioTickR((float) (audioInBuffer[buffer_offset + i] * INV_TWO_TO_23)) * TWO_TO_23);
-			}
-			else
-			{
-				current_sample = (int32_t)(audioTickL((float) (audioInBuffer[buffer_offset + i] * INV_TWO_TO_23)) * TWO_TO_23);
-			}
 
-			audioOutBuffer[buffer_offset + i] = current_sample;
+		for (i = 0; i < (HALF_BUFFER_SIZE); i = i + 2)
+		{
+			audioOutBuffer[buffer_offset + i] = (int32_t)(audioTickR((float) (audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31) * TWO_TO_23);
+			audioOutBuffer[buffer_offset + i + 1] = (int32_t)(audioTickL((float) (audioInBuffer[buffer_offset + i + 1] << 8) * INV_TWO_TO_31) * TWO_TO_23);
 		}
+
 	}
 }
-float rightIn = 0.0f;
+
+
 
 
 float audioTickL(float audioIn)
 {
-
-	sample = audioIn;
-	tCycle_setFreq(&mySine[0],220.0f);
-	sample = tCycle_tick(&mySine[0]); // tick the oscillator
-
+	sample = processString(0, audioIn);
 	return sample;
 }
-
-
-uint32_t myCounter = 0;
 
 float audioTickR(float audioIn)
 {
-	sample = audioIn;
-	//sample = tCycle_tick(&mySine[1]); // tick the oscillator
+	sample = processString(1, audioIn);
 	return sample;
 }
 
 
-uint8_t LED_States[3] = {0,0,0};
-void buttonCheck(void)
+float processString(int whichString, float input)
 {
-	buttonValues[0] = !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_6);
-	buttonValues[1] = !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_7);
-	buttonValues[2] = !HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_11);
-	for (int i = 0; i < NUM_BUTTONS; i++)
+	whichString = whichString + whichBoard;
+	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichString * 2] << 8) + ((uint16_t)SPI_RX[(whichString * 2) + 1] & 0xff);
+	if (stringPositions[whichString] == 65535)
 	{
-	  if ((buttonValues[i] != buttonValuesPrev[i]) && (buttonCounters[i] < 10))
-	  {
-		  buttonCounters[i]++;
-	  }
-	  if ((buttonValues[i] != buttonValuesPrev[i]) && (buttonCounters[i] >= 10))
-	  {
-		  if (buttonValues[i] == 1)
-		  {
-			  buttonPressed[i] = 1;
-		  }
-		  buttonValuesPrev[i] = buttonValues[i];
-		  buttonCounters[i] = 0;
-	  }
+		stringFrequencies[whichString] = openStringFrequencies[whichString];
+		//stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
+	}
+	else
+	{
+		stringMappedPositions[whichString] = map((float)stringPositions[whichString], fretMeasurements[whichString][1], fretMeasurements[whichString][2], fretScaling[1], fretScaling[2]); //scale length of measurement from 12th fret to 7th fret to be string length of .5 to .666666
+		stringFrequencies[whichString] = (1.0 / (2.0f * stringMappedPositions[whichString])) * openStringFrequencies[whichString] * 2.0f;
+		///-stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
 	}
 
-	if (buttonPressed[0] == 1)
-	{
+	tSawtooth_setFreq(&mySaw[whichString], stringFrequencies[whichString]);
+	return tSawtooth_tick(&mySaw[whichString]) * tEnvelopeFollower_tick(&myFollower[whichString], tHighpass_tick(&dcBlock[whichString], input));
+}
 
-		if (LED_States[0] == 0)
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
-			LED_States[0] = 1;
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
-			LED_States[0] = 0;
-		}
-		buttonPressed[0] = 0;
-	}
-	if (buttonPressed[1] == 1)
-	{
-		if (LED_States[1] == 0)
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
-			LED_States[1] = 1;
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-			LED_States[1] = 0;
-		}
-		buttonPressed[1] = 0;
-	}
 
-	if (buttonPressed[2] == 1)
-	{
-		if (LED_States[2] == 0)
-		{
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-			LED_States[2] = 1;
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-			LED_States[2] = 0;
-		}
-		buttonPressed[2] = 0;
-	}
+
+float map(float value, float istart, float istop, float ostart, float ostop)
+{
+    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 }
 
 void HAL_SAI_ErrorCallback(SAI_HandleTypeDef *hsai)

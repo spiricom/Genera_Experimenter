@@ -20,7 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "dma.h"
 #include "fatfs.h"
 #include "i2c.h"
@@ -28,15 +27,11 @@
 #include "sai.h"
 #include "sdmmc.h"
 #include "spi.h"
-#include "tim.h"
-#include "usart.h"
-#include "usb_host.h"
 #include "gpio.h"
 #include "fmc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ui.h"
 #include "leaf.h"
 #include "audiostream.h"
 /* USER CODE END Includes */
@@ -64,8 +59,6 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_USB_HOST_Process(void);
-
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
 void SDRAM_Initialization_sequence(void);
@@ -87,7 +80,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
   MPU_Conf();
   /* USER CODE END 1 */
-  
 
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
@@ -116,21 +108,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_FMC_Init();
-  MX_ADC1_Init();
-  MX_ADC3_Init();
-  MX_I2C2_Init();
   MX_SDMMC1_SD_Init();
-  MX_SPI1_Init();
   MX_FATFS_Init();
   MX_SAI1_Init();
-  MX_TIM3_Init();
-  MX_TIM4_Init();
-  MX_TIM7_Init();
-  MX_TIM1_Init();
-  MX_USART6_UART_Init();
   MX_RNG_Init();
   MX_SPI2_Init();
-  MX_USB_HOST_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
   //pull reset pin on audio codec low to make sure it's stable
@@ -140,17 +123,12 @@ int main(void)
   tempFPURegisterVal |= (1<<24); // set the FTZ (flush-to-zero) bit in the FPU control register
   __set_FPSCR(tempFPURegisterVal);
 
-  if (HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values, NUM_ADC_CHANNELS) != HAL_OK)
-	{
-	  Error_Handler();
-	}
-
   for (int i = 0; i < 16; i++)
   {
 	  SPI_TX[i] = counter++;
   }
 
-  HAL_SPI_TransmitReceive_DMA(&hspi2, &SPI_TX, &SPI_RX, 16);
+  HAL_SPI_TransmitReceive_DMA(&hspi2, SPI_TX, SPI_RX, 16);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
@@ -161,8 +139,6 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
   /* USER CODE END 2 */
- 
- 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -170,7 +146,6 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   }
@@ -234,11 +209,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6|RCC_PERIPHCLK_RNG
-                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SPI2
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_SPI2
                               |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SDMMC
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_ADC
-                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_FMC;
+                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_FMC;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 344;
   PeriphClkInitStruct.PLL2.PLL2P = 7;
@@ -251,25 +224,15 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
-  PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
-  PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
-  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Enable USB Voltage detector 
-  */
-  HAL_PWREx_EnableUSBVoltageDetector();
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
-{
-	;
-}
 
 
 #define SDRAM_TIMEOUT ((uint32_t)0xFFFF)

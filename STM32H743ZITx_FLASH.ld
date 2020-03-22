@@ -180,7 +180,6 @@ SECTIONS
   } >DTCMRAM
 
 
-
 	  .RAM_D1 (NOLOAD) :
   {
         KEEP(*(.RAM_D1)) 
@@ -223,3 +222,7 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
+
+
+
+
