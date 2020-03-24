@@ -38,6 +38,8 @@ float rightIn = 0.0f;
 tSawtooth mySaw[2];
 tHighpass dcBlock[2];
 tEnvelopeFollower myFollower[2];
+tExpSmooth pitchSmoother[2];
+tMedianFilter median[2];
 
 uint16_t stringPositions[2];
 float stringMappedPositions[2];
@@ -48,9 +50,8 @@ uint32_t previousMIDInotes[2];
 uint8_t stringTouchLH[2] = {0,0};
 uint8_t stringTouchRH[2] = {0,0};
 float openStringFrequencies[4] = {41.204f, 55.0f, 73.416f, 97.999f};
+
 // frets are measured at 3 7 12 and 19
-
-
 float fretMeasurements[4][4] ={
 		{25002.0f, 25727.0f, 25485.0f, 25291.0f},
 		{17560.0f, 18006.0f, 17776.0f, 17704.0f},
@@ -74,11 +75,11 @@ char smallMemory[SMALL_MEM_SIZE];
 #define MEDIUM_MEM_SIZE 500000
 char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 
-#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
-char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
+//#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
+//char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
 
 tMempool smallPool;
-tMempool largePool;
+//tMempool largePool;
 
 
 /**********************************************/
@@ -98,7 +99,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
 
 	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
-	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
+	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
 	HAL_Delay(10);
 
@@ -107,9 +108,13 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		audioOutBuffer[i] = 0;
 	}
 
-	tSawtooth_init(&mySaw);
-	tEnvelopeFollower_init(&myFollower, 0.01f, 0.9999f);
-	tHighpass_init(&dcBlock, 250.0f);
+	for (int i = 0; i < 2; i++)
+	{
+		tSawtooth_init(&mySaw[i]);
+		tEnvelopeFollower_init(&myFollower[i], 0.01f, 0.999f);
+		tHighpass_init(&dcBlock[i], 250.0f);
+		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.01f);
+	}
 	HAL_Delay(1);
 
 	// set up the I2S driver to send audio data to the codec (and retrieve input as well)
@@ -145,16 +150,23 @@ void audioFrame(uint16_t buffer_offset)
 }
 
 
-
-
 float audioTickL(float audioIn)
 {
+	//sample = audioIn;
 	sample = processString(0, audioIn);
+
+	/*
+	audioIn = tHighpass_tick(&dcBlock[0], audioIn);
+	float smoothed = tEnvelopeFollower_tick(&myFollower[0], audioIn);
+	float tempVal = tMedianFilter_tick(&median[0], audioIn);
+*/
+
 	return sample;
 }
 
 float audioTickR(float audioIn)
 {
+	//sample = audioIn;
 	sample = processString(1, audioIn);
 	return sample;
 }
@@ -162,21 +174,50 @@ float audioTickR(float audioIn)
 
 float processString(int whichString, float input)
 {
-	whichString = whichString + whichBoard;
-	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichString * 2] << 8) + ((uint16_t)SPI_RX[(whichString * 2) + 1] & 0xff);
+	int whichStringOfFour = whichString + whichBoard;
+
+	stringTouchLH[whichString] = (SPI_RX[8] >> whichStringOfFour) & 1;
+	stringTouchRH[whichString] = (SPI_RX[8] >> (whichStringOfFour + 4)) & 1;
+
+
+
+
+	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichStringOfFour * 2] << 8) + ((uint16_t)SPI_RX[(whichStringOfFour * 2) + 1] & 0xff);
+
+
+
+
 	if (stringPositions[whichString] == 65535)
 	{
-		stringFrequencies[whichString] = openStringFrequencies[whichString];
+		stringFrequencies[whichString] = openStringFrequencies[whichStringOfFour];
 		//stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
 	}
 	else
 	{
-		stringMappedPositions[whichString] = map((float)stringPositions[whichString], fretMeasurements[whichString][1], fretMeasurements[whichString][2], fretScaling[1], fretScaling[2]); //scale length of measurement from 12th fret to 7th fret to be string length of .5 to .666666
-		stringFrequencies[whichString] = (1.0 / (2.0f * stringMappedPositions[whichString])) * openStringFrequencies[whichString] * 2.0f;
-		///-stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
+		stringMappedPositions[whichString] = map((float)stringPositions[whichString], fretMeasurements[1][whichStringOfFour], fretMeasurements[2][whichStringOfFour], fretScaling[1], fretScaling[2]);
+		stringFrequencies[whichString] = ((1.0 / stringMappedPositions[whichString])) * openStringFrequencies[whichStringOfFour];
+		///stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
 	}
 
-	tSawtooth_setFreq(&mySaw[whichString], stringFrequencies[whichString]);
+	//check for muting
+	if (((stringTouchLH[whichString]) && (stringPositions[whichString] == 65535)) || (stringTouchRH[whichString]))
+
+	{
+		//myFollower[whichString]->y = 0.0f;
+		tEnvelopeFollower_decayCoeff(&myFollower[whichString], 0.99f);
+		input = 0.0f;
+	}
+	else
+	{
+		tEnvelopeFollower_decayCoeff(&myFollower[whichString], 0.99999f);
+	}
+	tExpSmooth_setDest(&pitchSmoother[whichString], stringFrequencies[whichString]);
+	float myFreq = tExpSmooth_tick(&pitchSmoother[whichString]);
+	tSawtooth_setFreq(&mySaw[whichString], myFreq);
+
+
+
+
 	return tSawtooth_tick(&mySaw[whichString]) * tEnvelopeFollower_tick(&myFollower[whichString], tHighpass_tick(&dcBlock[whichString], input));
 }
 

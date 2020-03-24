@@ -107,9 +107,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_FMC_Init();
-  MX_SDMMC1_SD_Init();
-  MX_FATFS_Init();
+  //MX_FMC_Init();
+  //MX_SDMMC1_SD_Init();
+  //MX_FATFS_Init();
   MX_SAI1_Init();
   MX_RNG_Init();
   MX_SPI2_Init();
@@ -132,7 +132,7 @@ int main(void)
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
-  SDRAM_Initialization_sequence();
+  //SDRAM_Initialization_sequence();
   HAL_Delay(100);
 
   audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
