@@ -124,7 +124,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tNoise_init(&noise[i], WhiteNoise);
 		tThreshold_init(&threshold[i],1.0f, 2.5f);
 		tADSR_init(&envelope[i], 0.0f, 200.0f, 0.0f, 100.0f);
-		tSlide_init(&fastSlide[i],1.0f,8820.0f);
+		tSlide_init(&fastSlide[i],1.0f,16000.0f);
 		tSlide_init(&slowSlide[i],1.0f,4410.0f);
 		tSVF_init(&lowpass[i], SVFTypeLowpass, 1000.0f, 1.0f);
 
