@@ -40,6 +40,12 @@ tHighpass dcBlock[2];
 tEnvelopeFollower myFollower[2];
 tExpSmooth pitchSmoother[2];
 tMedianFilter median[2];
+tNoise noise[2];
+tThreshold threshold[2];
+tADSR envelope[2];
+tSlide fastSlide[2];
+tSlide slowSlide[2];
+tSVF lowpass[2];
 
 uint16_t stringPositions[2];
 float stringMappedPositions[2];
@@ -110,10 +116,19 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	for (int i = 0; i < 2; i++)
 	{
-		tSawtooth_init(&mySaw[i]);
-		tEnvelopeFollower_init(&myFollower[i], 0.01f, 0.999f);
+		//tSawtooth_init(&mySaw[i]);
+		tEnvelopeFollower_init(&myFollower[i], 0.01f, 0.9995f);
 		tHighpass_init(&dcBlock[i], 250.0f);
 		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.01f);
+		tMedianFilter_init(&median[i], 50);
+		tNoise_init(&noise[i], WhiteNoise);
+		tThreshold_init(&threshold[i],1.0f, 2.5f);
+		tADSR_init(&envelope[i], 0.0f, 200.0f, 0.0f, 100.0f);
+		tSlide_init(&fastSlide[i],1.0f,8820.0f);
+		tSlide_init(&slowSlide[i],1.0f,4410.0f);
+		tSVF_init(&lowpass[i], SVFTypeLowpass, 1000.0f, 1.0f);
+
+
 	}
 	HAL_Delay(1);
 
@@ -149,25 +164,115 @@ void audioFrame(uint16_t buffer_offset)
 	}
 }
 
+float status = 0.0f;
+int outOfThreshPositiveChange = 0;
+int outOfThreshNegativeChange = 0;
+int delayCounter = 0;
+float currentMaximum = -60.0f;
+int sahArmed = 0;
+int previousOutOfThresh = 0;
+float intoThresh = 0.0f;
+float medianOut = 0.0f;
+float clippedDbSmoothed = 0.0f;
+float dbSmoothed = 0.0f;
+float smoothed = 0.0f;
+int clipped = 0;
+float tempAbs = 0.0f;
+float smoothed1 = 0.0f;
+
 
 float audioTickL(float audioIn)
 {
 	//sample = audioIn;
-	sample = processString(0, audioIn);
+	//sample = processString(0, audioIn);
 
-	/*
+	if ((audioIn > .9999f) || (audioIn < -0.9999f))
+	{
+		clipped = 1;
+	}
 	audioIn = tHighpass_tick(&dcBlock[0], audioIn);
-	float smoothed = tEnvelopeFollower_tick(&myFollower[0], audioIn);
-	float tempVal = tMedianFilter_tick(&median[0], audioIn);
-*/
+	tempAbs = fabsf(audioIn);
+	//audioIn = tSVF_tick(&lowpass[0], audioIn);
+	//smoothed1 = tEnvelopeFollower_tick(&myFollower[0], audioIn);
 
-	return sample;
+	smoothed = tSlide_tick(&fastSlide[0], tempAbs);
+	dbSmoothed = atodb(smoothed);
+	clippedDbSmoothed = LEAF_clip(-60.0f, dbSmoothed, 6.0f);
+	medianOut = tMedianFilter_tick(&median[0], clippedDbSmoothed);
+	intoThresh = clippedDbSmoothed - medianOut;
+
+
+	int outOfThresh = tThreshold_tick(&threshold[0], intoThresh);
+	if ((outOfThresh > 0) && (previousOutOfThresh == 0))
+	{
+		outOfThreshPositiveChange = 1;
+	}
+
+	else
+	{
+		outOfThreshPositiveChange = 0;
+	}
+
+	if ((outOfThresh == 0) && (previousOutOfThresh > 0))
+	{
+		outOfThreshNegativeChange = 1;
+	}
+
+	else
+	{
+		outOfThreshNegativeChange = 0;
+	}
+	previousOutOfThresh = outOfThresh;
+
+	float increment = 0.000755857898715f;
+
+
+
+	//if you didn't get an attack within the last 1323 samples, and you got one now
+	if ((status <= 0.0f) && (outOfThreshPositiveChange == 1))
+	{
+		status = 1.0f;
+		currentMaximum = -60.0f;
+		delayCounter = 170;
+		sahArmed = 1;
+	}
+	else if (status > 0.0f)
+	{
+		status = status - (increment);
+	}
+
+	//update the maximum of the samples since last reset
+	if (clippedDbSmoothed > currentMaximum)
+	{
+		currentMaximum = clippedDbSmoothed;
+	}
+
+	if (delayCounter > 0)
+	{
+		delayCounter--;
+	}
+
+	//if you waited 140 samples to ride to the peak, then now make a noteOn event
+	if ((delayCounter == 0) && (sahArmed == 1))
+	{
+		//float tempAmp = map(currentMaximum, -60.0f, 6.0f, 0.0f, 1.0f);
+		float tempAmp = dbtoa(currentMaximum);
+		tempAmp = LEAF_clip(0.0f, tempAmp, 1.0f);
+		tADSR_on(&envelope[0], tempAmp);
+		sahArmed = 0;
+	}
+
+	sample = tNoise_tick(&noise[0]) * tADSR_tick(&envelope[0]);
+	//sample = 0.0f;
+	//sample = smoothed;
+	return sample + (float)sahArmed;
 }
 
 float audioTickR(float audioIn)
 {
 	//sample = audioIn;
-	sample = processString(1, audioIn);
+	sample = 0.0f;
+	//sample = processString(1, audioIn);
 	return sample;
 }
 
