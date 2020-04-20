@@ -222,6 +222,7 @@ void buttonCheck(void)
 	if (buttonPressed[0] == 1)
 	{
 
+		/*
 		if (LED_States[0] == 0)
 		{
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
@@ -233,6 +234,7 @@ void buttonCheck(void)
 			LED_States[0] = 0;
 		}
 		buttonPressed[0] = 0;
+		*/
 	}
 	if (buttonPressed[1] == 1)
 	{

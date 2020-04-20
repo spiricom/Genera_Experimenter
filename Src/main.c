@@ -85,7 +85,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
   MPU_Conf();
   /* USER CODE END 1 */
-  
 
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
@@ -151,8 +150,6 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
   /* USER CODE END 2 */
- 
- 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
