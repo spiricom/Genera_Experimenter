@@ -88,8 +88,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tRamp_initToPool(&adc[i],7.0f, 1, &smallPool); //set all ramps for knobs to be 7ms ramp time and let the init function know they will be ticked every sample
 
 	}
-	tNoise_initToPool(&noise, WhiteNoise, &smallPool);
-	tNoise_initToPool(&noise2, WhiteNoise, &smallPool);
+	tNoise_initToPool(&noise, PinkNoise, &smallPool);
+	tNoise_initToPool(&noise2, PinkNoise, &smallPool);
 	for (int i = 0; i < 6; i++)
 	{
 		//tCycle_initToPool(&mySine[i], &smallPool);
@@ -98,10 +98,10 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	HAL_Delay(10);
 
-	tVZFilter_init(&shelf1, Lowshelf, 80.0f, 2.0f);
-	tVZFilter_init(&shelf2, Highshelf, 12000.0f, 2.0f);
-	tVZFilter_init(&bell1, Bell, 1000.0f, 2.0f);
-	tVZFilter_init(&bell2, Bell, 6000.0f, 2.0f);
+	tVZFilter_init(&shelf1, Lowshelf, 80.0f, 4.0f);
+	tVZFilter_init(&shelf2, Highshelf, 12000.0f, 4.0f);
+	tVZFilter_init(&bell1, Bell, 1000.0f, 1.9f);
+	tVZFilter_init(&bell2, Bell, 6000.0f, 1.9f);
 
 
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++)
@@ -179,31 +179,30 @@ float audioTickL(float audioIn)
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
 
-	sample = tNoise_tick(&noise) * 0.1f; // or uncomment this to try white noise
-	//tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
-	tVZFilter_setGain(&shelf1, fastdbtoa(tRamp_tick(&adc[0]) * 40.0f - 20.0f));
+	sample = tNoise_tick(&noise) * 0.1f; // some white noise to test : this would be the input signal normally
 
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
 
-	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
-	tVZFilter_setGain(&shelf2, fastdbtoa(tRamp_tick(&adc[1]) * 40.0f - 20.0f));
+	//tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f)); //frequency of the low shelf fixed at 80Hz (based on Mackie mixer style EQ)
+	tVZFilter_setGain(&shelf1, fastdbtoa(tRamp_tick(&adc[0]) * 60.0f - 30.0f)); //+/-30db on a shelf translates to actual boost/cut of +/-15db (because of the symmetrical structure for some reason)
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // bandwidth is in octaves, anything below 2 on a shelf filter will overshoot and have resonance at the cutoff
 
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f)); //frequency of the high shelf fixed at 12k (based on Mackie mixer style EQ)
+	tVZFilter_setGain(&shelf2, fastdbtoa(tRamp_tick(&adc[1]) * 60.0f - 30.0f)); //+/-30db on a shelf translates to actual boost/cut of +/-15db (because of the symmetrical structure for some reason)
+	//tVZFilter_setBandwidth(&shelf2, tRamp_tick(&adc[1])*2.0f + 3.0f); // bandwidth is in octaves, anything below 2 on a shelf filter will overshoot and have resonance at the cutoff
 
 	tVZFilter_setFreq(&bell1, faster_mtof(tRamp_tick(&adc[2])*77.0f + 42.0f)); //midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
-	tVZFilter_setGain(&bell1, fastdbtoa(tRamp_tick(&adc[4]) * 60.0f - 30.0f)); // in db - this range is -15db to 15db  -- the object wants this value in linear amplitude so it's converted from db to a
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+	tVZFilter_setGain(&bell1, fastdbtoa(tRamp_tick(&adc[4]) * 34.0f - 17.0f)); // in db - this range is -17db to 17db  -- the object wants this value in linear amplitude so it's converted from db to a
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // stick with bandwidth of 1.9 for now
 
 	tVZFilter_setFreq(&bell2, faster_mtof(tRamp_tick(&adc[3])*77.0f + 42.0f)); // midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
-	tVZFilter_setGain(&bell2, fastdbtoa(tRamp_tick(&adc[5]) * 60.0f - 30.0f)); // in db - this range is -15db to 15db  -- the object wants this value in linear amplitude so it's converted from db to a
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+	tVZFilter_setGain(&bell2, fastdbtoa(tRamp_tick(&adc[5]) * 34.0f - 17.0f)); // in db - this range is -17db to 17db  -- the object wants this value in linear amplitude so it's converted from db to a
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // stick with bandwidth of 1.9 for now
 
 
-	sample = tVZFilter_tick(&shelf1, sample);
-	sample = tVZFilter_tick(&shelf2, sample);
-	sample = tVZFilter_tick(&bell1, sample);
-	sample = tVZFilter_tick(&bell2, sample);
-
+	sample = tVZFilter_tick(&shelf1, sample); //put it through the low shelf
+	sample = tVZFilter_tick(&shelf2, sample); // now put that result through the high shelf
+	sample = tVZFilter_tick(&bell1, sample); // now add a bell (or peaking eq) filter
+	sample = tVZFilter_tick(&bell2, sample); // and a second bell (or peaking eq) filter
 
 
 	return sample;
