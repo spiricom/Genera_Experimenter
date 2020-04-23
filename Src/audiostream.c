@@ -49,6 +49,8 @@ tNoise noise2;
 //tCycle mySine[6];
 tVZFilter shelf1;
 tVZFilter shelf2;
+tVZFilter bell1;
+tVZFilter bell2;
 
 //MEMPOOLS
 #define SMALL_MEM_SIZE 5000
@@ -96,8 +98,10 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	HAL_Delay(10);
 
-	tVZFilter_init(&shelf1, Lowshelf, 1000.0f, 3.0f);
-	tVZFilter_init(&shelf2, Highshelf, 6000.0f, 3.0f);
+	tVZFilter_init(&shelf1, Lowshelf, 80.0f, 2.0f);
+	tVZFilter_init(&shelf2, Highshelf, 12000.0f, 2.0f);
+	tVZFilter_init(&bell1, Bell, 1000.0f, 2.0f);
+	tVZFilter_init(&bell2, Bell, 6000.0f, 2.0f);
 
 
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++)
@@ -175,11 +179,32 @@ float audioTickL(float audioIn)
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
 
-	sample = tNoise_tick(&noise) * 0.2f; // or uncomment this to try white noise
-	tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
-	tVZFilter_setGain(&shelf1, dbtoa(tRamp_tick(&adc[2]) * 60.0f - 30.0f));
-	tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[4])*2.0f + 3.0f);
+	sample = tNoise_tick(&noise) * 0.1f; // or uncomment this to try white noise
+	//tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
+	tVZFilter_setGain(&shelf1, fastdbtoa(tRamp_tick(&adc[0]) * 40.0f - 20.0f));
+
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+
+	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
+	tVZFilter_setGain(&shelf2, fastdbtoa(tRamp_tick(&adc[1]) * 40.0f - 20.0f));
+
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+
+	tVZFilter_setFreq(&bell1, faster_mtof(tRamp_tick(&adc[2])*77.0f + 42.0f)); //midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
+	tVZFilter_setGain(&bell1, fastdbtoa(tRamp_tick(&adc[4]) * 60.0f - 30.0f)); // in db - this range is -15db to 15db  -- the object wants this value in linear amplitude so it's converted from db to a
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+
+	tVZFilter_setFreq(&bell2, faster_mtof(tRamp_tick(&adc[3])*77.0f + 42.0f)); // midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
+	tVZFilter_setGain(&bell2, fastdbtoa(tRamp_tick(&adc[5]) * 60.0f - 30.0f)); // in db - this range is -15db to 15db  -- the object wants this value in linear amplitude so it's converted from db to a
+	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f);
+
+
 	sample = tVZFilter_tick(&shelf1, sample);
+	sample = tVZFilter_tick(&shelf2, sample);
+	sample = tVZFilter_tick(&bell1, sample);
+	sample = tVZFilter_tick(&bell2, sample);
+
+
 
 	return sample;
 }
