@@ -45,8 +45,10 @@ uint16_t frameCounter = 0;
 //audio objects
 tRamp adc[6];
 tNoise noise;
-tCycle mySine[6];
-
+tNoise noise2;
+//tCycle mySine[6];
+tVZFilter shelf1;
+tVZFilter shelf2;
 
 //MEMPOOLS
 #define SMALL_MEM_SIZE 5000
@@ -85,13 +87,18 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	}
 	tNoise_initToPool(&noise, WhiteNoise, &smallPool);
+	tNoise_initToPool(&noise2, WhiteNoise, &smallPool);
 	for (int i = 0; i < 6; i++)
 	{
-		tCycle_initToPool(&mySine[i], &smallPool);
-		tCycle_setFreq(&mySine[i], 440.0f);
+		//tCycle_initToPool(&mySine[i], &smallPool);
+		//tCycle_setFreq(&mySine[i], 440.0f);
 	}
 
 	HAL_Delay(10);
+
+	tVZFilter_init(&shelf1, Lowshelf, 1000.0f, 3.0f);
+	tVZFilter_init(&shelf2, Highshelf, 6000.0f, 3.0f);
+
 
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++)
 	{
@@ -143,11 +150,11 @@ void audioFrame(uint16_t buffer_offset)
 		{
 			if ((i & 1) == 0)
 			{
-				current_sample = (int32_t)(audioTickR((float) (audioInBuffer[buffer_offset + i] * INV_TWO_TO_23)) * TWO_TO_23);
+				current_sample = (int32_t)(audioTickR((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31)) * TWO_TO_23);
 			}
 			else
 			{
-				current_sample = (int32_t)(audioTickL((float) (audioInBuffer[buffer_offset + i] * INV_TWO_TO_23)) * TWO_TO_23);
+				current_sample = (int32_t)(audioTickL((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31)) * TWO_TO_23);
 			}
 
 			audioOutBuffer[buffer_offset + i] = current_sample;
@@ -163,10 +170,16 @@ float audioTickL(float audioIn)
 	sample = 0.0f;
 	for (int i = 0; i < 6; i = i+2) // even numbered knobs (left side of board)
 	{
-		tCycle_setFreq(&mySine[i], (tRamp_tick(&adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i]); // tick the oscillator
+		//tCycle_setFreq(&mySine[i], (tRamp_tick(&adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
+		//sample += tCycle_tick(&mySine[i]); // tick the oscillator
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
+
+	sample = tNoise_tick(&noise) * 0.2f; // or uncomment this to try white noise
+	tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f));
+	tVZFilter_setGain(&shelf1, dbtoa(tRamp_tick(&adc[2]) * 60.0f - 30.0f));
+	tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[4])*2.0f + 3.0f);
+	sample = tVZFilter_tick(&shelf1, sample);
 
 	return sample;
 }
@@ -184,14 +197,18 @@ float audioTickR(float audioIn)
 
 	for (int i = 0; i < 6; i = i+2) // odd numbered knobs (right side of board)
 	{
-		tCycle_setFreq(&mySine[i+1], (tRamp_tick(&adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i+1]); // tick the oscillator
+		//tCycle_setFreq(&mySine[i+1], (tRamp_tick(&adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
+		//sample += tCycle_tick(&mySine[i+1]); // tick the oscillator
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
 
 
-	//sample = tNoise_tick(&noise); // or uncomment this to try white noise
+	sample = tNoise_tick(&noise2) * 0.4f; // or uncomment this to try white noise
 
+	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[1])*70.0f + 30.0f));
+	//tVZFilter_setGain(&shelf2, tRamp_tick(&adc[3])*2.0f);
+	//tVZFilter_setBandwidth(&shelf2, tRamp_tick(&adc[5])*2.0f + 3.0f);
+	//sample = sample - tVZFilter_tick(&shelf2, sample);
 	return sample;
 }
 
