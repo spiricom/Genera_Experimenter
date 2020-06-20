@@ -1,8 +1,8 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : usbh_platform.h
-  * @brief          : Header for usbh_platform.c file.
+  * File Name          : dma.h
+  * Description        : This file contains all the function prototypes for
+  *                      the dma.c file
   ******************************************************************************
   * @attention
   *
@@ -16,29 +16,41 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBH_PLATFORM_H__
-#define __USBH_PLATFORM_H__
+#ifndef __bdma_H
+#define __bdma_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_host.h"
+#include "main.h"
 
-/* USER CODE BEGIN INCLUDE */
+/* DMA memory to memory transfer handles -------------------------------------*/
 
-/* USER CODE END INCLUDE */
+/* USER CODE BEGIN Includes */
 
-void MX_DriverVbusFS(uint8_t state); 
+/* USER CODE END Includes */
+
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+
+void MX_BDMA_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __USBH_PLATFORM_H__ */
+#endif /* __bdma_H */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

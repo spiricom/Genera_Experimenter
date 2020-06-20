@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "bdma.h"
 #include "dma.h"
 #include "fatfs.h"
 #include "i2c.h"
@@ -30,7 +31,6 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_host.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -64,8 +64,6 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_USB_HOST_Process(void);
-
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
 void SDRAM_Initialization_sequence(void);
@@ -73,7 +71,13 @@ void SDRAM_Initialization_sequence(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define NUM_COUNTER_CYCLES_TO_AVERAGE 32
+volatile int64_t cycleCountVals[4][3];
+volatile int64_t cycleCountValsAverager[4][NUM_COUNTER_CYCLES_TO_AVERAGE];
+volatile uint16_t cycleCountAveragerCounter[4] = {0,0,0,0};
+float cycleCountAverages[4][3];
 
+static void CycleCounterInit( void );
 /* USER CODE END 0 */
 
 /**
@@ -111,6 +115,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_BDMA_Init();
   MX_DMA_Init();
   MX_FMC_Init();
   MX_ADC1_Init();
@@ -126,10 +131,11 @@ int main(void)
   MX_TIM1_Init();
   MX_USART6_UART_Init();
   MX_RNG_Init();
-  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
   //pull reset pin on audio codec low to make sure it's stable
+
+  CycleCounterInit();
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 
   uint32_t tempFPURegisterVal = __get_FPSCR();
@@ -146,18 +152,31 @@ int main(void)
   SDRAM_Initialization_sequence();
   HAL_Delay(100);
 
+
+
   audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
-  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-  //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+
+
+  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+	  /*
+	  int buttonRead = !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_7);
+	  if (buttonRead)
+	  {
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+	  }
+	  else
+	  {
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+	  }
+	  */
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   }
@@ -224,8 +243,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6|RCC_PERIPHCLK_RNG
                               |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SAI1
                               |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C2
-                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_USB
-                              |RCC_PERIPHCLK_FMC;
+                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_FMC;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 344;
   PeriphClkInitStruct.PLL2.PLL2P = 7;
@@ -241,23 +259,41 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
-  PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
   PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Enable USB Voltage detector 
-  */
-  HAL_PWREx_EnableUSBVoltageDetector();
 }
 
 /* USER CODE BEGIN 4 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
+	if (hadc == &hadc3)
+	{
+		for (int i = 0; i < AUDIO_FRAME_SIZE; i++)
+		{
+			for (int j = 0; j < NUM_EXT_ADC_CHANNELS; j++)
+			{
+				int tempInt = ADC3_values[(i*NUM_EXT_ADC_CHANNELS) + j];
+				audioADCInputs[j][currentADC3BufferPos] = ((float)(tempInt - TWO_TO_15) * INV_TWO_TO_15);
+			}
+			currentADC3BufferPos++;
+			if (currentADC3BufferPos >= 2048)
+			{
+				currentADC3BufferPos = 0;
+			}
+		}
+	}
+}
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
 	;
 }
-
+void HAL_ADC_Error(ADC_HandleTypeDef *hadc)
+{
+	;
+}
 
 #define SDRAM_TIMEOUT ((uint32_t)0xFFFF)
 
@@ -437,6 +473,29 @@ void MPU_Conf(void)
 
 
 	  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+}
+/* helper function to initialize measuring unit (cycle counter) */
+static void CycleCounterInit( void )
+{
+  /* Enable TRC */
+  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+  /* Unlock DWT registers */
+  if ((*(uint32_t*)0xE0001FB4) & 1)
+    *(uint32_t*)0xE0001FB0 = 0xC5ACCE55;
+
+  /* clear the cycle counter */
+  DWT->CYCCNT = 0;
+
+  /* start the cycle counter */
+  DWT->CTRL = 0x40000001;
+
+  for (int i = 0; i < 4; i++)
+  {
+	  cycleCountAverages[i][0] = 0.0f;
+	  cycleCountAverages[i][1] = 0.0f;
+	  cycleCountAverages[i][2] = 0.0f;
+  }
 }
 
 /* USER CODE END 4 */

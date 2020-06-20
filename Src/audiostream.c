@@ -13,17 +13,17 @@
 #include "codec.h"
 #include "tim.h"
 #include "ui.h"
-
+#include "adc.h"
 #define NUM_BUTTONS 3
 
 
 //the audio buffers are put in the D2 RAM area because that is a memory location that the DMA has access to.
 int32_t audioOutBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
 int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
-
+uint16_t ADC3_values[NUM_EXT_ADC_CHANNELS * AUDIO_FRAME_SIZE] __ATTR_RAM_D3;
 void audioFrame(uint16_t buffer_offset);
-float audioTickL(float audioIn);
-float audioTickR(float audioIn);
+float audioTickL(float audioIn, int sampleNum);
+float audioTickR(float audioIn, int sampleNum);
 void buttonCheck(void);
 
 HAL_StatusTypeDef transmit_status;
@@ -32,10 +32,14 @@ HAL_StatusTypeDef receive_status;
 
 uint8_t codecReady = 0;
 
-uint8_t buttonValues[NUM_BUTTONS];
-uint8_t buttonValuesPrev[NUM_BUTTONS];
-uint32_t buttonCounters[NUM_BUTTONS];
-uint32_t buttonPressed[NUM_BUTTONS];
+volatile uint8_t buttonValues[NUM_BUTTONS];
+volatile uint8_t buttonValuesPrev[NUM_BUTTONS];
+volatile uint32_t buttonCounters[NUM_BUTTONS];
+volatile uint32_t buttonPressed[NUM_BUTTONS];
+
+volatile float audioADCInputs[NUM_EXT_ADC_CHANNELS][ADC_RING_BUFFER_SIZE];
+uint64_t currentADC3BufferPos = 0;
+uint64_t frameCounter2 = 0;
 
 
 float sample = 0.0f;
@@ -111,8 +115,13 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 
 
-	HAL_Delay(1);
 
+
+	if (HAL_ADC_Start_DMA(&hadc3,(uint32_t*)&ADC3_values,NUM_EXT_ADC_CHANNELS * AUDIO_FRAME_SIZE) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+	//HAL_Delay(1);
 	// set up the I2S driver to send audio data to the codec (and retrieve input as well)
 	transmit_status = HAL_SAI_Transmit_DMA(hsaiOut, (uint8_t *)&audioOutBuffer[0], AUDIO_BUFFER_SIZE);
 	receive_status = HAL_SAI_Receive_DMA(hsaiIn, (uint8_t *)&audioInBuffer[0], AUDIO_BUFFER_SIZE);
@@ -126,17 +135,33 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 }
 
+
 void audioFrame(uint16_t buffer_offset)
 {
 	int i;
 	int32_t current_sample = 0;
-
-	frameCounter++;
-	if (frameCounter > 1)
+	frameCounter2++;
+	//HAL_ADC_Start_DMA(&hadc3,(uint32_t*)&ADC3_values[(buffer_offset > 0)], 3*AUDIO_FRAME_SIZE);
+/*
+	currentADC3BufferPos = 0;
+	for (int j= 0; j < AUDIO_FRAME_SIZE; j++)
 	{
-		frameCounter = 0;
-		buttonCheck();
+
+		//tempInt = ADC3_values[(buffer_offset == 0)][currentADC3BufferPos];
+		tempInt = ADC3_values[currentADC3BufferPos];
+		tempInt2 = tempInt - TWO_TO_15;
+		tempFloat = (float)tempInt2;
+		tempFloat = tempFloat * INV_TWO_TO_15;
+		audioADCInputs[0][j] = tempFloat;
+		if (audioADCInputs[0][j] > 0.1f)
+		{
+			//HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+		}
+		currentADC3BufferPos = currentADC3BufferPos+3;
 	}
+*/
+
+	buttonCheck();
 
 	//read the analog inputs and smooth them with ramps
 	for (i = 0; i < 6; i++)
@@ -154,11 +179,11 @@ void audioFrame(uint16_t buffer_offset)
 		{
 			if ((i & 1) == 0)
 			{
-				current_sample = (int32_t)(audioTickR((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31)) * TWO_TO_23);
+				current_sample = (int32_t)(audioTickR((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31), i/2) * TWO_TO_23);
 			}
 			else
 			{
-				current_sample = (int32_t)(audioTickL((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31)) * TWO_TO_23);
+				current_sample = (int32_t)(audioTickL((float) ((audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31), i/2) * TWO_TO_23);
 			}
 
 			audioOutBuffer[buffer_offset + i] = current_sample;
@@ -167,82 +192,40 @@ void audioFrame(uint16_t buffer_offset)
 }
 float rightIn = 0.0f;
 
-
-float audioTickL(float audioIn)
+int sampleNumGlobal = 0;
+float audioTickL(float audioIn, int sampleNum)
 {
 
 	sample = 0.0f;
-	for (int i = 0; i < 6; i = i+2) // even numbered knobs (left side of board)
+
+	sample = audioADCInputs[0][sampleNumGlobal];
+	sampleNumGlobal++;
+	if (sampleNumGlobal >= 2048)
 	{
-		//tCycle_setFreq(&mySine[i], (tRamp_tick(&adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		//sample += tCycle_tick(&mySine[i]); // tick the oscillator
+		sampleNumGlobal = 0;
 	}
-	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
-
-	sample = tNoise_tick(&noise) * 0.1f; // some white noise to test : this would be the input signal normally
-
-
-	//tVZFilter_setFreq(&shelf1, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f)); //frequency of the low shelf fixed at 80Hz (based on Mackie mixer style EQ)
-	tVZFilter_setGain(&shelf1, fastdbtoa(tRamp_tick(&adc[0]) * 60.0f - 30.0f)); //+/-30db on a shelf translates to actual boost/cut of +/-15db (because of the symmetrical structure for some reason)
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // bandwidth is in octaves, anything below 2 on a shelf filter will overshoot and have resonance at the cutoff
-
-	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[0])*70.0f + 30.0f)); //frequency of the high shelf fixed at 12k (based on Mackie mixer style EQ)
-	tVZFilter_setGain(&shelf2, fastdbtoa(tRamp_tick(&adc[1]) * 60.0f - 30.0f)); //+/-30db on a shelf translates to actual boost/cut of +/-15db (because of the symmetrical structure for some reason)
-	//tVZFilter_setBandwidth(&shelf2, tRamp_tick(&adc[1])*2.0f + 3.0f); // bandwidth is in octaves, anything below 2 on a shelf filter will overshoot and have resonance at the cutoff
-
-	tVZFilter_setFreq(&bell1, faster_mtof(tRamp_tick(&adc[2])*77.0f + 42.0f)); //midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
-	tVZFilter_setGain(&bell1, fastdbtoa(tRamp_tick(&adc[4]) * 34.0f - 17.0f)); // in db - this range is -17db to 17db  -- the object wants this value in linear amplitude so it's converted from db to a
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // stick with bandwidth of 1.9 for now
-
-	tVZFilter_setFreq(&bell2, faster_mtof(tRamp_tick(&adc[3])*77.0f + 42.0f)); // midi notes 42-119  to get a range of 100Hz to 8000Hz (similar to a mackie mixer mid sweep knob)
-	tVZFilter_setGain(&bell2, fastdbtoa(tRamp_tick(&adc[5]) * 34.0f - 17.0f)); // in db - this range is -17db to 17db  -- the object wants this value in linear amplitude so it's converted from db to a
-	//tVZFilter_setBandwidth(&shelf1, tRamp_tick(&adc[1])*2.0f + 3.0f); // stick with bandwidth of 1.9 for now
-
-
-	sample = tVZFilter_tick(&shelf1, sample); //put it through the low shelf
-	sample = tVZFilter_tick(&shelf2, sample); // now put that result through the high shelf
-	sample = tVZFilter_tick(&bell1, sample); // now add a bell (or peaking eq) filter
-	sample = tVZFilter_tick(&bell2, sample); // and a second bell (or peaking eq) filter
-
-
 	return sample;
 }
 
 
 uint32_t myCounter = 0;
 
-float audioTickR(float audioIn)
+float audioTickR(float audioIn, int sampleNum)
 {
 	rightIn = audioIn;
-
-	sample = 0.0f;
-
-
-
-	for (int i = 0; i < 6; i = i+2) // odd numbered knobs (right side of board)
-	{
-		//tCycle_setFreq(&mySine[i+1], (tRamp_tick(&adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		//sample += tCycle_tick(&mySine[i+1]); // tick the oscillator
-	}
-	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
-
-
-	sample = tNoise_tick(&noise2) * 0.4f; // or uncomment this to try white noise
-
-	//tVZFilter_setFreq(&shelf2, mtof(tRamp_tick(&adc[1])*70.0f + 30.0f));
-	//tVZFilter_setGain(&shelf2, tRamp_tick(&adc[3])*2.0f);
-	//tVZFilter_setBandwidth(&shelf2, tRamp_tick(&adc[5])*2.0f + 3.0f);
-	//sample = sample - tVZFilter_tick(&shelf2, sample);
+	//sample = (audioADCInputs[1][sampleNumGlobal] + audioADCInputs[2][sampleNumGlobal]) * 0.5f;
+	sample = audioADCInputs[2][sampleNumGlobal];
+	//sample = 0.0f;
 	return sample;
 }
 
 
-uint8_t LED_States[3] = {0,0,0};
+volatile uint8_t LED_States[3] = {0,0,0};
 void buttonCheck(void)
 {
 	buttonValues[0] = !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_6);
 	buttonValues[1] = !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_7);
-	buttonValues[2] = !HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_11);
+	//buttonValues[2] = !HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_11);
 	for (int i = 0; i < NUM_BUTTONS; i++)
 	{
 	  if ((buttonValues[i] != buttonValuesPrev[i]) && (buttonCounters[i] < 10))
@@ -263,7 +246,7 @@ void buttonCheck(void)
 	if (buttonPressed[0] == 1)
 	{
 
-		/*
+
 		if (LED_States[0] == 0)
 		{
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
@@ -275,18 +258,18 @@ void buttonCheck(void)
 			LED_States[0] = 0;
 		}
 		buttonPressed[0] = 0;
-		*/
+
 	}
 	if (buttonPressed[1] == 1)
 	{
 		if (LED_States[1] == 0)
 		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 			LED_States[1] = 1;
 		}
 		else
 		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 			LED_States[1] = 0;
 		}
 		buttonPressed[1] = 0;
@@ -296,12 +279,12 @@ void buttonCheck(void)
 	{
 		if (LED_States[2] == 0)
 		{
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+
 			LED_States[2] = 1;
 		}
 		else
 		{
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+
 			LED_States[2] = 0;
 		}
 		buttonPressed[2] = 0;

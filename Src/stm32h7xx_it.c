@@ -56,8 +56,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 extern DMA_HandleTypeDef hdma_adc1;
+extern DMA_HandleTypeDef hdma_adc3;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_sai1_a;
 extern DMA_HandleTypeDef hdma_sai1_b;
@@ -258,45 +258,17 @@ void ADC_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles USB On The Go FS End Point 1 Out global interrupt.
+  * @brief This function handles BDMA channel0 global interrupt.
   */
-void OTG_FS_EP1_OUT_IRQHandler(void)
+void BDMA_Channel0_IRQHandler(void)
 {
-  /* USER CODE BEGIN OTG_FS_EP1_OUT_IRQn 0 */
+  /* USER CODE BEGIN BDMA_Channel0_IRQn 0 */
 
-  /* USER CODE END OTG_FS_EP1_OUT_IRQn 0 */
-  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
-  /* USER CODE BEGIN OTG_FS_EP1_OUT_IRQn 1 */
+  /* USER CODE END BDMA_Channel0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc3);
+  /* USER CODE BEGIN BDMA_Channel0_IRQn 1 */
 
-  /* USER CODE END OTG_FS_EP1_OUT_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USB On The Go FS End Point 1 In global interrupt.
-  */
-void OTG_FS_EP1_IN_IRQHandler(void)
-{
-  /* USER CODE BEGIN OTG_FS_EP1_IN_IRQn 0 */
-
-  /* USER CODE END OTG_FS_EP1_IN_IRQn 0 */
-  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
-  /* USER CODE BEGIN OTG_FS_EP1_IN_IRQn 1 */
-
-  /* USER CODE END OTG_FS_EP1_IN_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USB On The Go FS global interrupt.
-  */
-void OTG_FS_IRQHandler(void)
-{
-  /* USER CODE BEGIN OTG_FS_IRQn 0 */
-
-  /* USER CODE END OTG_FS_IRQn 0 */
-  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
-  /* USER CODE BEGIN OTG_FS_IRQn 1 */
-
-  /* USER CODE END OTG_FS_IRQn 1 */
+  /* USER CODE END BDMA_Channel0_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

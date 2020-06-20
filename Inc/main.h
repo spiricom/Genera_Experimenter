@@ -52,7 +52,7 @@ extern "C" {
 #define __ATTR_RAM_D2	__attribute__ ((section(".RAM_D2"))) __attribute__ ((aligned (32)))
 #define __ATTR_RAM_D3	__attribute__ ((section(".RAM_D3"))) __attribute__ ((aligned (32)))
 #define __ATTR_SDRAM	__attribute__ ((section(".SDRAM"))) __attribute__ ((aligned (32)))
-
+#define NUM_EXT_ADC_CHANNELS 3
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
