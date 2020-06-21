@@ -24,6 +24,7 @@
 #include "bdma.h"
 #include "dma.h"
 #include "fatfs.h"
+#include "hrtim.h"
 #include "i2c.h"
 #include "rng.h"
 #include "sai.h"
@@ -131,6 +132,7 @@ int main(void)
   MX_TIM1_Init();
   MX_USART6_UART_Init();
   MX_RNG_Init();
+  MX_HRTIM_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
   //pull reset pin on audio codec low to make sure it's stable
@@ -152,7 +154,7 @@ int main(void)
   SDRAM_Initialization_sequence();
   HAL_Delay(100);
 
-
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
   audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
@@ -240,10 +242,11 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6|RCC_PERIPHCLK_RNG
-                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SAI1
-                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C2
-                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_FMC;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_HRTIM1|RCC_PERIPHCLK_USART6
+                              |RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_SPI1
+                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SDMMC
+                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_ADC
+                              |RCC_PERIPHCLK_FMC;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 344;
   PeriphClkInitStruct.PLL2.PLL2P = 7;
@@ -252,6 +255,14 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_0;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.PLL3.PLL3M = 5;
+  PeriphClkInitStruct.PLL3.PLL3N = 192;
+  PeriphClkInitStruct.PLL3.PLL3P = 4;
+  PeriphClkInitStruct.PLL3.PLL3Q = 2;
+  PeriphClkInitStruct.PLL3.PLL3R = 4;
+  PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_2;
+  PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
+  PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
   PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
@@ -259,7 +270,8 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
-  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL3;
+  PeriphClkInitStruct.Hrtim1ClockSelection = RCC_HRTIM1CLK_CPUCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -267,10 +279,95 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+int ADC_arrayCount[64];
+int  ADC_arrayCountCounter = 0;
+int prevTempInt[3][16];
+int prevAvg[3];
+int ADCBetweenCounter[3] = {0,0,0};
+int ADCFoundOne[3] = {0,0,0};
+int firstADCScan = 0;
+int whichSensor = 0;
+int tempADCInt = 0;
+int averagerPos = 0;
+int time0 = 0;
+int time1 = 0;
+int time2 = 0;
+int ADCLockout = 0;
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	if (hadc == &hadc3)
 	{
+		//ADC_arrayCount[ADC_arrayCountCounter] =  frameCounter2;
+		//ADC_arrayCountCounter++;
+		//if (ADC_arrayCountCounter>=64)
+		//{
+			//ADC_arrayCountCounter = 0;
+		//}
+		for (int i = 0; i < ADC3_ARRAY_SIZE; i++)
+		{
+			for (int j = 0; j < NUM_EXT_ADC_CHANNELS; j++)
+			{
+				tempADCInt = ADC3_values[(i*NUM_EXT_ADC_CHANNELS) + j];
+				if (firstADCScan > 100)
+				{
+					if (!ADCLockout)
+					{
+						if (abs(tempADCInt-prevAvg[j]) > 700)
+						{
+							HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+							ADCFoundOne[j] = 1;
+						}
+						if (!ADCFoundOne[j])
+						{
+							ADCBetweenCounter[j]++;
+						}
+					}
+				}
+				prevTempInt[j][averagerPos % 16] = tempADCInt;
+				prevAvg[j] = 0;
+				for (int k = 0; k < 16; k++)
+				{
+					prevAvg[j] += prevTempInt[j][k];
+				}
+				prevAvg[j] /= 16;
+				averagerPos++;
+				//audioADCInputs[j][currentADC3BufferPos] = ((float)(tempInt - TWO_TO_15) * INV_TWO_TO_15);
+			}
+			if (ADCLockout > 0)
+			{
+				ADCLockout--;
+			}
+		}
+		if ((ADCFoundOne[0] ==1) && (ADCFoundOne[1] ==1) && (ADCFoundOne[2] ==1))
+		{
+
+			int tempMin = 2147483647; //signed int32 max
+			for (int i = 0; i < NUM_EXT_ADC_CHANNELS; i++)
+			{
+				if (ADCBetweenCounter[i] < tempMin)
+				{
+					tempMin = ADCBetweenCounter[i];
+					whichSensor = i;
+				}
+			}
+			time0 = ADCBetweenCounter[0] - tempMin;
+			time1 = ADCBetweenCounter[1] - tempMin;
+			time2 = ADCBetweenCounter[2] - tempMin;
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+			ADCLockout = 10000;
+			ADCFoundOne[0] = 0;
+			ADCFoundOne[1] = 0;
+			ADCFoundOne[2] = 0;
+			ADCBetweenCounter[0] = 0;
+			ADCBetweenCounter[1] = 0;
+			ADCBetweenCounter[2] = 0;
+
+		}
+		if (firstADCScan < 200)
+		{
+			firstADCScan++;
+		}
+		/*
 		for (int i = 0; i < AUDIO_FRAME_SIZE; i++)
 		{
 			for (int j = 0; j < NUM_EXT_ADC_CHANNELS; j++)
@@ -284,6 +381,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 				currentADC3BufferPos = 0;
 			}
 		}
+		*/
 	}
 }
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)

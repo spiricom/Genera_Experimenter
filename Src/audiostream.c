@@ -20,7 +20,7 @@
 //the audio buffers are put in the D2 RAM area because that is a memory location that the DMA has access to.
 int32_t audioOutBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
 int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
-uint16_t ADC3_values[NUM_EXT_ADC_CHANNELS * AUDIO_FRAME_SIZE] __ATTR_RAM_D3;
+uint16_t ADC3_values[NUM_EXT_ADC_CHANNELS * ADC3_ARRAY_SIZE] __ATTR_RAM_D3;
 void audioFrame(uint16_t buffer_offset);
 float audioTickL(float audioIn, int sampleNum);
 float audioTickR(float audioIn, int sampleNum);
@@ -117,7 +117,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 
 
-	if (HAL_ADC_Start_DMA(&hadc3,(uint32_t*)&ADC3_values,NUM_EXT_ADC_CHANNELS * AUDIO_FRAME_SIZE) != HAL_OK)
+	if (HAL_ADC_Start_DMA(&hadc3,(uint32_t*)&ADC3_values,NUM_EXT_ADC_CHANNELS * ADC3_ARRAY_SIZE) != HAL_OK)
 	{
 	  Error_Handler();
 	}
