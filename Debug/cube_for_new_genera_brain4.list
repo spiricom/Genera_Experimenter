@@ -21880,8 +21880,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     hdma_adc3.Init.Mode = DMA_CIRCULAR;
  8009a0e:	f44f 7380 	mov.w	r3, #256	; 0x100
  8009a12:	61c3      	str	r3, [r0, #28]
-    hdma_adc3.Init.Priority = DMA_PRIORITY_HIGH;
- 8009a14:	f44f 3300 	mov.w	r3, #131072	; 0x20000
+    hdma_adc3.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+ 8009a14:	f44f 3340 	mov.w	r3, #196608	; 0x30000
  8009a18:	6203      	str	r3, [r0, #32]
     if (HAL_DMA_Init(&hdma_adc3) != HAL_OK)
  8009a1a:	f7f8 f8fb 	bl	8001c14 <HAL_DMA_Init>
