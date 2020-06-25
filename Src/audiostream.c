@@ -12,10 +12,13 @@
 #include "leaf.h"
 #include "codec.h"
 #include "gpio.h"
+#include "adc.h"
 
 //the audio buffers are put in the D2 RAM area because that is a memory location that the DMA has access to.
 int32_t audioOutBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
 int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
+uint16_t ADC_values[NUM_ADC_CHANNELS * AUDIO_FRAME_SIZE] __ATTR_RAM_D2;
+uint32_t currentADCBufferPos = 0;
 
 void audioFrame(uint16_t buffer_offset);
 float audioTick(void);
@@ -82,6 +85,7 @@ int noteOffHappened[2] = {0,0};
 float noteOnAmplitudes[2] = {0.0f, 0.0f};
 int outOfThresh[2] = {0,0};
 
+int ADC_Ready = 0;
 float detuneAmounts[NUM_SAWTOOTHS] = {0.997f, 0.999f, 1.001f, 1.003f};
 
 // frets are measured at 3 7 12 and 19
@@ -98,8 +102,7 @@ float fretScaling[4] = {0.9f, 0.66666666666f, 0.5f, 0.25f};
 
 
 
-
-
+volatile float audioADCInputs[NUM_ADC_CHANNELS][ADC_RING_BUFFER_SIZE];
 
 //MEMPOOLS
 #define SMALL_MEM_SIZE 5000
@@ -140,6 +143,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	{
 		audioOutBuffer[i] = 0;
 	}
+
 
 	/*
 	for (int i = 0; i < 2; i++)
@@ -198,12 +202,17 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 }
 
-
+int ADC_notStarted = 1;
 float inputSamples[2];
 void audioFrame(uint16_t buffer_offset)
 {
 	int i;
 
+	if (ADC_notStarted)
+	{
+		HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values,NUM_ADC_CHANNELS * AUDIO_FRAME_SIZE);
+		ADC_notStarted = 0;
+	}
 	//if the codec isn't ready, keep the buffer as all zeros
 	//otherwise, start computing audio!
 
@@ -212,8 +221,8 @@ void audioFrame(uint16_t buffer_offset)
 
 		for (i = 0; i < (HALF_BUFFER_SIZE); i = i + 2)
 		{
-			inputSamples[1] = (audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31;
-			inputSamples[0] = (audioInBuffer[buffer_offset + i + 1] << 8) * INV_TWO_TO_31;
+			//inputSamples[1] = (audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31;
+			//inputSamples[0] = (audioInBuffer[buffer_offset + i + 1] << 8) * INV_TWO_TO_31;
 
 			audioOutBuffer[buffer_offset + i] = (int32_t)(audioTick() * TWO_TO_23);
 			audioOutBuffer[buffer_offset + i + 1] = 0;
@@ -223,16 +232,19 @@ void audioFrame(uint16_t buffer_offset)
 }
 float intoThresh1 = 0.0f;
 float noteOnAmplitude[2] = {0.0f, 0.0f};
+int sampleNumGlobal = 0;
 
 float audioTick()
 {
 	sample = 0.0f;
+	/*
 	for (int whichString = 0; whichString < 2; whichString ++)
 	{
 		//sample = audioIn;
 		//sample = processString(0, audioIn);
 
 		//sample = audioIn;
+
 		attackDetect2(whichString, inputSamples[whichString]);
 		processString(whichString, inputSamples[whichString]);
 		float tempSample = 0.0f;
@@ -247,13 +259,13 @@ float audioTick()
 		//sample +=  SFXRhodesTick(whichString);
 
 
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, outOfThreshPositiveChange[1] & 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, sahArmed[1] & 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, outOfThresh[1] & 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, stringTouchRH[1] & 1);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, outOfThreshPositiveChange[1] & 1);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, sahArmed[1] & 1);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, outOfThresh[1] & 1);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, stringTouchRH[1] & 1);
 
 
-		sample = tanhf(sample * 1.6f);
+		//sample = tanhf(sample * 1.6f);
 		//sample = LEAF_clip(-1.0f, dbtoa(intoThresh1) * 0.5f, 1.0f);
 		//sample = 0.0f;
 		//sample = smoothed;
@@ -262,6 +274,16 @@ float audioTick()
 		//sample = powf(sample, 0.5f);
 		//sample += outOfThreshPositiveChange[0];
 		//sample -= noteOnHappened[0];
+	}
+	*/
+	if (ADC_Ready)
+	{
+		sample = audioADCInputs[0][sampleNumGlobal];
+		sampleNumGlobal++;
+		if (sampleNumGlobal >= ADC_RING_BUFFER_SIZE)
+		{
+			sampleNumGlobal = 0;
+		}
 	}
 	return sample;
 
@@ -591,6 +613,31 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 	audioFrame(0);
 }
 
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+		for (int i = 0; i < AUDIO_FRAME_SIZE; i++)
+		{
+			for (int j = 0; j < NUM_ADC_CHANNELS; j++)
+			{
+				int tempInt = ADC_values[(i*NUM_ADC_CHANNELS) + j];
+				audioADCInputs[j][currentADCBufferPos] = ((float)(tempInt - TWO_TO_15) * INV_TWO_TO_15);
+			}
+			currentADCBufferPos++;
+			if (currentADCBufferPos >= ADC_RING_BUFFER_SIZE)
+			{
+				currentADCBufferPos = 0;
+			}
+		}
+		ADC_Ready = 1;
+}
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
+
+}
+void HAL_ADC_Error(ADC_HandleTypeDef *hadc)
+{
+
+}
 
 void attackDetectMedian(int whichString, float input)
 {

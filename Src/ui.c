@@ -9,4 +9,4 @@
 
 
 
-uint16_t ADC_values[NUM_ADC_CHANNELS] __ATTR_RAM_D2;
+
