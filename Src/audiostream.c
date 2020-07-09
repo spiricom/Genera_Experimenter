@@ -14,11 +14,23 @@
 #include "gpio.h"
 #include "adc.h"
 
+#define NUM_STRINGS NUM_ADC_CHANNELS
+
+#define ATODB_TABLE_SIZE 512
+#define ATODB_TABLE_SIZE_MINUS_ONE 511
+
+#define FILTER_ORDER 12
+#define LHMUTE_COUNTLIM 100
+#define RHMUTE_COUNTLIM 10
+
+float atodbTable[ATODB_TABLE_SIZE];
+
+
 //the audio buffers are put in the D2 RAM area because that is a memory location that the DMA has access to.
 int32_t audioOutBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
 int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2;
-uint16_t ADC_values[NUM_ADC_CHANNELS * AUDIO_FRAME_SIZE] __ATTR_RAM_D2;
-uint32_t currentADCBufferPos = 0;
+int32_t ADC_values[NUM_ADC_CHANNELS * ADC_BUFFER_SIZE] __ATTR_RAM_D2;
+
 
 void audioFrame(uint16_t buffer_offset);
 float audioTick(void);
@@ -30,66 +42,73 @@ float SFXRhodesTick(int whichString);
 void SFXRhodesAlloc(void);
 
 
+
 HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
-
-
-
-int whichBoard = 1;
 
 
 uint8_t codecReady = 0;
 float sample = 0.0f;
 float rightIn = 0.0f;
 
-#define NUM_SAWTOOTHS 4
-tSVF myLowpass[2];
-tSawtooth mySaw[2][NUM_SAWTOOTHS];
-tCycle mySine[2];
-tHighpass dcBlock[2];
-tEnvelopeFollower myFollower[2];
-tExpSmooth pitchSmoother[2];
-tMedianFilter median[2];
-tNoise noise[2];
-tThreshold threshold[2];
-tADSR envelope[2];
-tSlide fastSlide[2];
-tSlide slowSlide[2];
-tSVF lowpass[2];
-tRampUpDown updownRamp[2];
+#define NUM_SAWTOOTHS 1
+tSVF myLowpass[NUM_STRINGS];
+tSawtooth mySaw[NUM_STRINGS][NUM_SAWTOOTHS];
+tCycle mySine[NUM_STRINGS];
+tHighpass dcBlock[NUM_STRINGS];
+tEnvelopeFollower myFollower[NUM_STRINGS];
+tExpSmooth pitchSmoother[NUM_STRINGS];
+tMedianFilter median[NUM_STRINGS];
+tNoise noise[NUM_STRINGS];
+tThreshold threshold[NUM_STRINGS];
+tADSR envelope[NUM_STRINGS];
+tSlide fastSlide[NUM_STRINGS];
+tSlide slowSlide[NUM_STRINGS];
+tSVF lowpass[NUM_STRINGS];
+tRampUpDown updownRamp[NUM_STRINGS];
 
-uint16_t stringPositions[2];
-float stringMappedPositions[2];
-float stringFrequencies[2];
-float stringMIDIVersionOfFrequencies[2];
-uint32_t currentMIDInotes[2];
-uint32_t previousMIDInotes[2];
-uint8_t stringTouchLH[2] = {0,0};
-uint8_t stringTouchRH[2] = {0,0};
-float openStringFrequencies[4] = {41.204f, 55.0f, 73.416f, 97.999f};
+tSimplePoly poly;
+
+uint16_t stringPositions[NUM_STRINGS];
+float stringMappedPositions[NUM_STRINGS];
+float stringFrequencies[NUM_STRINGS];
+float stringMIDIVersionOfFrequencies[NUM_STRINGS];
+uint32_t currentMIDInotes[NUM_STRINGS];
+uint32_t previousMIDInotes[NUM_STRINGS];
+uint8_t stringTouchLH[NUM_STRINGS] = {0,0,0,0};
+uint8_t stringTouchRH[NUM_STRINGS] = {0,0,0,0};
+float openStringFrequencies[NUM_STRINGS] = {41.204f, 55.0f, 73.416f, 97.999f};
 float octave = 1.0f;
 
 float noiseFloor = -40.0f;
-float status[2] = {0.0f, 0.0f};
-int outOfThreshPositiveChange[2] = {0,0};
-int delayCounter[2] = {0,0};
-float currentMaximum[2] = {-120.f,-120.f};
-int sahArmed[2] = {0,0};
-int previousOutOfThresh[2] = {0,0};
+float status[NUM_STRINGS] = {0.0f, 0.0f, 0.0f, 0.0f};
+int outOfThreshPositiveChange[NUM_STRINGS] = {0,0,0,0};
+int delayCounter[NUM_STRINGS] = {0,0,0,0};
+float currentMaximum[NUM_STRINGS] = {-120.f,-120.f, -120.f, -120.f};
+int sahArmed[NUM_STRINGS] = {0,0,0,0};
+int previousOutOfThresh[NUM_STRINGS] = {0,0,0,0};
 int attackDelay = 400;
- int offLockout[2] = {0,0};
- int offLockoutDelay = 1000;
- float finalFreqs[2];
-int noteOnHappened[2] = {0,0};
-int noteOffHappened[2] = {0,0};
-float noteOnAmplitudes[2] = {0.0f, 0.0f};
-int outOfThresh[2] = {0,0};
+int offLockout[NUM_STRINGS] = {0,0,0,0};
+int offLockoutDelay = 1000;
+float finalFreqs[NUM_STRINGS];
+int noteOnHappened[NUM_STRINGS] = {0,0,0,0};
+int noteOffHappened[NUM_STRINGS] = {0,0,0,0};
+float noteOnAmplitude[NUM_STRINGS] = {0.0f, 0.0f, 0.0f, 0.0f};
+int outOfThresh[NUM_STRINGS] = {0,0,0,0};
+
+float knobParams[2];
+float joy_x;
+float joy_y;
+int LHmuteCounter[NUM_STRINGS] = {0,0,0,0};
+int LHstabilityCounter[NUM_STRINGS] = {0,0,0,0};
+int RHmuteCounter[NUM_STRINGS] = {0,0,0,0};
+float stringFreqs[NUM_STRINGS] = {0.0f, 0.0f, 0.0f, 0.0f};
 
 int ADC_Ready = 0;
 float detuneAmounts[NUM_SAWTOOTHS] = {0.997f, 0.999f, 1.001f, 1.003f};
 
-// frets are measured at 3 7 12 and 19
-float fretMeasurements[4][4] ={
+// frets are measured at 3 7 12 and 19   need to redo these measurements with an accurately set capo
+float fretMeasurements[NUM_STRINGS][4] ={
 		{25002.0f, 25727.0f, 25485.0f, 25291.0f},
 		{17560.0f, 18006.0f, 17776.0f, 17704.0f},
 		{10071.0f, 10314.0f, 10075.0f, 10063.0f},
@@ -97,15 +116,16 @@ float fretMeasurements[4][4] ={
 	};
 
 
-float fretScaling[4] = {0.9f, 0.66666666666f, 0.5f, 0.25f};
+float fretScaling[NUM_STRINGS] = {0.9f, 0.66666666666f, 0.5f, 0.25f};
 
 
+tHighpass opticalHighpass[NUM_STRINGS * FILTER_ORDER];
+tVZFilter opticalLowpass[NUM_STRINGS * FILTER_ORDER];
 
-
-volatile float audioADCInputs[NUM_ADC_CHANNELS][ADC_RING_BUFFER_SIZE];
+tExpSmooth gainSmoothed;
 
 //MEMPOOLS
-#define SMALL_MEM_SIZE 5000
+#define SMALL_MEM_SIZE 50000
 char smallMemory[SMALL_MEM_SIZE];
 
 #define MEDIUM_MEM_SIZE 500000
@@ -114,7 +134,7 @@ char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 //#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 //char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
 
-tMempool smallPool;
+tMempool mediumPool;
 //tMempool largePool;
 
 
@@ -130,11 +150,9 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	whichBoard = whichBoard * 2; // get the correct board offset (2 strings per board)
+	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
-	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
-
-	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
+	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE);
 	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
 	HAL_Delay(10);
@@ -144,7 +162,16 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		audioOutBuffer[i] = 0;
 	}
 
+	for (int i = 0; i < NUM_ADC_CHANNELS * FILTER_ORDER; i++)
+	{
+		tHighpass_init(&opticalHighpass[i], 100.0f);
+		tVZFilter_init(&opticalLowpass[i], Lowpass, 1000.0f, 0.6f);
+	}
+	LEAF_generate_atodb(atodbTable, ATODB_TABLE_SIZE);
 
+	tSimplePoly_init(&poly,1);
+	tSimplePoly_setNumVoices(&poly,1);
+	tExpSmooth_init(&gainSmoothed, 0.0f, 0.01f);
 	/*
 	for (int i = 0; i < 2; i++)
 	{
@@ -164,7 +191,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	*/
 
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < NUM_STRINGS; i++)
 	{
 		for (int j = 0; j < NUM_SAWTOOTHS; j++)
 		{
@@ -175,7 +202,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tHighpass_init(&dcBlock[i], 3000.0f);
 		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.002f);
 		tNoise_init(&noise[i], WhiteNoise);
-		tThreshold_init(&threshold[i],0.5f, 4.0f);
+		tThreshold_init(&threshold[i],0.5f, 8.0f);
 		tADSR_init(&envelope[i], 0.0f, 100.0f, 0.6f, 20.0f);
 		tADSR_setLeakFactor(&envelope[i], 0.999998f);
 		tSlide_init(&fastSlide[i],1.0f,1110.0f);
@@ -183,9 +210,6 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tSVF_init(&lowpass[i], SVFTypeLowpass, 4000.0f, 1.0f);
 		tRampUpDown_init(&updownRamp[i], 0.0f, 104.0f, 1); //5000 samples should be 104 ms
 	}
-
-
-	SFXRhodesAlloc();
 
 	HAL_Delay(1);
 
@@ -203,19 +227,21 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 }
 
 int ADC_notStarted = 1;
-float inputSamples[2];
+int frameCount = 0;
+
 void audioFrame(uint16_t buffer_offset)
 {
 	int i;
-
+	//HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_9);
+	//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_9, GPIO_PIN_SET);
 	if (ADC_notStarted)
 	{
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values,NUM_ADC_CHANNELS * AUDIO_FRAME_SIZE);
+		HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values,NUM_ADC_CHANNELS * ADC_BUFFER_SIZE);
 		ADC_notStarted = 0;
 	}
 	//if the codec isn't ready, keep the buffer as all zeros
 	//otherwise, start computing audio!
-
+	frameCount++;
 	if (codecReady)
 	{
 
@@ -231,12 +257,50 @@ void audioFrame(uint16_t buffer_offset)
 	}
 }
 float intoThresh1 = 0.0f;
-float noteOnAmplitude[2] = {0.0f, 0.0f};
+
 int sampleNumGlobal = 0;
 
+
+int distanceBetweenReadAndWrite = 0;
 float audioTick()
 {
 	sample = 0.0f;
+/*
+	if (ADC_Ready)
+	{
+		//distanceBetweenReadAndWrite = currentADCBufferPos - sampleNumGlobal;
+		//if (distanceBetweenReadAndWrite < 0)
+		//{
+		//	distanceBetweenReadAndWrite += ADC_RING_BUFFER_SIZE;
+		//}
+		for (int i = 0; i < NUM_STRINGS; i++)
+		{
+			//float tempSamp = audioADCInputs[i][sampleNumGlobal];
+			//attackDetect2(i, tempSamp);
+			//processString(i, tempSamp);
+			float tempSample = 0.0f;
+			//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
+			float theEnv = tADSR_tick(&envelope[i]);
+			for (int j = 0; j < NUM_SAWTOOTHS; j++)
+			{
+				tempSample += tSawtooth_tick(&mySaw[i][j]) * theEnv;
+			}
+			//tempSample += tCycle_tick(&mySine[i]) * theEnv;
+			//tempSample = tSVF_tick(&myLowpass[i], tempSample);
+			//}
+			sample += tempSample;
+			//sample +=  SFXRhodesTick(whichString);
+		}
+		sampleNumGlobal++;
+		//do this as a mask instead to protect the data from COVID
+		if (sampleNumGlobal >= ADC_RING_BUFFER_SIZE)
+		{
+			sampleNumGlobal = 0;
+		}
+
+	}
+*/
+
 	/*
 	for (int whichString = 0; whichString < 2; whichString ++)
 	{
@@ -276,23 +340,38 @@ float audioTick()
 		//sample -= noteOnHappened[0];
 	}
 	*/
-	if (ADC_Ready)
+
+	float tempSample = 0.0f;
+	//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
+
+	tExpSmooth_setDest(&gainSmoothed, tSimplePoly_getVelocity(&poly, 0) * 0.2f);
+	int myString = tSimplePoly_getPitch(&poly, 0);
+	float theFreq = stringFreqs[myString];
+	for (int i = 0; i < NUM_SAWTOOTHS; i++)
 	{
-		sample = audioADCInputs[0][sampleNumGlobal];
-		sampleNumGlobal++;
-		if (sampleNumGlobal >= ADC_RING_BUFFER_SIZE)
-		{
-			sampleNumGlobal = 0;
-		}
+		tSawtooth_setFreq(&mySaw[0][i], theFreq * detuneAmounts[i]);
 	}
+	float theEnv = tExpSmooth_tick(&gainSmoothed);
+
+	//float theEnv = tADSR_tick(&envelope[0]);
+	for (int j = 0; j < NUM_SAWTOOTHS; j++)
+	{
+		tempSample += tSawtooth_tick(&mySaw[0][j]) * theEnv;
+	}
+	sample = tempSample;
+	sample = tanhf(sample);
 	return sample;
 
 }
 
 
 
-float previousRampSmoothed[2] = {0.0f, 0.0f};
-int downCounter[2] = {0,0};
+float previousRampSmoothed[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+int downCounter[4] = {0,0,0,0};
+float pastValues[4][512];
+int whichVal = 0;
+int strikeTime[4];
+
 void attackDetect2(int whichString, float input)
 {
 	float intoThresh = 0.0f;
@@ -301,28 +380,24 @@ void attackDetect2(int whichString, float input)
 	float smoothed = 0.0f;
 	float smoothed2 = 0.0f;
 	float tempAbs = 0.0f;
-	float increment = 0.005f;
-	//float increment = 0.000755857898715f;
+	//float increment = 0.005f;
+	float increment = 0.000755857898715f;
 	//float increment = 0.000455857898715f;
 	//float increment = 0.000255857898715f;
-	float rampsmoothed = 0.0f;
+	//float rampsmoothed = 0.0f;
 
 	noteOnHappened[whichString] = 0;
-	input = tHighpass_tick(&dcBlock[whichString], input);
+	//input = tHighpass_tick(&dcBlock[whichString], input);
 	//input = tSVF_tick(&lowpass[whichString], input);
 	tempAbs = fabsf(input);
+	pastValues[whichString][whichVal%512] = tempAbs;
 
 	smoothed = tSlide_tick(&fastSlide[whichString], tempAbs);
 	smoothed2  = tSlide_tick(&slowSlide[whichString], smoothed);
-	dbSmoothed = LEAF_clip(-54.0f, atodb(smoothed), 12.0f);
-
-	dbSmoothed2 = LEAF_clip(-54.0f, atodb(smoothed2), 12.0f);
+	dbSmoothed = LEAF_clip(-60.0f, atodbTable[(uint32_t)(smoothed * ATODB_TABLE_SIZE_MINUS_ONE)], 12.0f);
+	dbSmoothed2 = LEAF_clip(-60.0f, atodbTable[(uint32_t)(smoothed2 * ATODB_TABLE_SIZE_MINUS_ONE)], 12.0f);
 	intoThresh = dbSmoothed - dbSmoothed2;
 
-	if (whichString == 0)
-	{
-		intoThresh1 = intoThresh;
-	}
 	outOfThresh[whichString] = tThreshold_tick(&threshold[whichString], intoThresh);
 	if ((outOfThresh[whichString] > 0) && (previousOutOfThresh[whichString] == 0))
 	{
@@ -343,27 +418,55 @@ void attackDetect2(int whichString, float input)
 	{
 		status[whichString] = 1.0f;
 		currentMaximum[whichString] = 0.0f;
-		delayCounter[whichString] = 50;
+		/*
+		for (int i = 0; i < distanceBetweenReadAndWrite; i++)
+		{
+			float testSample = audioADCInputs[whichString][(i+sampleNumGlobal) % ADC_RING_BUFFER_SIZE];
+			if (testSample > currentMaximum[whichString])
+			{
+				currentMaximum[whichString] = testSample;
+			}
+		}
+		*/
+		if (whichString == 0)
+		{
+			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_9, GPIO_PIN_SET);
+		}
+		else if (whichString == 1)
+		{
+			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_10, GPIO_PIN_SET);
+		}
+
+		sahArmed[whichString] = 1;
+		//downCounter[whichString] = 0;
+		offLockout[whichString] = offLockoutDelay;
+		delayCounter[whichString] = 128;
+		pastValues[whichString][whichVal%512] += 2.0f;
+		//TODO: //may want to make this look into the future values held by the ADC input array instead and set this delay to the time between the read and write pointers
+		strikeTime[whichString] = whichVal%512;
 		sahArmed[whichString] = 1;
 	}
 	else if (status[whichString] > 0.0f)
 	{
 		status[whichString] = status[whichString] - (increment);
 	}
+	/*
 	tRampUpDown_setDest(&updownRamp[whichString], tempAbs);
 	rampsmoothed = tRampUpDown_tick(&updownRamp[whichString]);
 
-	//update the maximum of the samples since last reset
-	if (rampsmoothed > currentMaximum[whichString])
+	*/
+	if (tempAbs > currentMaximum[whichString])
 	{
-		currentMaximum[whichString] = rampsmoothed;
+		currentMaximum[whichString] = tempAbs;
 	}
+
 
 	if (delayCounter[whichString] > 0)
 	{
 		delayCounter[whichString]--;
 	}
 
+	/*
 	if ((intoThresh < (previousRampSmoothed[whichString] - 0.004f)) && (sahArmed[whichString] == 1))
 	{
 		downCounter[whichString]++;
@@ -372,21 +475,34 @@ void attackDetect2(int whichString, float input)
 	{
 		downCounter[whichString] = 0;
 	}
+*/
 
 	if ((sahArmed[whichString] == 1) && (delayCounter[whichString] == 0))
 	//if you waited some number of samples to ride to the peak, then now make a noteOn event
 	//if ((delayCounter[whichString] == 0) && (sahArmed[whichString] == 1))
 	{
 		//float tempAmp = map(currentMaximum, -60.0f, 6.0f, 0.0f, 1.0f);
-		float tempAmp = powf(currentMaximum[whichString], 0.5f);
-		tADSR_on(&envelope[whichString], 0.5f);
-		noteOnAmplitude[whichString] = tempAmp;
+		//float tempAmp = fasterPowf(currentMaximum[whichString], 0.5f);
+
+		//tADSR_on(&envelope[whichString], currentMaximum[whichString]);
+		if (whichString == 0)
+		{
+			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_9, GPIO_PIN_RESET);
+		}
+		else if (whichString == 1)
+		{
+			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_10, GPIO_PIN_RESET);
+		}
+		tSimplePoly_noteOn(&poly, whichString, LEAF_clip(0, currentMaximum[whichString] * 512.0f, 127));
+		//tSimplePoly_noteOn(&poly, whichString, 127);
+		pastValues[whichString][whichVal%512] += 3.0f;
+		//noteOnAmplitude[whichString] = tempAmp;
 		noteOnHappened[whichString] = 1;
 		sahArmed[whichString] = 0;
-		downCounter[whichString] = 0;
+		//downCounter[whichString] = 0;
 		offLockout[whichString] = offLockoutDelay;
 	}
-	previousRampSmoothed[whichString] = intoThresh;
+	//previousRampSmoothed[whichString] = intoThresh;
 
 	if (offLockout[whichString] > 0)
 	{
@@ -394,37 +510,52 @@ void attackDetect2(int whichString, float input)
 	}
 
 }
-float knobParams[2];
-float joy_x;
-float joy_y;
-int LHmuteCounter[2] = {0,0};
-int LHstabilityCounter[2] = {0,0};
-int RHmuteCounter[2] = {0,0};
-float stringFreqs[2] = {0.0f, 0.0f};
+
+
+
+
 float processString(int whichString, float input)
 {
-	int whichStringOfFour = whichString + whichBoard;
 
-	stringTouchLH[whichString] = (SPI_RX[8] >> whichStringOfFour) & 1;
-	stringTouchRH[whichString] = (SPI_RX[8] >> (whichStringOfFour + 4)) & 1;
+	stringTouchLH[whichString] = (SPI_RX[8] >> whichString) & 1;
+	stringTouchRH[whichString] = (SPI_RX[8] >> (whichString + 4)) & 1;
+
+	if (stringTouchRH[0])
+	{
+		HAL_GPIO_WritePin(GPIOG, GPIO_PIN_11, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOG, GPIO_PIN_11, GPIO_PIN_RESET);
+	}
+
+	if (stringTouchRH[1])
+	{
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+	}
+
 
 	noteOffHappened[whichString] = 0;
 
 
-	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichStringOfFour * 2] << 8) + ((uint16_t)SPI_RX[(whichStringOfFour * 2) + 1] & 0xff);
+	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichString * 2] << 8) + ((uint16_t)SPI_RX[(whichString * 2) + 1] & 0xff);
 
 
 
 
 	if (stringPositions[whichString] == 65535)
 	{
-		stringFrequencies[whichString] = openStringFrequencies[whichStringOfFour];
+		stringFrequencies[whichString] = openStringFrequencies[whichString];
 		stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
 	}
 	else
 	{
-		stringMappedPositions[whichString] = map((float)stringPositions[whichString], fretMeasurements[1][whichStringOfFour], fretMeasurements[2][whichStringOfFour], fretScaling[1], fretScaling[2]);
-		stringFrequencies[whichString] = ((1.0 / stringMappedPositions[whichString])) * openStringFrequencies[whichStringOfFour];
+		stringMappedPositions[whichString] = map((float)stringPositions[whichString], fretMeasurements[1][whichString], fretMeasurements[2][whichString], fretScaling[1], fretScaling[2]);
+		stringFrequencies[whichString] = ((1.0 / stringMappedPositions[whichString])) * openStringFrequencies[whichString];
 		stringMIDIVersionOfFrequencies[whichString] = LEAF_frequencyToMidi(stringFrequencies[whichString]);
 	}
 
@@ -446,14 +577,19 @@ float processString(int whichString, float input)
 	{
 		RHmuteCounter[whichString] = 0;
 	}
-	if (((LHmuteCounter[whichString] > 1000) && (stringPositions[whichString] == 65535)) || (RHmuteCounter[whichString] > 400))
+	if (((LHmuteCounter[whichString] > LHMUTE_COUNTLIM) && (stringPositions[whichString] == 65535)) || (RHmuteCounter[whichString] > RHMUTE_COUNTLIM))
 	{
+
+
 		if (offLockout[whichString] == 0)
 		{
-			tADSR_off(&envelope[whichString]);
-			noteOffHappened[whichString] = 1;
+			tSimplePoly_noteOff(&poly, whichString);
+			//tADSR_off(&envelope[whichString]);
+			//noteOffHappened[whichString] = 1;
 		}
+
 	}
+	/*
 	else
 	{
 		//tEnvelopeFollower_decayCoeff(&myFollower[whichString], 0.99999f);
@@ -466,120 +602,29 @@ float processString(int whichString, float input)
 	{
 		LHstabilityCounter[whichString] = 0;
 	}
+	*/
 	//if (LHstabilityCounter[whichString] > 8000)
 	{
 		tExpSmooth_setDest(&pitchSmoother[whichString], mtof((round(stringMIDIVersionOfFrequencies[whichString]))));
 	}
-		float myFreq = tExpSmooth_tick(&pitchSmoother[whichString]) * octave;
-		for (int i = 0; i < NUM_SAWTOOTHS; i++)
-		{
-			tSawtooth_setFreq(&mySaw[whichString][i], myFreq * detuneAmounts[i]);
-			tCycle_setFreq(&mySine[i], myFreq * 0.5f);
-		}
+	float myFreq = tExpSmooth_tick(&pitchSmoother[whichString]) * octave;
+	//for (int i = 0; i < NUM_SAWTOOTHS; i++)
+	//{
+		//tSawtooth_setFreq(&mySaw[whichString][i], myFreq * detuneAmounts[i]);
+	//}
+	//tCycle_setFreq(&mySine[whichString], myFreq);
+	//joy_x = ((SPI_RX[9] << 8) + (SPI_RX[10])) * 0.00025f;
+	//joy_y = ((SPI_RX[11] << 8) + (SPI_RX[12])) * 0.00025f;
+	//knobParams[0] = faster_mtof(joy_x * 230.0f) ; //brightness
+	//tSVF_setFreq(&myLowpass[whichString], LEAF_clip(50.0f, (knobParams[0] + (myFreq * 3.0f)) * tADSR_tick(&envelope[whichString]), 18000.0f));
 
-		joy_x = ((SPI_RX[9] << 8) + (SPI_RX[10])) * 0.00025f;
-		joy_y = ((SPI_RX[11] << 8) + (SPI_RX[12])) * 0.00025f;
-		knobParams[0] = faster_mtof(joy_x * 230.0f) ; //brightness
-		tSVF_setFreq(&myLowpass[whichString], LEAF_clip(50.0f, (knobParams[0] + (myFreq * 3.0f)) * tADSR_tick(&envelope[whichString]), 18000.0f));
 
-
-		stringFreqs[whichString] =myFreq;
+	stringFreqs[whichString] = myFreq;
 
 	return 0.0f;
 
 }
 
-
-///FM RHODES ELECTRIC PIANO SYNTH
-#define NUM_VOC_VOICES 2
-
-tCycle FM_sines[NUM_VOC_VOICES][6];
-float FM_freqRatios[4][6] = {{1.0f, 1.0001f, 1.0f, 3.0f, 1.0f, 1.0f}, {2.0f, 2.0001f, .99999f, 3.0f, 5.0f, 8.0f},  {1.0f, 2.0f, 1.0f, 7.0f, 3.0f, 4.0f}, {1.0f, 2.0f, 1.0f, 7.0f, 3.0f, 4.0f}};
-float FM_indices[4][6] = {{1016.0f, 0.0f, 120.0f, 32.0f, 208.0f, 168.0f}, {100.0f, 100.0f, 300.0f, 300.0f, 10.0f, 5.0f}, {500.0f, 50.0f, 500.0f, 10.0f,0.0f, 0.0f}, {50.0f, 128.0f, 1016.0f, 528.0f, 4.0f, 0.0f}};
-float FM_decays[4][6] = {{64.0f, 2000.0f, 3000.0f, 3400.0f, 3200.0f, 3100.0f}, {2000.0f, 300.0f, 800.0f, 3000.0f, 340.0f, 50.0f}, {20.0f, 50.0f, 50.0f, 10.0f, 30.0f, 20.0f}, {584.0f, 1016.0f, 1016.0f, 1000.0f, 600.0f, 500.0f}};
-float FM_sustains[4][6] = {{0.9f, 0.9f, 0.9f, 0.9f, 0.7f, 0.7f}, {0.5f, 0.3f, 0.3f, 0.3f, 0.3f, 0.3f}, {0.3f, 0.3f, 0.3f, 0.3f, 0.0f, 0.0f},{0.5f, 0.3f, 0.3f, 0.3f, 0.3f, 0.3f}};
-float FM_attacks[4][6] = {{7.0f, 7.0f, 7.0f, 7.0f, 7.0f, 7.0f}, {7.0f, 7.0f, 7.0f, 7.0f, 7.0f,7.0f}, {10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f},{1000.0f, 680.0f, 250.0f, 1300.0f, 750.0f, 820.0f}};
-tADSR FM_envs[NUM_VOC_VOICES][6];
-float feedback_output = 0.0f;
-
-tCycle tremolo;
-
-int Rsound = 2;
-
-char* soundNames[4];
-
-//FM Rhodes
-void SFXRhodesAlloc()
-{
-	soundNames[0] = "DARK  ";
-	soundNames[1] = "LIGHT ";
-	soundNames[2] = "BASS  ";
-	soundNames[3] = "PAD   ";
-	for (int i = 0; i < NUM_VOC_VOICES; i++)
-	{
-		for (int j = 0; j < 6; j++)
-		{
-			tCycle_initToPool(&FM_sines[i][j], &smallPool);
-			tADSR_initToPool(&FM_envs[i][j], FM_attacks[Rsound][j], FM_decays[Rsound][j], FM_sustains[Rsound][j], 100.0f, &smallPool);
-			tADSR_setLeakFactor(&FM_envs[i][j], 0.999987f);
-		}
-	}
-	tCycle_initToPool(&tremolo, &smallPool);
-	tCycle_setFreq(&tremolo, 3.0f);
-
-
-}
-
-
-float SFXRhodesTick(int whichString)
-{
-	joy_x = ((SPI_RX[9] << 8) + (SPI_RX[10])) * 0.00025f;
-	joy_y = ((SPI_RX[11] << 8) + (SPI_RX[12])) * 0.00025f;
-	knobParams[0] = (joy_x * 2.0f) + 0.7f; //brightness
-	knobParams[1] = joy_y; //brightness
-	float sample = 0.0f;
-
-	//tCycle_setFreq(&tremolo, knobParams[2]);
-
-	if (noteOnHappened[whichString])
-	{
-		for (int j = 0; j < 6; j++)
-
-		{
-			tADSR_on(&FM_envs[whichString][j], noteOnAmplitude[whichString] * 2.0f);// * 0.0078125f);
-		}
-
-	}
-	if (noteOffHappened[whichString])
-	{
-		for (int j = 0; j < 6; j++)
-			{
-				tADSR_off(&FM_envs[whichString][j]);
-			}
-	}
-
-		float myFrequency = stringFreqs[whichString];
-		tCycle_setFreq(&FM_sines[whichString][5], (myFrequency  * FM_freqRatios[Rsound][5]) + (FM_indices[Rsound][5] * feedback_output * knobParams[0]));
-		feedback_output = tCycle_tick(&FM_sines[whichString][5]);
-		tCycle_setFreq(&FM_sines[whichString][4], (myFrequency  * FM_freqRatios[Rsound][4]) + (FM_indices[Rsound][4] * feedback_output * knobParams[0] * tADSR_tick(&FM_envs[whichString][5])));
-		tCycle_setFreq(&FM_sines[whichString][3], (myFrequency  * FM_freqRatios[Rsound][3]) + (FM_indices[Rsound][3] * knobParams[0] * tCycle_tick(&FM_sines[whichString][4]) * tADSR_tick(&FM_envs[whichString][4])));
-		tCycle_setFreq(&FM_sines[whichString][2], (myFrequency  * FM_freqRatios[Rsound][2]) + (FM_indices[Rsound][2] * knobParams[0] * tCycle_tick(&FM_sines[whichString][3]) * tADSR_tick(&FM_envs[whichString][3])));
-		tCycle_setFreq(&FM_sines[whichString][1], myFrequency  * FM_freqRatios[Rsound][1]);
-		tCycle_setFreq(&FM_sines[whichString][0],( myFrequency  * FM_freqRatios[Rsound][0]) + (FM_indices[Rsound][0] * knobParams[0] * tCycle_tick(&FM_sines[whichString][1]) * tADSR_tick(&FM_envs[whichString][1])));
-
-
-
-		sample += tCycle_tick(&FM_sines[whichString][2]) * tADSR_tick(&FM_envs[whichString][2]);
-		sample += tCycle_tick(&FM_sines[whichString][0]) * tADSR_tick(&FM_envs[whichString][0]);
-
-	float tremoloSignal = ((tCycle_tick(&tremolo) * 0.5f) + 0.5f) * knobParams[1];
-	sample = sample * (tremoloSignal + (1.0f - knobParams[1]));
-
-	sample *= 1.0f;
-	return sample;
-	//sample = LEAF_shaper(sample, 1.0f);
-	//sample *= 0.8f;
-}
 
 
 float map(float value, float istart, float istop, float ostart, float ostop)
@@ -612,27 +657,54 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 {
 	audioFrame(0);
 }
+int sampRecords[256];
+uint8_t currentSamp;
 
+
+void ADC_Frame(int offset)
+{
+	//HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_11);
+
+	sampRecords[currentSamp] = frameCount;
+	currentSamp++;
+	for (int i = offset; i < ADC_FRAME_SIZE + offset; i++)
+	{
+		for (int j = 0; j < NUM_ADC_CHANNELS; j++)
+		{
+			int tempInt = ADC_values[(i*NUM_ADC_CHANNELS) + j];
+			float tempSamp = (((float)tempInt - INV_TWO_TO_15) * INV_TWO_TO_15);
+			//tempSamp = tHighpass_tick(&opticalHighpass[j+NUM_STRINGS], tHighpass_tick(&opticalHighpass[j], tempSamp));
+
+
+			for (int k = 0; k < FILTER_ORDER; k++)
+			{
+				//tempSamp = tHighpass_tick(&opticalHighpass[j+ (NUM_STRINGS * k)], tVZFilter_tick(&opticalLowpass[j + (NUM_STRINGS * k)], tempSamp));
+				tempSamp = tHighpass_tick(&opticalHighpass[j+ (NUM_STRINGS * k)], tempSamp);
+				//
+			}
+			tempSamp = tVZFilter_tick(&opticalLowpass[j], tempSamp);
+
+			attackDetect2(j, tempSamp);
+			processString(j, tempSamp);
+		}
+		whichVal++;
+
+	}
+
+	ADC_Ready = 1;
+
+}
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-		for (int i = 0; i < AUDIO_FRAME_SIZE; i++)
-		{
-			for (int j = 0; j < NUM_ADC_CHANNELS; j++)
-			{
-				int tempInt = ADC_values[(i*NUM_ADC_CHANNELS) + j];
-				audioADCInputs[j][currentADCBufferPos] = ((float)(tempInt - TWO_TO_15) * INV_TWO_TO_15);
-			}
-			currentADCBufferPos++;
-			if (currentADCBufferPos >= ADC_RING_BUFFER_SIZE)
-			{
-				currentADCBufferPos = 0;
-			}
-		}
-		ADC_Ready = 1;
+
+
+	ADC_Frame(ADC_FRAME_SIZE);
+
+
 }
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
 {
-
+	ADC_Frame(0);
 }
 void HAL_ADC_Error(ADC_HandleTypeDef *hadc)
 {

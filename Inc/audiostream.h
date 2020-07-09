@@ -33,15 +33,17 @@
 #include "leaf.h"
 #include "main.h"
 
-#define AUDIO_FRAME_SIZE      32
+#define AUDIO_FRAME_SIZE      64
 #define HALF_BUFFER_SIZE      AUDIO_FRAME_SIZE * 2 //number of samples per half of the "double-buffer" (twice the audio frame size because there are interleaved samples for both left and right channels)
 #define AUDIO_BUFFER_SIZE     AUDIO_FRAME_SIZE * 4 //number of samples in the whole data structure (four times the audio frame size because of stereo and also double-buffering/ping-ponging)
-#define ADC_RING_BUFFER_SIZE 	256
+#define ADC_RING_BUFFER_SIZE 	2048
+#define ADC_FRAME_SIZE 64
+#define ADC_BUFFER_SIZE ADC_FRAME_SIZE * 2
 
 extern int32_t audioOutBuffer[AUDIO_BUFFER_SIZE];
 extern uint8_t codecReady;
 #define NUM_ADC_CHANNELS 4
-extern uint16_t ADC_values[NUM_ADC_CHANNELS * AUDIO_FRAME_SIZE];
+extern int32_t ADC_values[NUM_ADC_CHANNELS * ADC_BUFFER_SIZE];
 extern uint32_t currentADCBufferPos;
 extern int ADC_Ready;
 /* Exported types ------------------------------------------------------------*/

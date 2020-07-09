@@ -21,7 +21,7 @@ Drivers/STM32H7xx_HAL_Driver/Src \
 Middlewares/Third_Party/FatFs/src \
 Middlewares/Third_Party/FatFs/src/option \
 Src \
-leaf/LEAF/Externals \
-leaf/LEAF/Src \
+leaf/leaf/Externals \
+leaf/leaf/Src \
 startup \
 

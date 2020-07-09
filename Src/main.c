@@ -35,6 +35,7 @@
 /* USER CODE BEGIN Includes */
 #include "leaf.h"
 #include "audiostream.h"
+#include "wave.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +64,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
 void SDRAM_Initialization_sequence(void);
+static void FS_FileOperations(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -70,6 +72,16 @@ void SDRAM_Initialization_sequence(void);
 uint8_t SPI_TX[16] __ATTR_RAM_D2;
 uint8_t SPI_RX[16] __ATTR_RAM_D2;
 uint8_t counter;
+
+
+FRESULT res;
+  FATFS MMCFatFs;
+  FIL myFile;
+  FATFS fs;
+  DSTATUS statusH;
+  BYTE work[1024]; /* Work area (larger is better for processing time) */
+  uint8_t workBuffer[1024];
+
 /* USER CODE END 0 */
 
 /**
@@ -138,15 +150,121 @@ int main(void)
   HAL_Delay(100);
 
   audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
+
+/*
+  statusH = disk_initialize(0);
+    if (statusH != RES_OK)
+    {
+      //ShowDiskStatus(status);
+    }
+    HAL_Delay(100);
+    statusH = disk_status(0);
+    if (statusH != RES_OK)
+    {
+      //ShowDiskStatus(status);
+    }
+    HAL_Delay(100);
+    res = f_mount(&fs, SDPath, 1);
+    if (res != FR_OK)
+    {
+      //ShowFatFsError(res);
+    }
+    HAL_Delay(100);
+    char label[12];
+    res = f_getlabel(SDPath, label, 0);
+    if (res != FR_OK)
+    {
+      //ShowFatFsError(res);
+    }
+    HAL_Delay(100);
+    FATFS *fs2;
+     DWORD fre_clust, fre_sect, tot_sect;
+     res = f_getfree(SDPath, &fre_clust, &fs2);
+     if (res != FR_OK)
+     {
+       //ShowFatFsError(res);
+     }
+     tot_sect = (fs2->n_fatent - 2) * fs2->csize;
+     fre_sect = fre_clust * fs2->csize;
+
+
+	 if(BSP_SD_IsDetected())
+	 {
+	   FRESULT res;
+
+	   res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
+
+
+
+	   FS_FileOperations();
+
+	 }
+/*
+     void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+     {
+       if(MFX_IRQOUT_PIN == GPIO_Pin)
+       {
+         if(BSP_SD_IsDetected())
+         {
+           Appli_state = APPLICATION_RUNNING;
+
+         }
+         else
+         {
+           Appli_state = APPLICATION_SD_UNPLUGGED;
+           f_mount(NULL, (TCHAR const*)"", 0);
+
+         }
+       }
+     }
+*/
+
+     //FIL testFile;
+     //uint8_t testBuffer[16] = "SD write succest";
+     //UINT testBytes;
+     //uint8_t path[5] = "s.txt";
+     //f_open(&testFile, (char*)path, FA_READ | FA_CREATE_ALWAYS);
+     //readWave(&testFile);
+     /*
+
+
+     uint8_t testBuffer[16] = "SD write succest";
+     UINT testBytes;
+
+
+	uint8_t path[13] = "testfili.txt";
+	path[12] = '\0';
+
+   res = f_open(&testFile, (char*)path, FA_WRITE | FA_CREATE_ALWAYS);
+
+   //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+   res = f_write(&testFile, testBuffer, 16, &testBytes);
+   //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+
+   res = f_close(&testFile);
+   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+   */
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  //int tempIntGP = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	  //if (tempIntGP)
+	  {
+		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	  }
+	  //else
 
+	  {
+		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -177,8 +295,11 @@ void SystemClock_Config(void)
   __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI
+                              |RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
@@ -214,7 +335,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_SPI2
                               |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SDMMC
                               |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_ADC
-                              |RCC_PERIPHCLK_FMC;
+                              |RCC_PERIPHCLK_FMC|RCC_PERIPHCLK_CKPER;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 344;
   PeriphClkInitStruct.PLL2.PLL2P = 7;
@@ -225,11 +346,12 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
   PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.CkperClockSelection = RCC_CLKPSOURCE_HSI;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
-  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_CLKP;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -329,7 +451,73 @@ float randomNumber(void) {
 	float num = (float)rand * INV_TWO_TO_32;
 	return num;
 }
+volatile FRESULT res2;
+uint8_t rtext[100];                                   /* File read buffer */
+volatile uint32_t byteswritten, bytesread;                     /* File write/read counts */
+volatile uint8_t wtext[] = "This is STM32 working with FatFs2"; /* File write buffer */
+static void FS_FileOperations(void)
+{
+                                       /* FatFs function common result code */
 
+
+	res2 = FR_TOO_MANY_OPEN_FILES;
+  /* Open the text file object with read access */
+  f_open(&myFile, "s.wav", FA_READ);
+  {
+	/* Read data from the text file */
+	res2 = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
+
+	if((bytesread > 0) && (res2 == FR_OK))
+	{
+	  /* Close the open text file */
+	  f_close(&myFile);
+	}
+  }
+
+
+
+#if 0
+  /* Register the file system object to the FatFs module */
+  if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
+  {
+    /* Create and Open a new text file object with write access */
+    if(f_open(&myFile, "STM32_2.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+    {
+      /* Write data to the text file */
+      res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
+
+      if((byteswritten > 0) && (res == FR_OK))
+      {
+        /* Close the open text file */
+        f_close(&myFile);
+
+        /* Open the text file object with read access */
+        if(f_open(&myFile, "STM32_2.TXT", FA_READ) == FR_OK)
+        {
+          /* Read data from the text file */
+          res = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
+
+          if((bytesread > 0) && (res == FR_OK))
+          {
+            /* Close the open text file */
+            f_close(&myFile);
+
+            /* Compare read data with the expected data */
+            if((bytesread == byteswritten))
+            {
+              /* Success of the demo: no error occurrence */
+              //BSP_LED_On(LED1);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+  #endif
+  /* Error */
+  //Error_Handler();
+}
 
 void MPU_Conf(void)
 {
@@ -418,6 +606,7 @@ void MPU_Conf(void)
 
 	  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
+
 
 /* USER CODE END 4 */
 
