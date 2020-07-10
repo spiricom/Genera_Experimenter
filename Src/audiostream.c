@@ -13,6 +13,10 @@
 #include "codec.h"
 #include "gpio.h"
 #include "adc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "sai.h"
 
 #define NUM_STRINGS NUM_ADC_CHANNELS
 
@@ -21,7 +25,7 @@
 
 #define FILTER_ORDER 12
 #define LHMUTE_COUNTLIM 100
-#define RHMUTE_COUNTLIM 10
+#define RHMUTE_COUNTLIM 1
 
 float atodbTable[ATODB_TABLE_SIZE];
 
@@ -51,7 +55,7 @@ uint8_t codecReady = 0;
 float sample = 0.0f;
 float rightIn = 0.0f;
 
-#define NUM_SAWTOOTHS 1
+#define NUM_SAWTOOTHS 4
 tSVF myLowpass[NUM_STRINGS];
 tSawtooth mySaw[NUM_STRINGS][NUM_SAWTOOTHS];
 tCycle mySine[NUM_STRINGS];
@@ -124,6 +128,8 @@ tVZFilter opticalLowpass[NUM_STRINGS * FILTER_ORDER];
 
 tExpSmooth gainSmoothed;
 
+int waitTimeOver = 0;
+
 //MEMPOOLS
 #define SMALL_MEM_SIZE 50000
 char smallMemory[SMALL_MEM_SIZE];
@@ -171,6 +177,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	tSimplePoly_init(&poly,1);
 	tSimplePoly_setNumVoices(&poly,1);
+	poly->recover_stolen = 0;
 	tExpSmooth_init(&gainSmoothed, 0.0f, 0.01f);
 	/*
 	for (int i = 0; i < 2; i++)
@@ -203,8 +210,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.002f);
 		tNoise_init(&noise[i], WhiteNoise);
 		tThreshold_init(&threshold[i],0.5f, 8.0f);
-		tADSR_init(&envelope[i], 0.0f, 100.0f, 0.6f, 20.0f);
-		tADSR_setLeakFactor(&envelope[i], 0.999998f);
+		tADSR_init(&envelope[i], 6.0f, 100.0f, 0.6f, 20.0f);
+		tADSR_setLeakFactor(&envelope[i], 0.99998f);
 		tSlide_init(&fastSlide[i],1.0f,1110.0f);
 		tSlide_init(&slowSlide[i],500.0f,1.0f);
 		tSVF_init(&lowpass[i], SVFTypeLowpass, 4000.0f, 1.0f);
@@ -340,7 +347,7 @@ float audioTick()
 		//sample -= noteOnHappened[0];
 	}
 	*/
-
+/*
 	float tempSample = 0.0f;
 	//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
 
@@ -351,15 +358,17 @@ float audioTick()
 	{
 		tSawtooth_setFreq(&mySaw[0][i], theFreq * detuneAmounts[i]);
 	}
-	float theEnv = tExpSmooth_tick(&gainSmoothed);
 
-	//float theEnv = tADSR_tick(&envelope[0]);
+	//float theEnv = tExpSmooth_tick(&gainSmoothed);
+
+	float theEnv = tADSR_tick(&envelope[0]);
 	for (int j = 0; j < NUM_SAWTOOTHS; j++)
 	{
 		tempSample += tSawtooth_tick(&mySaw[0][j]) * theEnv;
 	}
 	sample = tempSample;
 	sample = tanhf(sample);
+	*/
 	return sample;
 
 }
@@ -416,7 +425,10 @@ void attackDetect2(int whichString, float input)
 	//if you didn't get an attack within the last 1323 samples, and you got one now
 	if ((status[whichString] <= 0.0f) && (outOfThreshPositiveChange[whichString] == 1))
 	{
-		status[whichString] = 1.0f;
+		status[0] = 1.0f;
+		status[1] = 1.0f;
+		status[2] = 1.0f;
+		status[3] = 1.0f;
 		currentMaximum[whichString] = 0.0f;
 		/*
 		for (int i = 0; i < distanceBetweenReadAndWrite; i++)
@@ -440,7 +452,7 @@ void attackDetect2(int whichString, float input)
 		sahArmed[whichString] = 1;
 		//downCounter[whichString] = 0;
 		offLockout[whichString] = offLockoutDelay;
-		delayCounter[whichString] = 128;
+		delayCounter[whichString] = 200;
 		pastValues[whichString][whichVal%512] += 2.0f;
 		//TODO: //may want to make this look into the future values held by the ADC input array instead and set this delay to the time between the read and write pointers
 		strikeTime[whichString] = whichVal%512;
@@ -493,7 +505,11 @@ void attackDetect2(int whichString, float input)
 		{
 			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_10, GPIO_PIN_RESET);
 		}
-		tSimplePoly_noteOn(&poly, whichString, LEAF_clip(0, currentMaximum[whichString] * 512.0f, 127));
+		if (waitTimeOver)
+		{
+			tSimplePoly_noteOn(&poly, whichString, LEAF_clip(1, currentMaximum[whichString] * 512.0f, 127));
+			tADSR_on(&envelope[0], currentMaximum[whichString]*10.0f);
+		}
 		//tSimplePoly_noteOn(&poly, whichString, 127);
 		pastValues[whichString][whichVal%512] += 3.0f;
 		//noteOnAmplitude[whichString] = tempAmp;
@@ -512,7 +528,7 @@ void attackDetect2(int whichString, float input)
 }
 
 
-
+int prevPolyOn = 0;
 
 float processString(int whichString, float input)
 {
@@ -584,6 +600,10 @@ float processString(int whichString, float input)
 		if (offLockout[whichString] == 0)
 		{
 			tSimplePoly_noteOff(&poly, whichString);
+			if (tSimplePoly_getNumActiveVoices(&poly) == 0)
+			{
+				tADSR_off(&envelope[0]);
+			}
 			//tADSR_off(&envelope[whichString]);
 			//noteOffHappened[whichString] = 1;
 		}
@@ -660,6 +680,7 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 int sampRecords[256];
 uint8_t currentSamp;
 
+uint8_t SDWriteIndex = 0;
 
 void ADC_Frame(int offset)
 {
@@ -674,23 +695,40 @@ void ADC_Frame(int offset)
 			int tempInt = ADC_values[(i*NUM_ADC_CHANNELS) + j];
 			float tempSamp = (((float)tempInt - INV_TWO_TO_15) * INV_TWO_TO_15);
 			//tempSamp = tHighpass_tick(&opticalHighpass[j+NUM_STRINGS], tHighpass_tick(&opticalHighpass[j], tempSamp));
+			//itoa(SDWriteIndex, wtext, 4);
 
+			if (SDReady)
+			{
+				writeToSD(SDWriteIndex);
 
+				if (SDWriteIndex > 254)
+				{
+					finishSD = 1;
+					HAL_ADC_Stop(&hadc1);
+					HAL_SAI_DMAStop(&hsai_BlockA1);
+					HAL_SAI_DMAStop(&hsai_BlockB1);
+				}
+			}
+/*			}
 			for (int k = 0; k < FILTER_ORDER; k++)
 			{
 				//tempSamp = tHighpass_tick(&opticalHighpass[j+ (NUM_STRINGS * k)], tVZFilter_tick(&opticalLowpass[j + (NUM_STRINGS * k)], tempSamp));
 				tempSamp = tHighpass_tick(&opticalHighpass[j+ (NUM_STRINGS * k)], tempSamp);
 				//
 			}
-			tempSamp = tVZFilter_tick(&opticalLowpass[j], tempSamp);
+			tempSamp = tVZFilter_tick(&opticalLowpass[j], tempSamp) * 1.5f;
 
 			attackDetect2(j, tempSamp);
 			processString(j, tempSamp);
+			*/
 		}
 		whichVal++;
 
 	}
-
+	if (whichVal > 3000)
+	{
+		waitTimeOver = 1;
+	}
 	ADC_Ready = 1;
 
 }

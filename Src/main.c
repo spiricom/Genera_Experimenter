@@ -72,7 +72,7 @@ static void FS_FileOperations(void);
 uint8_t SPI_TX[16] __ATTR_RAM_D2;
 uint8_t SPI_RX[16] __ATTR_RAM_D2;
 uint8_t counter;
-
+int SDReady = 0;
 
 FRESULT res;
   FATFS MMCFatFs;
@@ -81,6 +81,7 @@ FRESULT res;
   DSTATUS statusH;
   BYTE work[1024]; /* Work area (larger is better for processing time) */
   uint8_t workBuffer[1024];
+int finishSD = 0;
 
 /* USER CODE END 0 */
 
@@ -147,36 +148,34 @@ int main(void)
   HAL_Delay(10);
 
   //SDRAM_Initialization_sequence();
-  HAL_Delay(100);
+  HAL_Delay(1);
 
-  audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
-/*
   statusH = disk_initialize(0);
     if (statusH != RES_OK)
     {
       //ShowDiskStatus(status);
     }
-    HAL_Delay(100);
+    HAL_Delay(1);
     statusH = disk_status(0);
     if (statusH != RES_OK)
     {
       //ShowDiskStatus(status);
     }
-    HAL_Delay(100);
+    HAL_Delay(1);
     res = f_mount(&fs, SDPath, 1);
     if (res != FR_OK)
     {
       //ShowFatFsError(res);
     }
-    HAL_Delay(100);
+    HAL_Delay(1);
     char label[12];
     res = f_getlabel(SDPath, label, 0);
     if (res != FR_OK)
     {
       //ShowFatFsError(res);
     }
-    HAL_Delay(100);
+    HAL_Delay(1);
     FATFS *fs2;
      DWORD fre_clust, fre_sect, tot_sect;
      res = f_getfree(SDPath, &fre_clust, &fs2);
@@ -187,6 +186,8 @@ int main(void)
      tot_sect = (fs2->n_fatent - 2) * fs2->csize;
      fre_sect = fre_clust * fs2->csize;
 
+
+     audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
 	 if(BSP_SD_IsDetected())
 	 {
@@ -199,6 +200,11 @@ int main(void)
 	   FS_FileOperations();
 
 	 }
+
+
+
+
+
 /*
      void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
      {
@@ -255,12 +261,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //int tempIntGP = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
-	  //if (tempIntGP)
+	  int tempIntGP = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	  if (tempIntGP)
 	  {
 		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 	  }
-	  //else
+	  else
 
 	  {
 		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
@@ -453,70 +459,78 @@ float randomNumber(void) {
 }
 volatile FRESULT res2;
 uint8_t rtext[100];                                   /* File read buffer */
-volatile uint32_t byteswritten, bytesread;                     /* File write/read counts */
-volatile uint8_t wtext[] = "This is STM32 working with FatFs2"; /* File write buffer */
+uint32_t byteswritten, bytesread;                     /* File write/read counts */
+uint8_t wtext[4096] = "hello"; /* File write buffer */
+uint8_t tempText[20];
+int testNumber = 55559;
 static void FS_FileOperations(void)
 {
                                        /* FatFs function common result code */
 
-
+#if 0
 	res2 = FR_TOO_MANY_OPEN_FILES;
   /* Open the text file object with read access */
   f_open(&myFile, "s.wav", FA_READ);
   {
 	/* Read data from the text file */
 	res2 = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
-
+	atoi(100, wtext, 10);
 	if((bytesread > 0) && (res2 == FR_OK))
 	{
 	  /* Close the open text file */
 	  f_close(&myFile);
 	}
   }
+#endif
 
 
 
-#if 0
   /* Register the file system object to the FatFs module */
   if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
   {
-    /* Create and Open a new text file object with write access */
-    if(f_open(&myFile, "STM32_2.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
-    {
-      /* Write data to the text file */
-      res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
 
-      if((byteswritten > 0) && (res == FR_OK))
-      {
-        /* Close the open text file */
-        f_close(&myFile);
+		if(f_open(&myFile, "EBTEST1.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		{
+			SDReady = 1;
+		}
+    	//f_close(&myFile);
+     /* Write data to the text file */
+      //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
 
-        /* Open the text file object with read access */
-        if(f_open(&myFile, "STM32_2.TXT", FA_READ) == FR_OK)
-        {
-          /* Read data from the text file */
-          res = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
 
-          if((bytesread > 0) && (res == FR_OK))
-          {
-            /* Close the open text file */
-            f_close(&myFile);
-
-            /* Compare read data with the expected data */
-            if((bytesread == byteswritten))
-            {
-              /* Success of the demo: no error occurrence */
-              //BSP_LED_On(LED1);
-              return;
-            }
-          }
-        }
-      }
-    }
   }
-  #endif
+
   /* Error */
   //Error_Handler();
+}
+
+uint8_t comma[] = ", ";
+void writeToSD(int theNumber)
+{
+	if(finishSD == 1)
+	{
+		/* Close the open text file */
+		SDReady = 0;
+		 /* Create and Open a new text file object with write access */
+
+			 f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
+			 res = f_close(&myFile);
+		 	 if (res)
+		 	 {
+		 		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		 	 }
+
+	}
+	else
+	{
+    	itoa(theNumber,tempText, 10);
+    	strncat(wtext, tempText, sizeof(tempText));
+    	strncat(wtext, comma, sizeof(comma));
+
+
+		//f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
+		SDWriteIndex++;
+	}
 }
 
 void MPU_Conf(void)

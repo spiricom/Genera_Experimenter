@@ -60,13 +60,16 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 float randomNumber(void);
-
+void writeToSD(int);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 extern uint8_t SPI_TX[16];
 extern uint8_t SPI_RX[16];
+extern int SDReady;
+extern uint32_t byteswritten, bytesread;                     /* File write/read counts */
+extern int finishSD;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
