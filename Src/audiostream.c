@@ -131,15 +131,15 @@ tExpSmooth gainSmoothed;
 int waitTimeOver = 0;
 
 //MEMPOOLS
-#define SMALL_MEM_SIZE 50000
+#define SMALL_MEM_SIZE 10000
 char smallMemory[SMALL_MEM_SIZE];
 
 #define MEDIUM_MEM_SIZE 500000
-char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
+//char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 
-//#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
+
 //char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
-
+char largeMemory[LARGE_MEM_SIZE] __ATTR_RAM_D1;
 tMempool mediumPool;
 //tMempool largePool;
 
@@ -158,7 +158,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
-	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE);
+	//tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE);
 	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
 	HAL_Delay(10);
@@ -680,7 +680,7 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 int sampRecords[256];
 uint8_t currentSamp;
 
-uint8_t SDWriteIndex = 0;
+uint64_t SDWriteIndex = 0;
 
 void ADC_Frame(int offset)
 {
@@ -696,17 +696,19 @@ void ADC_Frame(int offset)
 			float tempSamp = (((float)tempInt - INV_TWO_TO_15) * INV_TWO_TO_15);
 			//tempSamp = tHighpass_tick(&opticalHighpass[j+NUM_STRINGS], tHighpass_tick(&opticalHighpass[j], tempSamp));
 			//itoa(SDWriteIndex, wtext, 4);
-
-			if (SDReady)
+			if (j == 0)
 			{
-				writeToSD(SDWriteIndex);
-
-				if (SDWriteIndex > 254)
+				if (SDReady)
 				{
-					finishSD = 1;
-					HAL_ADC_Stop(&hadc1);
-					HAL_SAI_DMAStop(&hsai_BlockA1);
-					HAL_SAI_DMAStop(&hsai_BlockB1);
+					writeToSD(SDWriteIndex, tempInt);
+
+					if (SDWriteIndex > 4000)
+					{
+						finishSD = 1;
+						HAL_ADC_Stop(&hadc1);
+						HAL_SAI_DMAStop(&hsai_BlockA1);
+						HAL_SAI_DMAStop(&hsai_BlockB1);
+					}
 				}
 			}
 /*			}

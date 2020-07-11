@@ -60,7 +60,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 float randomNumber(void);
-void writeToSD(int);
+void writeToSD(int, int);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

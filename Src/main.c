@@ -147,35 +147,35 @@ int main(void)
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
-  //SDRAM_Initialization_sequence();
-  HAL_Delay(1);
+  SDRAM_Initialization_sequence();
+  HAL_Delay(10);
 
-
+/*
   statusH = disk_initialize(0);
     if (statusH != RES_OK)
     {
       //ShowDiskStatus(status);
     }
-    HAL_Delay(1);
+    HAL_Delay(10);
     statusH = disk_status(0);
     if (statusH != RES_OK)
     {
       //ShowDiskStatus(status);
     }
-    HAL_Delay(1);
+    HAL_Delay(10);
     res = f_mount(&fs, SDPath, 1);
     if (res != FR_OK)
     {
       //ShowFatFsError(res);
     }
-    HAL_Delay(1);
+    HAL_Delay(10);
     char label[12];
     res = f_getlabel(SDPath, label, 0);
     if (res != FR_OK)
     {
       //ShowFatFsError(res);
     }
-    HAL_Delay(1);
+    HAL_Delay(10);
     FATFS *fs2;
      DWORD fre_clust, fre_sect, tot_sect;
      res = f_getfree(SDPath, &fre_clust, &fs2);
@@ -187,13 +187,11 @@ int main(void)
      fre_sect = fre_clust * fs2->csize;
 
 
-     audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
+*/
 
 	 if(BSP_SD_IsDetected())
 	 {
-	   FRESULT res;
 
-	   res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
 
 
 
@@ -201,7 +199,7 @@ int main(void)
 
 	 }
 
-
+     audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
 
 
@@ -460,9 +458,11 @@ float randomNumber(void) {
 volatile FRESULT res2;
 uint8_t rtext[100];                                   /* File read buffer */
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
-uint8_t wtext[4096] = "hello"; /* File write buffer */
-uint8_t tempText[20];
+uint8_t wtext[48000]; /* File write buffer */
+uint8_t tempText[30];
 int testNumber = 55559;
+uint8_t filename[30];
+uint8_t fileExt[] = ".txt";
 static void FS_FileOperations(void)
 {
                                        /* FatFs function common result code */
@@ -483,16 +483,25 @@ static void FS_FileOperations(void)
   }
 #endif
 
-
-
+  int theNumber = randomNumber() * 65535;
+  itoa(theNumber,tempText, 10);
+  strncat(filename, tempText, sizeof(tempText));
+  strncat(filename, fileExt, sizeof(fileExt));
+  statusH = disk_initialize(0);
   /* Register the file system object to the FatFs module */
   if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
   {
+	   FRESULT res;
 
-		if(f_open(&myFile, "EBTEST1.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
-		{
+	   //res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
+
+
+	  {
+		  if(f_open(&myFile, filename, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		  {
 			SDReady = 1;
-		}
+		  }
+	  }
     	//f_close(&myFile);
      /* Write data to the text file */
       //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
@@ -505,27 +514,65 @@ static void FS_FileOperations(void)
 }
 
 uint8_t comma[] = ", ";
-void writeToSD(int theNumber)
+uint8_t newline[] = "\r\n";
+uint64_t memoryPointer = 0;
+void writeToSD(int theIndex, int theNumber)
 {
 	if(finishSD == 1)
 	{
 		/* Close the open text file */
 		SDReady = 0;
+		largeMemory[memoryPointer] = 0;
+		memoryPointer++;
 		 /* Create and Open a new text file object with write access */
-
-			 f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
-			 res = f_close(&myFile);
-		 	 if (res)
-		 	 {
-		 		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		 	 }
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		 f_write(&myFile, largeMemory, memoryPointer, (void *)&byteswritten);
+		 res2 = f_close(&myFile);
+		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+		 if (res2 == FR_OK)
+		 {
+			 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		 }
 
 	}
 	else
 	{
-    	itoa(theNumber,tempText, 10);
-    	strncat(wtext, tempText, sizeof(tempText));
-    	strncat(wtext, comma, sizeof(comma));
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theIndex,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			largeMemory[memoryPointer] = tempText[i];
+			memoryPointer++;
+		}
+
+		largeMemory[memoryPointer] = 44;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+		//strncat(largeMemory, tempText, sizeof(tempText));
+		//strncat(largeMemory, comma, sizeof(comma));
+
+
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			largeMemory[memoryPointer] = tempText[i];
+			memoryPointer++;
+		}
+		largeMemory[memoryPointer] = 13;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 10;
+		memoryPointer++;
+    	//strncat(largeMemory, tempText, sizeof(tempText));
+    	//strncat(largeMemory, newline, sizeof(comma));
 
 
 		//f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
