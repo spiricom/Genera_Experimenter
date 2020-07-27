@@ -138,8 +138,8 @@ char smallMemory[SMALL_MEM_SIZE];
 //char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 
 
-//char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
-char largeMemory[LARGE_MEM_SIZE] __ATTR_RAM_D1;
+char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
+//char largeMemory[LARGE_MEM_SIZE] __ATTR_RAM_D1;
 tMempool mediumPool;
 //tMempool largePool;
 
@@ -693,24 +693,32 @@ void ADC_Frame(int offset)
 		for (int j = 0; j < NUM_ADC_CHANNELS; j++)
 		{
 			int tempInt = ADC_values[(i*NUM_ADC_CHANNELS) + j];
-			float tempSamp = (((float)tempInt - INV_TWO_TO_15) * INV_TWO_TO_15);
+			//float tempSamp = (((float)tempInt - INV_TWO_TO_15) * INV_TWO_TO_15);
+
+			stringPositions[j] =  ((uint16_t)SPI_RX[j * 2] << 8) + ((uint16_t)SPI_RX[(j * 2) + 1] & 0xff);
+			if (stringPositions[j] == 65535)
+			{
+				stringPositions[j] = 0;
+			}
+			stringTouchLH[j] = (SPI_RX[8] >> j) & 1;
+			stringTouchRH[j] = (SPI_RX[8] >> (j + 4)) & 1;
+
 			//tempSamp = tHighpass_tick(&opticalHighpass[j+NUM_STRINGS], tHighpass_tick(&opticalHighpass[j], tempSamp));
 			//itoa(SDWriteIndex, wtext, 4);
-			if (j == 0)
-			{
-				if (SDReady)
-				{
-					writeToSD(SDWriteIndex, tempInt);
 
-					if (SDWriteIndex > 4000)
-					{
-						finishSD = 1;
-						HAL_ADC_Stop(&hadc1);
-						HAL_SAI_DMAStop(&hsai_BlockA1);
-						HAL_SAI_DMAStop(&hsai_BlockB1);
-					}
+			if (SDReady)
+			{
+				writeToSD(SDWriteIndex, tempInt, (int)stringPositions[j],(int) stringTouchLH[j], (int)stringTouchRH[j], j);
+
+				if (memoryPointer >= (LARGE_MEM_SIZE - 300))
+				{
+					finishSD = 1;
+					HAL_ADC_Stop(&hadc1);
+					HAL_SAI_DMAStop(&hsai_BlockA1);
+					HAL_SAI_DMAStop(&hsai_BlockB1);
 				}
 			}
+
 /*			}
 			for (int k = 0; k < FILTER_ORDER; k++)
 			{

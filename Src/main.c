@@ -461,7 +461,7 @@ uint32_t byteswritten, bytesread;                     /* File write/read counts 
 uint8_t wtext[48000]; /* File write buffer */
 uint8_t tempText[30];
 int testNumber = 55559;
-uint8_t filename[30];
+int8_t filename[30];
 uint8_t fileExt[] = ".txt";
 static void FS_FileOperations(void)
 {
@@ -491,7 +491,7 @@ static void FS_FileOperations(void)
   /* Register the file system object to the FatFs module */
   if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
   {
-	   FRESULT res;
+	   //FRESULT res;
 
 	   //res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
 
@@ -516,18 +516,21 @@ static void FS_FileOperations(void)
 uint8_t comma[] = ", ";
 uint8_t newline[] = "\r\n";
 uint64_t memoryPointer = 0;
-void writeToSD(int theIndex, int theNumber)
+/*
+void writeToSD(int theIndex, int theNumber, int myPos, int lh, int rh, int whichString)
 {
 	if(finishSD == 1)
 	{
-		/* Close the open text file */
+
 		SDReady = 0;
 		largeMemory[memoryPointer] = 0;
 		memoryPointer++;
-		 /* Create and Open a new text file object with write access */
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+
+		//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		__disable_irq();
 		 f_write(&myFile, largeMemory, memoryPointer, (void *)&byteswritten);
 		 res2 = f_close(&myFile);
+		 __enable_irq();
 		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 		 if (res2 == FR_OK)
 		 {
@@ -535,7 +538,7 @@ void writeToSD(int theIndex, int theNumber)
 		 }
 
 	}
-	else
+	else if (whichString == 0)
 	{
 		for (int i = 0; i < 10; i++)
 		{
@@ -544,16 +547,17 @@ void writeToSD(int theIndex, int theNumber)
 		itoa(theIndex,tempText, 10);
 		for (int i = 0; i < 10; i++)
 		{
-			largeMemory[memoryPointer] = tempText[i];
-			memoryPointer++;
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
 		}
 
 		largeMemory[memoryPointer] = 44;
 		memoryPointer++;
 		largeMemory[memoryPointer] = 32;
 		memoryPointer++;
-		//strncat(largeMemory, tempText, sizeof(tempText));
-		//strncat(largeMemory, comma, sizeof(comma));
 
 
 
@@ -562,24 +566,372 @@ void writeToSD(int theIndex, int theNumber)
 			tempText[i] = 0;
 		}
 		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 5; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 1; i++)
 		{
 			largeMemory[memoryPointer] = tempText[i];
 			memoryPointer++;
 		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+	}
+	else if ((whichString > 0) && (whichString < 3))
+	{
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 1; i++)
+		{
+			largeMemory[memoryPointer] = tempText[i];
+			memoryPointer++;
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+
+	}
+	else
+	{
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 1; i++)
+		{
+			largeMemory[memoryPointer] = tempText[i];
+			memoryPointer++;
+		}
+
+		largeMemory[memoryPointer] = 59;
+		memoryPointer++;
 		largeMemory[memoryPointer] = 13;
 		memoryPointer++;
 		largeMemory[memoryPointer] = 10;
 		memoryPointer++;
-    	//strncat(largeMemory, tempText, sizeof(tempText));
-    	//strncat(largeMemory, newline, sizeof(comma));
 
-
-		//f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
 		SDWriteIndex++;
 	}
 }
+*/
+void writeToSD(int theIndex, int theNumber, int myPos, int lh, int rh, int whichString)
+{
+	if(finishSD == 1)
+	{
 
+		SDReady = 0;
+		largeMemory[memoryPointer] = 0;
+		memoryPointer++;
+
+		//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		__disable_irq();
+		 f_write(&myFile, largeMemory, memoryPointer, (void *)&byteswritten);
+		 res2 = f_close(&myFile);
+		 __enable_irq();
+		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+		 if (res2 == FR_OK)
+		 {
+			 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		 }
+
+	}
+	else if (whichString == 0)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theIndex,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+
+		largeMemory[memoryPointer] = 44;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 5; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(myPos,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(lh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+	}
+	else if ((whichString > 0) && (whichString < 3))
+	{
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(myPos,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(lh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+	}
+	else
+	{
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(theNumber,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 1; i++)
+		{
+			tempText[i] = 0;
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(myPos,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 10; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(lh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+
+		for (int i = 0; i < 30; i++)
+		{
+			tempText[i] = 0;
+		}
+		itoa(rh,tempText, 10);
+		for (int i = 0; i < 10; i++)
+		{
+			if (tempText[i] != 0)
+			{
+				largeMemory[memoryPointer] = tempText[i];
+				memoryPointer++;
+			}
+		}
+		largeMemory[memoryPointer] = 32;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 59;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 13;
+		memoryPointer++;
+		largeMemory[memoryPointer] = 10;
+		memoryPointer++;
+
+		SDWriteIndex++;
+	}
+}
 void MPU_Conf(void)
 {
 	//code from Keshikan https://github.com/keshikan/STM32H7_DMA_sample

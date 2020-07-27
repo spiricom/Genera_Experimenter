@@ -39,9 +39,9 @@
 #define ADC_RING_BUFFER_SIZE 	32
 #define ADC_FRAME_SIZE 512
 #define ADC_BUFFER_SIZE ADC_FRAME_SIZE * 2
-//#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
+#define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 
-#define LARGE_MEM_SIZE 500000 //32 MBytes - size of SDRAM IC
+//#define LARGE_MEM_SIZE 500000 //32 MBytes - size of SDRAM IC
 
 extern int32_t audioOutBuffer[AUDIO_BUFFER_SIZE];
 extern uint8_t codecReady;
@@ -50,7 +50,7 @@ extern int32_t ADC_values[NUM_ADC_CHANNELS * ADC_BUFFER_SIZE];
 extern uint32_t currentADCBufferPos;
 extern uint64_t SDWriteIndex;
 extern int ADC_Ready;
-extern char largeMemory[LARGE_MEM_SIZE] __ATTR_RAM_D1;
+extern char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
 /* Exported types ------------------------------------------------------------*/
 typedef enum
 {

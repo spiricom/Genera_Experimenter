@@ -60,7 +60,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 float randomNumber(void);
-void writeToSD(int, int);
+void writeToSD(int theIndex, int theNumber, int pos, int lh, int rh, int whichString);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -70,6 +70,7 @@ extern uint8_t SPI_RX[16];
 extern int SDReady;
 extern uint32_t byteswritten, bytesread;                     /* File write/read counts */
 extern int finishSD;
+extern uint64_t memoryPointer;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
