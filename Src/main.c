@@ -65,6 +65,7 @@ void SystemClock_Config(void);
 void MPU_Conf(void);
 void SDRAM_Initialization_sequence(void);
 static void FS_FileOperations(void);
+static void CycleCounterInit( void );
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -252,7 +253,7 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
    */
 
-
+     CycleCounterInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -445,6 +446,25 @@ void SDRAM_Initialization_sequence(void)
     /* Step 6: Set the refresh rate counter */
     /* Set the device refresh rate */
     HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT);
+}
+
+
+// helper function to initialize measuring unit (cycle counter) */
+static void CycleCounterInit( void )
+{
+  /* Enable TRC */
+  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+  /* Unlock DWT registers */
+  if ((*(uint32_t*)0xE0001FB4) & 1)
+    *(uint32_t*)0xE0001FB0 = 0xC5ACCE55;
+
+  /* clear the cycle counter */
+  DWT->CYCCNT = 0;
+
+  /* start the cycle counter */
+  DWT->CTRL = 0x40000001;
+
 }
 
 

@@ -35,6 +35,7 @@
 "Middlewares/Third_Party/FatFs/src/ff_gen_drv.o"
 "Middlewares/Third_Party/FatFs/src/option/ccsbcs.o"
 "Middlewares/Third_Party/FatFs/src/option/syscall.o"
+"Src/AVLtree.o"
 "Src/adc.o"
 "Src/audiostream.o"
 "Src/bsp_driver_sd.o"

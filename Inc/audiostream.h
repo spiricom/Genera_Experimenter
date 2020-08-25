@@ -37,7 +37,7 @@
 #define HALF_BUFFER_SIZE      AUDIO_FRAME_SIZE * 2 //number of samples per half of the "double-buffer" (twice the audio frame size because there are interleaved samples for both left and right channels)
 #define AUDIO_BUFFER_SIZE     AUDIO_FRAME_SIZE * 4 //number of samples in the whole data structure (four times the audio frame size because of stereo and also double-buffering/ping-ponging)
 #define ADC_RING_BUFFER_SIZE 	32
-#define ADC_FRAME_SIZE 512
+#define ADC_FRAME_SIZE 32
 #define ADC_BUFFER_SIZE ADC_FRAME_SIZE * 2
 #define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 
@@ -51,6 +51,7 @@ extern uint32_t currentADCBufferPos;
 extern uint64_t SDWriteIndex;
 extern int ADC_Ready;
 extern char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
+extern tMempool mediumPool;
 /* Exported types ------------------------------------------------------------*/
 typedef enum
 {
