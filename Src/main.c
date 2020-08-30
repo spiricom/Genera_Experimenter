@@ -127,7 +127,7 @@ int main(void)
   MX_FATFS_Init();
   MX_SAI1_Init();
   MX_RNG_Init();
-  MX_SPI2_Init();
+  //MX_SPI2_Init();
   MX_I2C2_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
@@ -144,7 +144,7 @@ int main(void)
 	  SPI_TX[i] = counter++;
   }
 
-  HAL_SPI_TransmitReceive_DMA(&hspi2, SPI_TX, SPI_RX, 16);
+  //HAL_SPI_TransmitReceive_DMA(&hspi2, SPI_TX, SPI_RX, 16);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
@@ -189,7 +189,7 @@ int main(void)
 
 
 */
-
+/*
 	 if(BSP_SD_IsDetected())
 	 {
 
@@ -199,7 +199,7 @@ int main(void)
 	   FS_FileOperations();
 
 	 }
-
+*/
      audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
 
@@ -260,6 +260,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  /*
 	  int tempIntGP = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
 	  if (tempIntGP)
 	  {
@@ -270,6 +271,7 @@ int main(void)
 	  {
 		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 	  }
+	  */
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

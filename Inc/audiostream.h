@@ -60,11 +60,8 @@ typedef enum
   BUFFER_OFFSET_FULL,
 }BUFFER_StateTypeDef;
 
-#ifdef SAMPLERATE96K
-#define SAMPLE_RATE 96000.f
-#else
-#define SAMPLE_RATE 48000.f
-#endif
+
+#define SAMPLE_RATE 192000.f
 
 #define INV_SAMPLE_RATE 1.f/SAMPLE_RATE
 #define SAMPLE_RATE_MS (SAMPLE_RATE / 1000.f)

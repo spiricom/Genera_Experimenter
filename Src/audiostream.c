@@ -38,7 +38,7 @@ int32_t ADC_values[NUM_ADC_CHANNELS * ADC_BUFFER_SIZE] __ATTR_RAM_D2;
 
 
 void audioFrame(uint16_t buffer_offset);
-float audioTick(void);
+float audioTick(float* input);
 float map(float value, float istart, float istop, float ostart, float ostop);
 float processString(int whichString, float input);
 void attackDetectMedian(int whichString, float input);
@@ -157,6 +157,14 @@ typedef enum BOOL {
 } BOOL;
 
 
+
+//10 distortion tanh
+int distortionMode = 0;
+tVZFilter bell1, shelf1, shelf2, shelf3, shelf4, bell2;
+tVZFilter lp1, lp2;
+tOversampler oversampler1, oversampler2;
+int distOS_ratio = 2;
+
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn)
 {
 	// Initialize LEAF.
@@ -167,23 +175,45 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
 
 	HAL_Delay(10);
+	leaf.clearOnAllocation = 1;
+
+	tOversampler_init(&oversampler1, distOS_ratio, FALSE);
+	tOversampler_init(&oversampler2, distOS_ratio, FALSE);
+
+	tVZFilter_init(&shelf1, Lowshelf, 80.0f , 6.0f);
+	tVZFilter_init(&shelf2, Highshelf, 12000.0f , 6.0f);
+	tVZFilter_init(&bell1, Bell, 1000.0f , 1.9f);
+
+	tVZFilter_init(&lp1, Lowpass, 18000.0f, 0.8f);
+
+	tVZFilter_init(&lp2, Lowpass, 18000.0f, 0.8f);
+
+	tVZFilter_init(&shelf3, Lowshelf, 80.0f, 6.0f);
+	tVZFilter_init(&shelf4, Highshelf, 12000.0f, 6.0f);
+	tVZFilter_init(&bell2, Bell, 1000.0f, 1.9f);
+
+
+	leaf.clearOnAllocation = 0;
+
 
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++)
 	{
 		audioOutBuffer[i] = 0;
 	}
 
+	/*
 	for (int i = 0; i < NUM_ADC_CHANNELS * FILTER_ORDER; i++)
 	{
 		tHighpass_init(&opticalHighpass[i], 100.0f);
 		tVZFilter_init(&opticalLowpass[i], Lowpass, 1000.0f, 0.6f);
 	}
+	*/
 	LEAF_generate_atodb(atodbTable, ATODB_TABLE_SIZE);
 
-	tSimplePoly_init(&poly,1);
-	tSimplePoly_setNumVoices(&poly,1);
-	poly->recover_stolen = 0;
-	tExpSmooth_init(&gainSmoothed, 0.0f, 0.01f);
+	//tSimplePoly_init(&poly,1);
+	//tSimplePoly_setNumVoices(&poly,1);
+	//poly->recover_stolen = 0;
+	//tExpSmooth_init(&gainSmoothed, 0.0f, 0.01f);
 	/*
 	for (int i = 0; i < 2; i++)
 	{
@@ -223,8 +253,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tRampUpDown_init(&updownRamp[i], 0.0f, 104.0f, 1); //5000 samples should be 104 ms
 	}
 */
-
-	attackDetectAH_init();
+	tCycle_init(&mySine[0]);
+	//attackDetectAH_init();
 
 	HAL_Delay(1);
 
@@ -251,24 +281,35 @@ void audioFrame(uint16_t buffer_offset)
 	int i;
 	//HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_9);
 	//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_9, GPIO_PIN_SET);
-	if (ADC_notStarted)
-	{
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values,NUM_ADC_CHANNELS * ADC_BUFFER_SIZE);
-		ADC_notStarted = 0;
-	}
+	//if (ADC_notStarted)
+	//{
+		//HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values,NUM_ADC_CHANNELS * ADC_BUFFER_SIZE);
+	//	//ADC_notStarted = 0;
+	//}
 	//if the codec isn't ready, keep the buffer as all zeros
 	//otherwise, start computing audio!
+
+
+    //displayValues[1] = (presetKnobValues[Distortion][1] * 30.0f) - 15.0f;
+    //displayValues[2] = (presetKnobValues[Distortion][2] * 34.0f) - 17.0f;
+    //displayValues[3] = faster_mtof(presetKnobValues[Distortion][3] * 77.0f + 42.0f);
+
+    //tVZFilter_setGain(&shelf1, fastdbtoa(-1.0f * displayValues[1]));
+    //tVZFilter_setGain(&shelf2, fastdbtoa(displayValues[1]));
+    //tVZFilter_setFreq(&bell1, displayValues[3]);
+    //tVZFilter_setGain(&bell1, fastdbtoa(displayValues[2]));
+
 	frameCount++;
 	if (codecReady)
 	{
-
+		float inputSamples[2];
 		for (i = 0; i < (HALF_BUFFER_SIZE); i = i + 2)
 		{
-			//inputSamples[1] = (audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31;
-			//inputSamples[0] = (audioInBuffer[buffer_offset + i + 1] << 8) * INV_TWO_TO_31;
-
-			//audioOutBuffer[buffer_offset + i] = (int32_t)(audioTick() * TWO_TO_23);
-			//audioOutBuffer[buffer_offset + i + 1] = 0;
+			inputSamples[1] = (audioInBuffer[buffer_offset + i]) * INV_TWO_TO_31;
+			inputSamples[0] = (audioInBuffer[buffer_offset + i + 1]) * INV_TWO_TO_31;
+			audioTick(inputSamples);
+			audioOutBuffer[buffer_offset + i] = (int32_t)(inputSamples[1] * TWO_TO_31);
+			audioOutBuffer[buffer_offset + i + 1] = (int32_t)(inputSamples[0] * TWO_TO_31);;
 		}
 
 	}
@@ -279,9 +320,90 @@ int sampleNumGlobal = 0;
 
 
 int distanceBetweenReadAndWrite = 0;
-float audioTick()
+
+float oversamplerArray[4];
+
+
+float audioTick(float* input)
 {
-	sample = 0.0f;
+
+	//float theInput = input[0];
+	float sample = input[1];
+	//displayValues[0] = ((presetKnobValues[Distortion][0] * 20.0f) + 1.0f); // 15.0f
+	//displayValues[4] = presetKnobValues[Distortion][4]; // 15.0f
+	sample = sample * 5.0f;
+
+
+
+    //    if (distortionMode > 0) oversamplerArray[i] = LEAF_shaper(oversamplerArray[i], 1.0f);
+   //     else oversamplerArray[i] = LEAF_tanh(oversamplerArray[i]);
+   // }
+
+
+
+	if (distortionMode > 0) sample = LEAF_shaper(sample, 1.0f);
+	    else sample = LEAF_tanh(sample);
+
+    	sample= tVZFilter_tick(&shelf1, sample); //put it through the low shelf
+    	sample = tVZFilter_tick(&shelf2, sample); // now put that result through the high shelf
+    	sample = tVZFilter_tick(&bell1, sample); // now add a bell (or peaking eq) filter
+
+ tOversampler_upsample(&oversampler2, sample, oversamplerArray);
+	for (int i = 0; i < distOS_ratio; i++)
+	{
+
+    	oversamplerArray[i] = LEAF_tanh((oversamplerArray[i] * 0.9) * 0.95f);
+    }
+    sample = tOversampler_downsample(&oversampler2, oversamplerArray);
+
+	//sample = tanhf(sample * 0.9) * 0.95f;
+	//sample = tVZFilter_tick(&lp2, sample);
+	input[0] = sample;
+	input[1] = sample;
+
+
+
+/*
+    tOversampler_upsample(&oversampler2, sample, oversamplerArray);
+    for (int i = 0; i < distOS_ratio; i++)
+    {
+    	oversamplerArray[i] = LEAF_shaper(oversamplerArray[i], 1.0f);
+    	//oversamplerArray[i] = LEAF_tanh(oversamplerArray[i]);
+	//sample = tVZFilter_tick(&lp1, sample);
+    	oversamplerArray[i]= tVZFilter_tick(&shelf1, oversamplerArray[i]); //put it through the low shelf
+    	oversamplerArray[i] = tVZFilter_tick(&shelf2, oversamplerArray[i]); // now put that result through the high shelf
+    	oversamplerArray[i] = tVZFilter_tick(&bell1, oversamplerArray[i]); // now add a bell (or peaking eq) filter
+
+
+
+    	oversamplerArray[i] = LEAF_tanh((oversamplerArray[i] * 0.9) * 0.95f);
+    }
+    sample = tOversampler_downsample(&oversampler2, oversamplerArray);
+
+	//sample = tanhf(sample * 0.9) * 0.95f;
+	//sample = tVZFilter_tick(&lp2, sample);
+	input[0] = sample;
+	input[1] = sample;
+*/
+
+/*
+	sample = theInput;
+	//displayValues[0] = ((presetKnobValues[Distortion][0] * 20.0f) + 1.0f); // 15.0f
+	//displayValues[4] = presetKnobValues[Distortion][4]; // 15.0f
+	sample = sample * 2.0f;
+
+	//sample = LEAF_shaper(sample, 1.0f);
+	sample = tanhf(sample);
+	sample = tVZFilter_tick(&shelf3, sample); //put it through the low shelf
+	sample = tVZFilter_tick(&shelf4, sample); // now put that result through the high shelf
+	sample = tVZFilter_tick(&bell2, sample); // now add a bell (or peaking eq) filter
+	sample = tanhf(sample * 0.9) * 0.95f;
+
+	input[1] = sample;
+*/
+
+
+	//samples[0] = 0.0f;
 /*
 	if (ADC_Ready)
 	{
@@ -378,8 +500,13 @@ float audioTick()
 	}
 	sample = tempSample;
 	sample = tanhf(sample);
+
 	*/
-	return sample;
+	//tCycle_setFreq(&mySine[0], 220.0f);
+	//sample = tCycle_tick(&mySine[0]);
+
+
+	return 0.0f;
 
 }
 
