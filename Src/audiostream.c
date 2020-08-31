@@ -29,11 +29,7 @@ float audioTick(float* input);
 HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
 
-#define NUM_COUNTER_CYCLES_TO_AVERAGE 1024
-volatile int64_t cycleCountVals[4][3];
-volatile int64_t cycleCountValsAverager[4][NUM_COUNTER_CYCLES_TO_AVERAGE];
-volatile uint16_t cycleCountAveragerCounter[4] = {0,0,0,0};
-float cycleCountAverages[4][3];
+volatile int32_t cycleCountVals[4];
 
 uint8_t codecReady = 0;
 
@@ -216,10 +212,8 @@ float audioTick(float* samples)
    	//cycle counting stuff below. At 192k you have at most 2500 cycles per sample (when running at 480MHz). There is also overhead from the frame processing and function calls, so in reality less than that.
 	tempCount6 = DWT->CYCCNT;
 
-	//cycleCountVals[0][2] = 0;
-
-	cycleCountVals[0][1] = tempCount6-tempCount5;
-	if (cycleCountVals[0][1] > 2500)
+	cycleCountVals[0] = tempCount6-tempCount5;
+	if (cycleCountVals[0] > 2500)
 	{
 		setLED_D(255);
 		//overflow
