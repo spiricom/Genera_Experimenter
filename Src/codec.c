@@ -75,43 +75,30 @@ void AudioCodec_init(I2C_HandleTypeDef* hi2c) {
 	myI2cData[0] = 0x07;
 	myI2cData[1] = 0x03;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
-	//HAL_Delay(2);
 
 	myI2cData[0] = 0x01;
 	myI2cData[1] = 0xe1; //0x41 for 48k, 0x81 for 96k, 0xe1 for 192k
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
-	//HAL_Delay(1); // might not be necessary
-
 	myI2cData[0] = 0x02;
 	myI2cData[1] = 0x00;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
-
-	//HAL_Delay(1); // might not be necessary
 
 	myI2cData[0] = 0x03;
 	myI2cData[1] = 0x79;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
-	//HAL_Delay(1); // might not be necessary
-
 	myI2cData[0] = 0x04;
 	myI2cData[1] = 0x01;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
-
-	//HAL_Delay(1); // might not be necessary
 
 	myI2cData[0] = 0x05;
 	myI2cData[1] = 0x01;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
-	//HAL_Delay(1); // might not be necessary
-
 	myI2cData[0] = 0x06;
 	myI2cData[1] = 0x10;
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
-
-	//HAL_Delay(1); // might not be necessary
 
 	//turn off power down bit to start things cookin'
 	myI2cData[0] = 0x07;
@@ -119,7 +106,5 @@ void AudioCodec_init(I2C_HandleTypeDef* hi2c) {
 	HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
 
-	//HAL_Delay(1); // might not be necessary
 	codecReady = 1;
-
 }

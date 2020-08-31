@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SPI.h
+  * File Name          : HRTIM.h
   * Description        : This file provides code for the configuration
-  *                      of the SPI instances.
+  *                      of the HRTIM instances.
   ******************************************************************************
   * @attention
   *
@@ -17,8 +17,8 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __spi_H
-#define __spi_H
+#ifndef __hrtim_H
+#define __hrtim_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -30,14 +30,16 @@
 
 /* USER CODE END Includes */
 
-extern SPI_HandleTypeDef hspi2;
+extern HRTIM_HandleTypeDef hhrtim;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_SPI2_Init(void);
-
+void MX_HRTIM_Init(void);
+                        
+void HAL_HRTIM_MspPostInit(HRTIM_HandleTypeDef *hhrtim);
+                    
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */
@@ -45,7 +47,7 @@ void MX_SPI2_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ spi_H */
+#endif /*__ hrtim_H */
 
 /**
   * @}

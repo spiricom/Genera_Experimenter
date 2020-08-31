@@ -23,11 +23,11 @@
 #include "adc.h"
 #include "dma.h"
 #include "fatfs.h"
+#include "hrtim.h"
 #include "i2c.h"
 #include "rng.h"
 #include "sai.h"
 #include "sdmmc.h"
-#include "spi.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -63,6 +63,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void MPU_Conf(void);
+void startTimersForLEDs(void);
 void SDRAM_Initialization_sequence(void);
 static void FS_FileOperations(void);
 static void CycleCounterInit( void );
@@ -127,9 +128,9 @@ int main(void)
   MX_FATFS_Init();
   MX_SAI1_Init();
   MX_RNG_Init();
-  //MX_SPI2_Init();
   MX_I2C2_Init();
   MX_ADC1_Init();
+  MX_HRTIM_Init();
   /* USER CODE BEGIN 2 */
 	//HAL_Delay(200);
   //pull reset pin on audio codec low to make sure it's stable
@@ -144,7 +145,6 @@ int main(void)
 	  SPI_TX[i] = counter++;
   }
 
-  //HAL_SPI_TransmitReceive_DMA(&hspi2, SPI_TX, SPI_RX, 16);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
@@ -200,7 +200,13 @@ int main(void)
 
 	 }
 */
-     audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
+
+  if (HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values, NUM_ADC_CHANNELS) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+
+    audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
 
 
@@ -252,7 +258,7 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
    */
-
+    startTimersForLEDs();
      CycleCounterInit();
   /* USER CODE END 2 */
 
@@ -339,7 +345,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_SPI2
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_HRTIM1|RCC_PERIPHCLK_RNG
                               |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SDMMC
                               |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_ADC
                               |RCC_PERIPHCLK_FMC|RCC_PERIPHCLK_CKPER;
@@ -355,10 +361,10 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.CkperClockSelection = RCC_CLKPSOURCE_HSI;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
-  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_CLKP;
+  PeriphClkInitStruct.Hrtim1ClockSelection = RCC_HRTIM1CLK_CPUCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -533,6 +539,55 @@ static void FS_FileOperations(void)
 
   /* Error */
   //Error_Handler();
+}
+void startTimersForLEDs(void)
+{
+
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].TIMxCR = HRTIM_TIMCR_CONT + HRTIM_TIMCR_PREEN + HRTIM_TIMCR_TREPU;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].PERxR = 0x3fff;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR = 200;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR = 200;
+	/* TD1 output set on TIMC period and reset on TIMC CMP1 event*/
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].RSTx1R = HRTIM_RST1R_CMP1;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].SETx1R = HRTIM_RST1R_PER;
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].RSTx2R = HRTIM_RST2R_CMP2;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].SETx2R = HRTIM_RST2R_PER;
+
+
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_E].TIMxCR = HRTIM_TIMCR_CONT + HRTIM_TIMCR_PREEN + HRTIM_TIMCR_TREPU;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_E].PERxR = 0x3fff;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_E].CMP2xR = 200;
+	/* TE2 output set on TIME period and reset on TIME CMP2 event*/
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_E].RSTx2R = HRTIM_SET2R_CMP2;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_E].SETx2R = HRTIM_RST2R_PER;
+
+
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].TIMxCR = HRTIM_TIMCR_CONT + HRTIM_TIMCR_PREEN + HRTIM_TIMCR_TREPU;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].PERxR = 0x3fff;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR = 200;
+	/* TB2 output set on TIMB period and reset on TIMB CMP2 event*/
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].RSTx2R = HRTIM_SET2R_CMP2;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].SETx2R = HRTIM_RST2R_PER;
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].TIMxCR = HRTIM_TIMCR_CONT + HRTIM_TIMCR_PREEN + HRTIM_TIMCR_TREPU;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].PERxR = 0x3fff;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].CMP1xR = 200;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].CMP2xR = 200;
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].RSTx1R = HRTIM_SET1R_CMP1;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].SETx1R = HRTIM_RST1R_PER;
+
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].RSTx2R = HRTIM_SET2R_CMP2;
+	HRTIM1->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_D].SETx2R = HRTIM_RST2R_PER;
+
+
+	HRTIM1->sMasterRegs.MCR = HRTIM_MCR_TBCEN + HRTIM_MCR_TECEN + HRTIM_MCR_TCCEN + HRTIM_MCR_TDCEN;
+	HRTIM1->sCommonRegs.OENR = HRTIM_OENR_TB2OEN + HRTIM_OENR_TE2OEN + HRTIM_OENR_TC1OEN + HRTIM_OENR_TC2OEN + HRTIM_OENR_TD1OEN + HRTIM_OENR_TD2OEN ;
+	HAL_HRTIM_MspPostInit(&hhrtim);
 }
 
 uint8_t comma[] = ", ";
