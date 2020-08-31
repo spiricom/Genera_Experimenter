@@ -177,6 +177,16 @@ void audioFrame(uint16_t buffer_offset)
 }
 
 
+
+///knob 1 = input gain (above 1)
+// knob 2 = spectral tilt
+// knob 3 = bandpass gain (center at 0db)
+// knob 4 = bandpass freq
+// knob 5 = output gain
+
+// CV input jacks 1-4 add to knobs 1-4.
+
+
 float audioTick(float* samples)
 {
 
