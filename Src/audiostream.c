@@ -150,10 +150,10 @@ void audioFrame(uint16_t buffer_offset)
 
 
 
-	params[0] = LEAF_clip(0.0f,(((smoothedADC[0] + smoothedADC[8]) * 20.0f) + 1.0f), 40.0f);
-    params[1] = LEAF_clip(-30.0f, ((smoothedADC[1] + smoothedADC[9]) * 30.0f) - 15.0f, 30.0f);
-    params[2] = LEAF_clip(-34.0f, ((smoothedADC[2] + smoothedADC[10]) * 34.0f) - 17.0f, 34.0f);
-    params[3] = LEAF_clip(10.0f, faster_mtof((smoothedADC[3] + smoothedADC[11]) * 77.0f + 42.0f), 18000.0f);
+	params[0] = LEAF_clip(0.0f,(((LEAF_clip(0.0f, (smoothedADC[0] + smoothedADC[8]), 1.0f) * 35.0f) + 1.0f)), 36.0f);
+    params[1] = LEAF_clip(-17.0f, ((LEAF_clip(0.0f, (smoothedADC[1] + smoothedADC[9]), 1.0f) * 35.0f) - 17.0f), 17.0f);
+    params[2] = LEAF_clip(-24.0f, ((LEAF_clip(0.0f, (smoothedADC[2] + smoothedADC[10]), 1.0f) * 46.0f) - 24.0f), 24.0f);
+    params[3] = LEAF_clip(10.0f, faster_mtof(((LEAF_clip(0.0f, (smoothedADC[3] + smoothedADC[11]), 1.0f) * 103.0f) + 24.0f)), 20000.0f);
     params[4] = smoothedADC[4];
 
 
