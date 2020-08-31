@@ -229,25 +229,30 @@ float audioTick(float* samples)
 
 		osArray[i] = tanhf(osArray[i] * 0.9f) * params[4];
 
-    	/*
-    	//button B sets distortion mode
-		if (distortionMode > 0)
-		{
-			sample = LEAF_shaper(sample, 1.0f);
-		}
-		else
-		{
-			sample = tanhf(sample);
-		}
 
-		sample= tVZFilter_tickEfficient(&shelf1, sample); //put it through the low shelf
-		sample = tVZFilter_tickEfficient(&shelf2, sample); // now put that result through the high shelf
-		sample = tVZFilter_tickEfficient(&bell1, sample); // now add a bell (or peaking eq) filter
-
-		sample = tanhf(sample * 0.9f) * params[4];
-		*/
     }
     sample = tOversampler_downsample(&os, osArray);
+
+
+    //non oversampled version
+	/*
+	//button B sets distortion mode
+	if (distortionMode > 0)
+	{
+		sample = LEAF_shaper(sample, 1.0f);
+	}
+	else
+	{
+		sample = tanhf(sample);
+	}
+
+	sample= tVZFilter_tickEfficient(&shelf1, sample); //put it through the low shelf
+	sample = tVZFilter_tickEfficient(&shelf2, sample); // now put that result through the high shelf
+	sample = tVZFilter_tickEfficient(&bell1, sample); // now add a bell (or peaking eq) filter
+
+	sample = tanhf(sample * 0.9f) * params[4];
+	*/
+
    	samples[0] = sample;
    	samples[1] = sample;
 

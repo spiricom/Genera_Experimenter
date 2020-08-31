@@ -16525,7 +16525,7 @@ OUTPUT(cube_for_new_genera_brain4.elf elf32-littlearm)
  .debug_macro   0x0000000000040ad8      0x2a6 leaf/leaf/Src/leaf-tables.o
  .debug_macro   0x0000000000040d7e      0x37b leaf/leaf/Src/leaf.o
 
-.debug_line     0x0000000000000000    0x2c6e7
+.debug_line     0x0000000000000000    0x2c6e9
  .debug_line    0x0000000000000000      0xda9 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
  .debug_line    0x0000000000000da9     0x1ca4 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.o
  .debug_line    0x0000000000002a4d     0x17a2 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.o
@@ -16546,33 +16546,33 @@ OUTPUT(cube_for_new_genera_brain4.elf elf32-littlearm)
  .debug_line    0x00000000000151f0     0x164d Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.o
  .debug_line    0x000000000001683d      0xab0 Middlewares/Third_Party/FatFs/src/ff_gen_drv.o
  .debug_line    0x00000000000172ed      0xaad Src/adc.o
- .debug_line    0x0000000000017d9a      0xf66 Src/audiostream.o
- .debug_line    0x0000000000018d00      0xa74 Src/bsp_driver_sd.o
- .debug_line    0x0000000000019774      0xd86 Src/codec.o
- .debug_line    0x000000000001a4fa      0x966 Src/dma.o
- .debug_line    0x000000000001ae60      0xa28 Src/fatfs.o
- .debug_line    0x000000000001b888      0x965 Src/fatfs_platform.o
- .debug_line    0x000000000001c1ed      0xa2e Src/fmc.o
- .debug_line    0x000000000001cc1b      0x9c7 Src/gpio.o
- .debug_line    0x000000000001d5e2      0xa30 Src/hrtim.o
- .debug_line    0x000000000001e012      0x9be Src/i2c.o
- .debug_line    0x000000000001e9d0     0x13a2 Src/main.o
- .debug_line    0x000000000001fd72      0x986 Src/rng.o
- .debug_line    0x00000000000206f8      0xa7c Src/sai.o
- .debug_line    0x0000000000021174      0xaaa Src/sd_diskio.o
- .debug_line    0x0000000000021c1e      0x9d4 Src/sdmmc.o
- .debug_line    0x00000000000225f2      0x960 Src/stm32h7xx_hal_msp.o
- .debug_line    0x0000000000022f52      0xa13 Src/stm32h7xx_it.o
- .debug_line    0x0000000000023965      0x9cc Src/system_stm32h7xx.o
- .debug_line    0x0000000000024331      0xf1a Src/ui.o
- .debug_line    0x000000000002524b      0xce2 leaf/leaf/Src/leaf-distortion.o
- .debug_line    0x0000000000025f2d     0x1729 leaf/leaf/Src/leaf-envelopes.o
- .debug_line    0x0000000000027656     0x237f leaf/leaf/Src/leaf-filters.o
- .debug_line    0x00000000000299d5      0xecf leaf/leaf/Src/leaf-math.o
- .debug_line    0x000000000002a8a4      0xd53 leaf/leaf/Src/leaf-mempool.o
- .debug_line    0x000000000002b5f7      0x767 leaf/leaf/Src/leaf-tables.o
- .debug_line    0x000000000002bd5e      0x90b leaf/leaf/Src/leaf.o
- .debug_line    0x000000000002c669       0x7e startup/startup_stm32h743xx.o
+ .debug_line    0x0000000000017d9a      0xf68 Src/audiostream.o
+ .debug_line    0x0000000000018d02      0xa74 Src/bsp_driver_sd.o
+ .debug_line    0x0000000000019776      0xd86 Src/codec.o
+ .debug_line    0x000000000001a4fc      0x966 Src/dma.o
+ .debug_line    0x000000000001ae62      0xa28 Src/fatfs.o
+ .debug_line    0x000000000001b88a      0x965 Src/fatfs_platform.o
+ .debug_line    0x000000000001c1ef      0xa2e Src/fmc.o
+ .debug_line    0x000000000001cc1d      0x9c7 Src/gpio.o
+ .debug_line    0x000000000001d5e4      0xa30 Src/hrtim.o
+ .debug_line    0x000000000001e014      0x9be Src/i2c.o
+ .debug_line    0x000000000001e9d2     0x13a2 Src/main.o
+ .debug_line    0x000000000001fd74      0x986 Src/rng.o
+ .debug_line    0x00000000000206fa      0xa7c Src/sai.o
+ .debug_line    0x0000000000021176      0xaaa Src/sd_diskio.o
+ .debug_line    0x0000000000021c20      0x9d4 Src/sdmmc.o
+ .debug_line    0x00000000000225f4      0x960 Src/stm32h7xx_hal_msp.o
+ .debug_line    0x0000000000022f54      0xa13 Src/stm32h7xx_it.o
+ .debug_line    0x0000000000023967      0x9cc Src/system_stm32h7xx.o
+ .debug_line    0x0000000000024333      0xf1a Src/ui.o
+ .debug_line    0x000000000002524d      0xce2 leaf/leaf/Src/leaf-distortion.o
+ .debug_line    0x0000000000025f2f     0x1729 leaf/leaf/Src/leaf-envelopes.o
+ .debug_line    0x0000000000027658     0x237f leaf/leaf/Src/leaf-filters.o
+ .debug_line    0x00000000000299d7      0xecf leaf/leaf/Src/leaf-math.o
+ .debug_line    0x000000000002a8a6      0xd53 leaf/leaf/Src/leaf-mempool.o
+ .debug_line    0x000000000002b5f9      0x767 leaf/leaf/Src/leaf-tables.o
+ .debug_line    0x000000000002bd60      0x90b leaf/leaf/Src/leaf.o
+ .debug_line    0x000000000002c66b       0x7e startup/startup_stm32h743xx.o
 
 .debug_str      0x0000000000000000   0x189390
  .debug_str     0x0000000000000000   0x17a0f1 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
