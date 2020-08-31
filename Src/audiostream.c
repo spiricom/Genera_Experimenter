@@ -33,7 +33,8 @@ volatile int32_t cycleCountVals[4];
 
 uint8_t codecReady = 0;
 
-
+//LEAF instance
+LEAF leaf;
 
 //MEMPOOLS
 char smallMemory[SMALL_MEM_SIZE];
@@ -61,27 +62,28 @@ tVZFilter lp1;
 
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
 
+
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn)
 {
 	// Initialize LEAF.
 
-	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
+	LEAF_init(&leaf, SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
-	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE);
-	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
+	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
+	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
 
 	HAL_Delay(10);
 	leaf.clearOnAllocation = 1;
 
-	tVZFilter_init(&shelf1, Lowshelf, 80.0f , 6.0f);
-	tVZFilter_init(&shelf2, Highshelf, 12000.0f , 6.0f);
-	tVZFilter_init(&bell1, Bell, 1000.0f , 1.9f);
+	tVZFilter_init(&shelf1, Lowshelf, 80.0f , 6.0f, &leaf);
+	tVZFilter_init(&shelf2, Highshelf, 12000.0f , 6.0f, &leaf);
+	tVZFilter_init(&bell1, Bell, 1000.0f , 1.9f, &leaf);
 
-	tVZFilter_init(&lp1, Lowpass, 18000.0f, 0.8f);
+	tVZFilter_init(&lp1, Lowpass, 18000.0f, 0.8f, &leaf);
 
 	for(int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
-		tExpSmooth_init(&adcSmooth[i], 0.0f, 0.1f);
+		tExpSmooth_init(&adcSmooth[i], 0.0f, 0.1f, &leaf);
 	}
 
 	leaf.clearOnAllocation = 0;
