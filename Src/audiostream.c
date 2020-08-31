@@ -30,7 +30,7 @@ HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
 
 volatile int32_t cycleCountVals[4];
-
+volatile int32_t cycleCountMinMax[4][2];
 uint8_t codecReady = 0;
 
 //LEAF instance
@@ -58,10 +58,18 @@ typedef enum BOOL {
 //10 distortion tanh
 int distortionMode = 0;
 tVZFilter bell1, shelf1, shelf2;
-tVZFilter lp1;
+tVZFilter lp1, lp2;
 
+tOversampler os;
+int osRatio = 2;
+float invOsRatio = 0.5f;
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
 
+float smoothedADC[NUM_ADC_CHANNELS];
+
+float params[8];
+
+void CycleCounterTrackMinAndMax( int whichCount);
 
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn)
 {
@@ -75,11 +83,13 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	HAL_Delay(10);
 	leaf.clearOnAllocation = 1;
 
-	tVZFilter_init(&shelf1, Lowshelf, 80.0f , 6.0f, &leaf);
-	tVZFilter_init(&shelf2, Highshelf, 12000.0f , 6.0f, &leaf);
-	tVZFilter_init(&bell1, Bell, 1000.0f , 1.9f, &leaf);
+	tVZFilter_init(&shelf1, Lowshelf, 80.0f * invOsRatio, 6.0f, &leaf);
+	tVZFilter_init(&shelf2, Highshelf, 12000.0f * invOsRatio, 6.0f, &leaf);
+	tVZFilter_init(&bell1, Bell, 1000.0f * invOsRatio, 1.9f, &leaf);
 
-	tVZFilter_init(&lp1, Lowpass, 18000.0f, 0.8f, &leaf);
+	tVZFilter_init(&lp1, Lowpass, 19000.0f, 0.5f, &leaf);
+	tVZFilter_init(&lp2, Lowpass, 19000.0f, 0.5f, &leaf);
+	tOversampler_init(&os, osRatio, 0, &leaf);
 
 	for(int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
@@ -112,11 +122,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 }
 
-int frameCount = 0;
 
-float smoothedADC[NUM_ADC_CHANNELS];
-
-float params[8];
+float osArray[4];
 
 void audioFrame(uint16_t buffer_offset)
 {
@@ -153,12 +160,9 @@ void audioFrame(uint16_t buffer_offset)
 
     tVZFilter_setGain(&shelf1, fastdbtoa(-1.0f * params[1]));
     tVZFilter_setGain(&shelf2, fastdbtoa(params[1]));
-    tVZFilter_setFreq(&bell1, params[3]);
+    tVZFilter_setFreq(&bell1, params[3]*invOsRatio);
     tVZFilter_setGain(&bell1, fastdbtoa(params[2]));
 
-
-
-	frameCount++;
 	if (codecReady)
 	{
 		float inputSamples[2];
@@ -198,25 +202,52 @@ float audioTick(float* samples)
 
 	//start of audio code
 	float sample = samples[0];
-	sample = tVZFilter_tick(&lp1, sample);
+
+	sample = tVZFilter_tickEfficient(&lp1, sample);
+	sample = tVZFilter_tickEfficient(&lp2, sample);
     sample = sample * params[0];
 
-    //button B sets distortion mode
-   	if (distortionMode > 0)
-   	{
-   		sample = LEAF_shaper(sample, 1.0f);
-   	}
-   	else
-   	{
-   		sample = tanhf(sample);
-   	}
 
-   	sample= tVZFilter_tick(&shelf1, sample); //put it through the low shelf
-   	sample = tVZFilter_tick(&shelf2, sample); // now put that result through the high shelf
-   	sample = tVZFilter_tick(&bell1, sample); // now add a bell (or peaking eq) filter
 
-   	sample = tanhf(sample * 0.9f) * params[4];
+    tOversampler_upsample(&os, sample, osArray);
 
+    for (int i = 0; i < osRatio; i++)
+    {
+    	//button B sets distortion mode
+		if (distortionMode > 0)
+		{
+			osArray[i] = LEAF_shaper(osArray[i], 1.0f);
+		}
+		else
+		{
+			osArray[i] = tanhf(osArray[i]);
+		}
+
+		osArray[i]= tVZFilter_tickEfficient(&shelf1, osArray[i]); //put it through the low shelf
+		osArray[i] = tVZFilter_tickEfficient(&shelf2, osArray[i]); // now put that result through the high shelf
+		osArray[i] = tVZFilter_tickEfficient(&bell1, osArray[i]); // now add a bell (or peaking eq) filter
+
+		osArray[i] = tanhf(osArray[i] * 0.9f) * params[4];
+
+    	/*
+    	//button B sets distortion mode
+		if (distortionMode > 0)
+		{
+			sample = LEAF_shaper(sample, 1.0f);
+		}
+		else
+		{
+			sample = tanhf(sample);
+		}
+
+		sample= tVZFilter_tickEfficient(&shelf1, sample); //put it through the low shelf
+		sample = tVZFilter_tickEfficient(&shelf2, sample); // now put that result through the high shelf
+		sample = tVZFilter_tickEfficient(&bell1, sample); // now add a bell (or peaking eq) filter
+
+		sample = tanhf(sample * 0.9f) * params[4];
+		*/
+    }
+    sample = tOversampler_downsample(&os, osArray);
    	samples[0] = sample;
    	samples[1] = sample;
 
@@ -225,6 +256,7 @@ float audioTick(float* samples)
 	tempCount6 = DWT->CYCCNT;
 
 	cycleCountVals[0] = tempCount6-tempCount5;
+	CycleCounterTrackMinAndMax(0);
 	if (cycleCountVals[0] > 2500)
 	{
 		setLED_D(255);
@@ -235,7 +267,22 @@ float audioTick(float* samples)
 }
 
 
-
+//this keeps min and max, but doesn't do the array for averaging - a bit less expensive
+void CycleCounterTrackMinAndMax( int whichCount)
+{
+	if (cycleCountVals[whichCount] > 0)
+	{
+		if ((cycleCountVals[whichCount] < cycleCountMinMax[whichCount][0]) || (cycleCountMinMax[whichCount][0] == 0))
+		{
+			cycleCountMinMax[whichCount][0] = cycleCountVals[whichCount];
+		}
+		//update max value ([2])
+		if (cycleCountVals[whichCount] > cycleCountMinMax[whichCount][1])
+		{
+			cycleCountMinMax[whichCount][1] = cycleCountVals[whichCount];
+		}
+	}
+}
 
 
 void HAL_SAI_ErrorCallback(SAI_HandleTypeDef *hsai)
