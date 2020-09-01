@@ -55,19 +55,26 @@ typedef enum BOOL {
 
 
 
-//10 distortion tanh
+#define NUM_FILTERS 128
 int distortionMode = 0;
-tVZFilter bell1, shelf1, shelf2;
-tVZFilter lp1, lp2;
+tVZFilter filters[NUM_FILTERS];
+float freqs[NUM_FILTERS][4];
+tExpSmooth filterGains[NUM_FILTERS];
+float randomization[NUM_FILTERS];
 
-tOversampler os;
-int osRatio = 2;
-float invOsRatio = 0.5f;
+tExpSmooth freqSmoothers[NUM_FILTERS];
+tExpSmooth bandwidthSmoothers[NUM_FILTERS];
+//int currentFilt = 0;
+float adcHysteresisThreshold = 0.005f;
+float lastFloatADC[NUM_ADC_CHANNELS];
+
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
 
 float smoothedADC[NUM_ADC_CHANNELS];
 
 float params[8];
+
+void updateFilter();
 
 void CycleCounterTrackMinAndMax( int whichCount);
 
@@ -83,13 +90,21 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	HAL_Delay(10);
 	leaf.clearOnAllocation = 1;
 
-	tVZFilter_init(&shelf1, Lowshelf, 80.0f * invOsRatio, 6.0f, &leaf);
-	tVZFilter_init(&shelf2, Highshelf, 12000.0f * invOsRatio, 6.0f, &leaf);
-	tVZFilter_init(&bell1, Bell, 1000.0f * invOsRatio, 1.9f, &leaf);
+	for (int i = 0; i< NUM_FILTERS; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			freqs[i][j] = mtof((randomNumber() * 110.0f) + 17.0f);
+		}
+		tVZFilter_init(&filters[i], BandpassPeak, freqs[i][0], 0.001f, &leaf);
 
-	tVZFilter_init(&lp1, Lowpass, 19000.0f, 0.5f, &leaf);
-	tVZFilter_init(&lp2, Lowpass, 19000.0f, 0.5f, &leaf);
-	tOversampler_init(&os, osRatio, 0, &leaf);
+
+		tExpSmooth_init(&filterGains[i], 0.0f, 0.01f, &leaf);
+		tExpSmooth_init(&freqSmoothers[i], 220.0f, 1.0f, &leaf);
+		tExpSmooth_init(&bandwidthSmoothers[i], 0.3f, 0.1f, &leaf);
+		randomization[i] = randomNumber();
+	}
+
 
 	for(int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
@@ -122,8 +137,9 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 }
 
-
-float osArray[4];
+uint intVersion = 0;
+uint intVersionPlusOne = 1;
+float floatVersion = 0.0f;
 
 void audioFrame(uint16_t buffer_offset)
 {
@@ -133,7 +149,14 @@ void audioFrame(uint16_t buffer_offset)
 	buttonCheck();
 	for (int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
-		tExpSmooth_setDest(&adcSmooth[i], (ADC_values[i] * INV_TWO_TO_16));
+		float floatADC = ADC_values[i] * INV_TWO_TO_16;
+
+		if (fastabsf(floatADC - lastFloatADC[i]) > adcHysteresisThreshold)
+		{
+			tExpSmooth_setDest(&adcSmooth[i], (ADC_values[i] * INV_TWO_TO_16));
+			lastFloatADC[i] = floatADC;
+		}
+
 	}
 
 	for (int i = 0; i < 8; i++)
@@ -147,22 +170,37 @@ void audioFrame(uint16_t buffer_offset)
 	}
 
 
+	params[0] = LEAF_clip(0.0f, (smoothedADC[0] + smoothedADC[8]), 1.0f) * 4000.0f;
+    params[1] = LEAF_clip(0.0f, (smoothedADC[1] + smoothedADC[9]), 1.0f) * 3.9f;
+    params[2] = LEAF_clip(0.0f, (smoothedADC[2] + smoothedADC[10]), 1.0f) * 160.0f;
+    params[3] = LEAF_clip(0.0f, (smoothedADC[3] + smoothedADC[11]), 1.0f);
+    params[4] = LEAF_clip(0.0f, ((smoothedADC[4]* 1.1f) - 0.1f), 1.0f);
+    params[5] = smoothedADC[5];
+
+
+	//float truncatedParam1 = (round(params[1] * 32.0f) * 0.03125f);
+	float truncatedParam1 = (round(params[1])) * .99f;
+	//params[4] is wiggliness (amount of noise allowed through in CV)
+	params[1] = LEAF_interpolation_linear(truncatedParam1, params[1], params[4]);
+
+	intVersion = (int)params[1];
+	intVersionPlusOne = (intVersion + 1) & 3;
+	floatVersion = params[1] - intVersion;
+
+	for (int i = 0; i < 16; i++)
+	{
+		updateFilter();
+	}
 
 
 
-	params[0] = LEAF_clip(0.0f,(((LEAF_clip(0.0f, (smoothedADC[0] + smoothedADC[8]), 1.0f) * 35.0f) + 1.0f)), 36.0f);
-    params[1] = LEAF_clip(-17.0f, ((LEAF_clip(0.0f, (smoothedADC[1] + smoothedADC[9]), 1.0f) * 35.0f) - 17.0f), 17.0f);
-    params[2] = LEAF_clip(-24.0f, ((LEAF_clip(0.0f, (smoothedADC[2] + smoothedADC[10]), 1.0f) * 46.0f) - 24.0f), 24.0f);
-    params[3] = LEAF_clip(10.0f, faster_mtof(((LEAF_clip(0.0f, (smoothedADC[3] + smoothedADC[11]), 1.0f) * 103.0f) + 24.0f)), 20000.0f);
-    params[4] = smoothedADC[4];
 
-
-
+/*
     tVZFilter_setGain(&shelf1, fastdbtoa(-1.0f * params[1]));
     tVZFilter_setGain(&shelf2, fastdbtoa(params[1]));
     tVZFilter_setFreq(&bell1, params[3]*invOsRatio);
     tVZFilter_setGain(&bell1, fastdbtoa(params[2]));
-
+*/
 	if (codecReady)
 	{
 		float inputSamples[2];
@@ -180,8 +218,28 @@ void audioFrame(uint16_t buffer_offset)
 
 }
 
+int currentFilt = 0;
+
+void updateFilter()
+{
+	float myBandwidth = 1.0f / (LEAF_interpolation_linear(params[0], randomization[currentFilt]*4000.0f, params[3]));
+
+	tExpSmooth_setDest(&bandwidthSmoothers[currentFilt], myBandwidth);
 
 
+	float myFreq = LEAF_interpolation_linear(freqs[currentFilt][intVersion], freqs[currentFilt][intVersionPlusOne], floatVersion);
+	tExpSmooth_setDest(&freqSmoothers[currentFilt], myFreq);
+
+	tExpSmooth_setDest(&filterGains[currentFilt], (float)(currentFilt < params[2]));
+	tVZFilter_setFreqAndBandwidthEfficientBP(&filters[currentFilt], tExpSmooth_tick(&freqSmoothers[currentFilt]),tExpSmooth_tick(&bandwidthSmoothers[currentFilt]));
+
+
+	currentFilt++;
+	if (currentFilt >= NUM_FILTERS)
+	{
+		currentFilt = 0;
+	}
+}
 ///knob 1 = input gain (above 1)
 // knob 2 = spectral tilt
 // knob 3 = bandpass gain (center at 0db)
@@ -190,7 +248,7 @@ void audioFrame(uint16_t buffer_offset)
 
 // CV input jacks 1-4 add to knobs 1-4.
 
-
+uint currentSampFilt = 0;
 float audioTick(float* samples)
 {
 
@@ -202,37 +260,16 @@ float audioTick(float* samples)
 
 	//start of audio code
 	float sample = samples[0];
-
-	sample = tVZFilter_tickEfficient(&lp1, sample);
-	sample = tVZFilter_tickEfficient(&lp2, sample);
-    sample = sample * params[0];
+	float output = 0.0f;
 
 
 
-    tOversampler_upsample(&os, sample, osArray);
-
-    for (int i = 0; i < osRatio; i++)
-    {
-    	//button B sets distortion mode
-		if (distortionMode > 0)
-		{
-			osArray[i] = LEAF_shaper(osArray[i], 1.0f);
-		}
-		else
-		{
-			osArray[i] = tanhf(osArray[i]);
-		}
-
-		osArray[i]= tVZFilter_tickEfficient(&shelf1, osArray[i]); //put it through the low shelf
-		osArray[i] = tVZFilter_tickEfficient(&shelf2, osArray[i]); // now put that result through the high shelf
-		osArray[i] = tVZFilter_tickEfficient(&bell1, osArray[i]); // now add a bell (or peaking eq) filter
-
-		osArray[i] = tanhf(osArray[i] * 0.9f) * params[4];
-
-
-    }
-    sample = tOversampler_downsample(&os, osArray);
-
+	for (int i = 0; i < NUM_FILTERS; i++)
+	{
+		output += tVZFilter_tickEfficient(&filters[i], sample * tExpSmooth_tick(&filterGains[i]));
+	}
+	output *= params[5] * 6.0f;
+	output = fast_tanh4(output);
 
     //non oversampled version
 	/*
@@ -253,16 +290,16 @@ float audioTick(float* samples)
 	sample = tanhf(sample * 0.9f) * params[4];
 	*/
 
-   	samples[0] = sample;
-   	samples[1] = sample;
+   	samples[0] = output;
+   	samples[1] = output;
 
 
-   	//cycle counting stuff below. At 192k you have at most 2500 cycles per sample (when running at 480MHz). There is also overhead from the frame processing and function calls, so in reality less than that.
+   	//cycle counting stuff below. At 48k you have at most 10000 cycles per sample (when running at 480MHz). There is also overhead from the frame processing and function calls, so in reality less than that.
 	tempCount6 = DWT->CYCCNT;
 
 	cycleCountVals[0] = tempCount6-tempCount5;
 	CycleCounterTrackMinAndMax(0);
-	if (cycleCountVals[0] > 2500)
+	if (cycleCountVals[0] > 9900)
 	{
 		setLED_D(255);
 		//overflow

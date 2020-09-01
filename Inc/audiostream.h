@@ -33,11 +33,11 @@
 #include "leaf.h"
 #include "main.h"
 
-#define AUDIO_FRAME_SIZE      128
+#define AUDIO_FRAME_SIZE      32
 #define HALF_BUFFER_SIZE      AUDIO_FRAME_SIZE * 2 //number of samples per half of the "double-buffer" (twice the audio frame size because there are interleaved samples for both left and right channels)
 #define AUDIO_BUFFER_SIZE     AUDIO_FRAME_SIZE * 4 //number of samples in the whole data structure (four times the audio frame size because of stereo and also double-buffering/ping-ponging)
 
-#define SMALL_MEM_SIZE 10000 //can make this bigger as long as there is room in DTCM-RAM
+#define SMALL_MEM_SIZE 60000 //can make this bigger as long as there is room in DTCM-RAM
 #define MEDIUM_MEM_SIZE 519000
 #define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 
@@ -62,7 +62,7 @@ typedef enum
 }BUFFER_StateTypeDef;
 
 
-#define SAMPLE_RATE 192000.f
+#define SAMPLE_RATE 48000.f
 
 #define INV_SAMPLE_RATE 1.f/SAMPLE_RATE
 #define SAMPLE_RATE_MS (SAMPLE_RATE / 1000.f)

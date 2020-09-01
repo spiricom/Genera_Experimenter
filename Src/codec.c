@@ -77,7 +77,7 @@ void AudioCodec_init(I2C_HandleTypeDef* hi2c) {
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
 	myI2cData[0] = 0x01;
-	myI2cData[1] = 0xe1; //0x41 for 48k, 0x81 for 96k, 0xe1 for 192k
+	myI2cData[1] = 0x41; //0x41 for 48k, 0x81 for 96k, 0xe1 for 192k
 	testVal = HAL_I2C_Master_Transmit(hi2c, CODEC_I2C_ADDRESS, myI2cData, i2cDataSize, I2Ctimeout);
 
 	myI2cData[0] = 0x02;
