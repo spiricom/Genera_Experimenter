@@ -62,12 +62,13 @@ float freqs[NUM_FILTERS][4];
 tExpSmooth filterGains[NUM_FILTERS];
 float randomization[NUM_FILTERS];
 
+tExpSmooth wanderSmoothers[NUM_FILTERS];
 tExpSmooth freqSmoothers[NUM_FILTERS];
 tExpSmooth bandwidthSmoothers[NUM_FILTERS];
 //int currentFilt = 0;
 float adcHysteresisThreshold = 0.005f;
 float lastFloatADC[NUM_ADC_CHANNELS];
-
+float floatADC[NUM_ADC_CHANNELS];
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
 
 float smoothedADC[NUM_ADC_CHANNELS];
@@ -100,8 +101,9 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 
 		tExpSmooth_init(&filterGains[i], 0.0f, 0.01f, &leaf);
-		tExpSmooth_init(&freqSmoothers[i], 220.0f, 1.0f, &leaf);
-		tExpSmooth_init(&bandwidthSmoothers[i], 0.3f, 0.1f, &leaf);
+		tExpSmooth_init(&freqSmoothers[i], 220.0f, 0.9f, &leaf);
+		tExpSmooth_init(&bandwidthSmoothers[i], 0.3f, 0.05f, &leaf);
+		tExpSmooth_init(&wanderSmoothers[i], 220.0f, 0.05f, &leaf);
 		randomization[i] = randomNumber();
 	}
 
@@ -149,12 +151,12 @@ void audioFrame(uint16_t buffer_offset)
 	buttonCheck();
 	for (int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
-		float floatADC = ADC_values[i] * INV_TWO_TO_16;
+		floatADC[i] = ((ADC_values[i]>>6) * INV_TWO_TO_10);
 
-		if (fastabsf(floatADC - lastFloatADC[i]) > adcHysteresisThreshold)
+		if (fastabsf(floatADC[i] - lastFloatADC[i]) > adcHysteresisThreshold)
 		{
-			tExpSmooth_setDest(&adcSmooth[i], (ADC_values[i] * INV_TWO_TO_16));
-			lastFloatADC[i] = floatADC;
+			tExpSmooth_setDest(&adcSmooth[i], floatADC[i]);
+			lastFloatADC[i] = floatADC[i];
 		}
 
 	}
@@ -171,17 +173,17 @@ void audioFrame(uint16_t buffer_offset)
 
 
 	params[0] = LEAF_clip(0.0f, (smoothedADC[0] + smoothedADC[8]), 1.0f) * 4000.0f;
-    params[1] = LEAF_clip(0.0f, (smoothedADC[1] + smoothedADC[9]), 1.0f) * 3.9f;
+    params[1] = LEAF_clip(0.0f, ((1.0f - floatADC[1]) + floatADC[9]), 1.0f) * 1.9f;
     params[2] = LEAF_clip(0.0f, (smoothedADC[2] + smoothedADC[10]), 1.0f) * 160.0f;
     params[3] = LEAF_clip(0.0f, (smoothedADC[3] + smoothedADC[11]), 1.0f);
     params[4] = LEAF_clip(0.0f, ((smoothedADC[4]* 1.1f) - 0.1f), 1.0f);
     params[5] = smoothedADC[5];
 
-
+    tExpSmooth_setDest(&wanderSmoothers[1], params[1]);
 	//float truncatedParam1 = (round(params[1] * 32.0f) * 0.03125f);
-	float truncatedParam1 = (round(params[1])) * .99f;
+	float truncatedParam1 = round((LEAF_clip(0.0f, (smoothedADC[1] + smoothedADC[9]), 1.0f) * 1.9f)) * .99f;
 	//params[4] is wiggliness (amount of noise allowed through in CV)
-	params[1] = LEAF_interpolation_linear(truncatedParam1, params[1], params[4]);
+	params[1] = LEAF_interpolation_linear(truncatedParam1, tExpSmooth_tick(&wanderSmoothers[1]), params[4]);
 
 	intVersion = (int)params[1];
 	intVersionPlusOne = (intVersion + 1) & 3;
