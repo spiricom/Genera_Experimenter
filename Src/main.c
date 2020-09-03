@@ -71,8 +71,6 @@ static void CycleCounterInit( void );
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t SPI_TX[16] __ATTR_RAM_D2;
-uint8_t SPI_RX[16] __ATTR_RAM_D2;
 uint8_t counter;
 int SDReady = 0;
 
@@ -140,11 +138,6 @@ int main(void)
   tempFPURegisterVal |= (1<<24); // set the FTZ (flush-to-zero) bit in the FPU control register
   __set_FPSCR(tempFPURegisterVal);
 
-  for (int i = 0; i < 16; i++)
-  {
-	  SPI_TX[i] = counter++;
-  }
-
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
   HAL_Delay(10);
 
@@ -189,7 +182,7 @@ int main(void)
 
 
 */
-/*
+
 	 if(BSP_SD_IsDetected())
 	 {
 
@@ -199,7 +192,6 @@ int main(void)
 	   FS_FileOperations();
 
 	 }
-*/
 
   if (HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_values, NUM_ADC_CHANNELS) != HAL_OK)
 	{
@@ -231,7 +223,7 @@ int main(void)
 */
 
      //FIL testFile;
-     //uint8_t testBuffer[16] = "SD write succest";
+     //uint8_t testBuffer[16] = "SD write success";
      //UINT testBytes;
      //uint8_t path[5] = "s.txt";
      //f_open(&testFile, (char*)path, FA_READ | FA_CREATE_ALWAYS);
@@ -392,68 +384,68 @@ void SystemClock_Config(void)
 #define SDRAM_REFRESH_COUNT                   	 ((uint32_t)0x0569)// 7.9us in cycles of 8.333333ns + 20 cycles as recommended by datasheet page 866/3289 for STM32H743
 void SDRAM_Initialization_sequence(void)
 {
-    __IO uint32_t tmpmrd = 0;
-    FMC_SDRAM_CommandTypeDef Command;
-    /* Step 1: Configure a clock configuration enable command */
-    Command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = 0;
+	__IO uint32_t tmpmrd = 0;
+	FMC_SDRAM_CommandTypeDef Command;
+	/* Step 1: Configure a clock configuration enable command */
+	Command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
+	Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	Command.AutoRefreshNumber = 1;
+	Command.ModeRegisterDefinition = 0;
 
-    /* Send the command */
-    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+	/* Send the command */
+	HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
-    /* Step 2: Insert 100 us minimum delay */
-    /* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
-    HAL_Delay(1);
+	/* Step 2: Insert 100 us minimum delay */
+	/* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
+	HAL_Delay(1);
 
-    /* Step 3: Configure a PALL (precharge all) command */
-    Command.CommandMode = FMC_SDRAM_CMD_PALL;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = 0;
+	/* Step 3: Configure a PALL (precharge all) command */
+	Command.CommandMode = FMC_SDRAM_CMD_PALL;
+	Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	Command.AutoRefreshNumber = 1;
+	Command.ModeRegisterDefinition = 0;
 
-    /* Send the command */
-    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+	/* Send the command */
+	HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
-    /* Step 5: Program the external memory mode register */
-    tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_4 | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
-        | SDRAM_MODEREG_CAS_LATENCY_2 | SDRAM_MODEREG_OPERATING_MODE_STANDARD
-        | SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+	/* Step 5: Program the external memory mode register */
+	tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_4 | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
+		| SDRAM_MODEREG_CAS_LATENCY_2 | SDRAM_MODEREG_OPERATING_MODE_STANDARD
+		| SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 
-    Command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = tmpmrd;
+	Command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
+	Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	Command.AutoRefreshNumber = 1;
+	Command.ModeRegisterDefinition = tmpmrd;
 
-    /* Send the command */
-    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+	/* Send the command */
+	HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
-    /* Step 4: Configure the 1st Auto Refresh command */
-    Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
-    Command.AutoRefreshNumber = 8;
-    Command.ModeRegisterDefinition = 0;
+	/* Step 4: Configure the 1st Auto Refresh command */
+	Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+	Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	Command.AutoRefreshNumber = 8;
+	Command.ModeRegisterDefinition = 0;
 
-    /* Send the command */
-    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+	/* Send the command */
+	HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
-    /* Step 2: Insert 100 us minimum delay */
-    /* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
-    HAL_Delay(1);
+	/* Step 2: Insert 100 us minimum delay */
+	/* Inserted delay is equal to 1 ms due to systick time base unit (ms) */
+	HAL_Delay(1);
 
-    /* Step 5: Configure the 2nd Auto Refresh command */
-    Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
-    Command.AutoRefreshNumber = 8;
-    Command.ModeRegisterDefinition = 0;
+	/* Step 5: Configure the 2nd Auto Refresh command */
+	Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+	Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	Command.AutoRefreshNumber = 8;
+	Command.ModeRegisterDefinition = 0;
 
-    /* Send the command */
-    HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
+	/* Send the command */
+	HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
-    /* Step 6: Set the refresh rate counter */
-    /* Set the device refresh rate */
-    HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT);
+	/* Step 6: Set the refresh rate counter */
+	/* Set the device refresh rate */
+	HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT);
 }
 
 
@@ -483,6 +475,7 @@ float randomNumber(void) {
 	float num = (float)rand * INV_TWO_TO_32;
 	return num;
 }
+
 volatile FRESULT res2;
 uint8_t rtext[100];                                   /* File read buffer */
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
@@ -491,6 +484,7 @@ uint8_t tempText[30];
 int testNumber = 55559;
 int8_t filename[30];
 uint8_t fileExt[] = ".txt";
+
 static void FS_FileOperations(void)
 {
                                        /* FatFs function common result code */
@@ -510,13 +504,12 @@ static void FS_FileOperations(void)
 	}
   }
 #endif
-
+/*
   int theNumber = randomNumber() * 65535;
   itoa(theNumber,tempText, 10);
   strncat(filename, tempText, sizeof(tempText));
   strncat(filename, fileExt, sizeof(fileExt));
   statusH = disk_initialize(0);
-  /* Register the file system object to the FatFs module */
   if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
   {
 	   //FRESULT res;
@@ -531,12 +524,40 @@ static void FS_FileOperations(void)
 		  }
 	  }
     	//f_close(&myFile);
-     /* Write data to the text file */
+    // Write data to the text file
       //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
 
 
   }
+*/
+  statusH = disk_initialize(0);
+  if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
+  {
+	   //FRESULT res;
 
+	   //res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
+
+
+	  {
+		  if(f_open(&myFile, "s.wav", FA_OPEN_ALWAYS | FA_READ) == FR_OK)
+		  {
+			SDReady = 1;
+		    readWave(&myFile);
+
+/*
+			res2 = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
+			//atoi(100, wtext, 10);
+			if((bytesread > 0) && (res2 == FR_OK))
+			{
+			  f_close(&myFile);
+			}
+		  */
+		  }
+	  }
+    	//f_close(&myFile);
+    // Write data to the text file
+      //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
+  }
   /* Error */
   //Error_Handler();
 }
@@ -1108,10 +1129,10 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-while(1)
-{
-;
-}
+	while(1)
+	{
+	;
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 

@@ -7,6 +7,7 @@
 
 #include "wave.h"
 #include "string.h"
+#include "audiostream.h"
 //#include "stdio.h"
 // WAVE header structure
 
@@ -16,6 +17,8 @@ unsigned char buffer2[2];
 char* seconds_to_time(float seconds);
 
 struct tWaveHeader header;
+
+volatile int ErrorDebugz = 0;
 
 int readWave(FIL *ptr) {
 
@@ -27,7 +30,7 @@ int readWave(FIL *ptr) {
  read = f_read(ptr, header.riff, sizeof(header.riff), &numBytesRead);
  //printf("(1-4): %s \n", header.riff);
 
- read = f_read(buffer4, sizeof(buffer4), 1, ptr);
+ read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
  //printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
  // convert little endian to big endian 4 byte int
@@ -38,13 +41,13 @@ int readWave(FIL *ptr) {
 
  //printf("(5-8) Overall size: bytes:%u, Kb:%u \n", header.overall_size, header.overall_size/1024);
 
- read = f_read(header.wave, sizeof(header.wave), 1, ptr);
+ read = f_read(ptr, header.wave, sizeof(header.wave), &numBytesRead);
  //printf("(9-12) Wave marker: %s\n", header.wave);
 
- read = f_read(header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), 1, ptr);
+ read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
  //printf("(13-16) Fmt marker: %s\n", header.fmt_chunk_marker);
 
- read = f_read(buffer4, sizeof(buffer4), 1, ptr);
+ read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
 // printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
  // convert little endian to big endian 4 byte integer
@@ -54,7 +57,7 @@ int readWave(FIL *ptr) {
 							(buffer4[3] << 24);
  //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
 
- read = f_read(buffer2, sizeof(buffer2), 1, ptr);
+ read = f_read(ptr, buffer2, sizeof(buffer2), &numBytesRead);
  //printf("%u %u \n", buffer2[0], buffer2[1]);
 
  header.format_type = buffer2[0] | (buffer2[1] << 8);
@@ -68,13 +71,13 @@ int readWave(FIL *ptr) {
 
  //printf("(21-22) Format type: %u %s \n", header.format_type, format_name);
 
- read = f_read(buffer2, sizeof(buffer2), 1, ptr);
+ read = f_read(ptr, buffer2, sizeof(buffer2), &numBytesRead);
  //printf("%u %u \n", buffer2[0], buffer2[1]);
 
  header.channels = buffer2[0] | (buffer2[1] << 8);
  //printf("(23-24) Channels: %u \n", header.channels);
 
- read = f_read(buffer4, sizeof(buffer4), 1, ptr);
+ read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
  //printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
  header.sample_rate = buffer4[0] |
@@ -84,7 +87,7 @@ int readWave(FIL *ptr) {
 
  //printf("(25-28) Sample rate: %u\n", header.sample_rate);
 
- read = f_read(buffer4, sizeof(buffer4), 1, ptr);
+ read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
  //printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
  header.byterate  = buffer4[0] |
@@ -93,24 +96,24 @@ int readWave(FIL *ptr) {
 						(buffer4[3] << 24);
  //printf("(29-32) Byte Rate: %u , Bit Rate:%u\n", header.byterate, header.byterate*8);
 
- read = f_read(buffer2, sizeof(buffer2), 1, ptr);
+ read = f_read(ptr, buffer2, sizeof(buffer2), &numBytesRead);
  //printf("%u %u \n", buffer2[0], buffer2[1]);
 
  header.block_align = buffer2[0] |
 					(buffer2[1] << 8);
  //printf("(33-34) Block Alignment: %u \n", header.block_align);
 
- read = f_read(buffer2, sizeof(buffer2), 1, ptr);
+ read = f_read(ptr, buffer2, sizeof(buffer2), &numBytesRead);
  //printf("%u %u \n", buffer2[0], buffer2[1]);
 
  header.bits_per_sample = buffer2[0] |
 					(buffer2[1] << 8);
  //printf("(35-36) Bits per sample: %u \n", header.bits_per_sample);
 
- read = f_read(header.data_chunk_header, sizeof(header.data_chunk_header), 1, ptr);
+ read = f_read(ptr, header.data_chunk_header, sizeof(header.data_chunk_header), &numBytesRead);
  //printf("(37-40) Data Marker: %s \n", header.data_chunk_header);
 
- read = f_read(buffer4, sizeof(buffer4), 1, ptr);
+ read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
 // printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
  header.data_size = buffer4[0] |
@@ -137,7 +140,7 @@ int readWave(FIL *ptr) {
  // read each sample from data chunk if PCM
  if (header.format_type == 1) { // PCM
     //printf("Dump sample data? Y/N?");
-	char c = 'n';
+	char c = 'Y';
 	//scanf("%c", &c);
 	if (c == 'Y' || c == 'y') {
 		long i =0;
@@ -155,68 +158,79 @@ int readWave(FIL *ptr) {
 					// the valid amplitude range for values based on the bits per sample
 			long low_limit = 0l;
 			long high_limit = 0l;
+			float inv_high_limit = 1.0f;
 
 			switch (header.bits_per_sample) {
 				case 8:
 					low_limit = -128;
 					high_limit = 127;
+
 					break;
 				case 16:
 					low_limit = -32768;
 					high_limit = 32767;
+					break;
+				case 24:
+					low_limit = -8388608;
+					high_limit = 8388607;
 					break;
 				case 32:
 					low_limit = -2147483648;
 					high_limit = 2147483647;
 					break;
 			}
+			inv_high_limit = 1.0f / high_limit;
+
+			//this will change for multiple files...
+			largeMemory[memoryPointer] = 0;
 
 			//printf("\n\n.Valid range for data values : %ld to %ld \n", low_limit, high_limit);
-			for (i =1; i <= num_samples; i++) {
-				//printf("==========Sample %ld / %ld=============\n", i, num_samples);
-				read = fread(data_buffer, sizeof(data_buffer), 1, ptr);
-				if (read == 1) {
+			for (i =1; i <= num_samples; i++)
+			{
+				read = f_read(ptr, data_buffer, sizeof(data_buffer), (void *)&numBytesRead);
 
+				if (numBytesRead > 0)
+				{
 					// dump the data read
 					unsigned int  xchannels = 0;
-					int data_in_channel = 0;
+					int32_t data_in_channel_32 = 0;
+					int16_t data_in_channel_16 = 0;
+					int8_t data_in_channel_8 = 0;
+					float float_data = 0.0f;
 
 					for (xchannels = 0; xchannels < header.channels; xchannels ++ ) {
 						//printf("Channel#%d : ", (xchannels+1));
 						// convert data from little endian to big endian based on bytes in each channel sample
 						if (bytes_in_each_channel == 4) {
-							data_in_channel =	data_buffer[0] |
+							data_in_channel_32 =	data_buffer[0] |
 												(data_buffer[1]<<8) |
 												(data_buffer[2]<<16) |
 												(data_buffer[3]<<24);
+							float_data = ((float)data_in_channel_32) * inv_high_limit;
 						}
 						else if (bytes_in_each_channel == 2) {
-							data_in_channel = data_buffer[0] |
-												(data_buffer[1] << 8);
+							data_in_channel_16 = (int16_t)(data_buffer[0] |
+												(data_buffer[1] << 8));
+							float_data = ((float)data_in_channel_16) * inv_high_limit;
 						}
 						else if (bytes_in_each_channel == 1) {
-							data_in_channel = data_buffer[0];
+							data_in_channel_8 = (int8_t)data_buffer[0];
+							float_data = ((float)data_in_channel_8) * inv_high_limit;
 						}
 
-						//printf("%d ", data_in_channel);
-
-						// check if value was in range
-						//if (data_in_channel < low_limit || data_in_channel > high_limit)
-							//printf("**value out of range\n");
-
-						//printf(" | ");
+						largeMemory[memoryPointer] = float_data;
+						memoryPointer++;
+						if (memoryPointer >= LARGE_MEM_SIZE_IN_FLOAT)
+						{
+							//ran out of space in SDRAM
+							return 0;
+						}
 					}
-
-					//printf("\n");
-				}
-				else {
-					//printf("Error reading file. %d bytes\n", read);
-					break;
 				}
 
-			} // 	for (i =1; i <= num_samples; i++) {
+			}
 
-		} // 	if (size_is_correct) {
+		}
 
 	 } // if (c == 'Y' || c == 'y') {
  } //  if (header.format_type == 1) {

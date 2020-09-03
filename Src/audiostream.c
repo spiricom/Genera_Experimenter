@@ -39,7 +39,7 @@ LEAF leaf;
 //MEMPOOLS
 char smallMemory[SMALL_MEM_SIZE];
 char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
-char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
+float largeMemory[LARGE_MEM_SIZE_IN_FLOAT] __ATTR_SDRAM;
 //small memory will be the default LEAF mempool
 // need to create custom mempools for the medium and large memory
 tMempool mediumPool;
@@ -53,8 +53,8 @@ typedef enum BOOL {
 	TRUE
 } BOOL;
 
-
-
+int distortionMode = 0;
+/*
 #define NUM_FILTERS 128
 int distortionMode = 0;
 tVZFilter filters[NUM_FILTERS];
@@ -76,6 +76,7 @@ float smoothedADC[NUM_ADC_CHANNELS];
 float params[8];
 
 void updateFilter();
+*/
 
 void CycleCounterTrackMinAndMax( int whichCount);
 
@@ -85,12 +86,13 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	LEAF_init(&leaf, SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
-	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
-	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
+	//tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
+	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
 
 	HAL_Delay(10);
 	leaf.clearOnAllocation = 1;
 
+	/*
 	for (int i = 0; i< NUM_FILTERS; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -112,7 +114,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	{
 		tExpSmooth_init(&adcSmooth[i], 0.0f, 0.1f, &leaf);
 	}
-
+*/
 	leaf.clearOnAllocation = 0;
 
 
@@ -149,6 +151,7 @@ void audioFrame(uint16_t buffer_offset)
 
 	int i;
 	buttonCheck();
+	/*
 	for (int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
 		floatADC[i] = ((ADC_values[i]>>6) * INV_TWO_TO_10);
@@ -194,7 +197,7 @@ void audioFrame(uint16_t buffer_offset)
 		updateFilter();
 	}
 
-
+*/
 
 
 /*
@@ -220,36 +223,9 @@ void audioFrame(uint16_t buffer_offset)
 
 }
 
-int currentFilt = 0;
-
-void updateFilter()
-{
-	float myBandwidth = 1.0f / (LEAF_interpolation_linear(params[0], randomization[currentFilt]*4000.0f, params[3]));
-
-	tExpSmooth_setDest(&bandwidthSmoothers[currentFilt], myBandwidth);
-
-
-	float myFreq = LEAF_interpolation_linear(freqs[currentFilt][intVersion], freqs[currentFilt][intVersionPlusOne], floatVersion);
-	tExpSmooth_setDest(&freqSmoothers[currentFilt], myFreq);
-
-	tExpSmooth_setDest(&filterGains[currentFilt], (float)(currentFilt < params[2]));
-	tVZFilter_setFreqAndBandwidthEfficientBP(&filters[currentFilt], tExpSmooth_tick(&freqSmoothers[currentFilt]),tExpSmooth_tick(&bandwidthSmoothers[currentFilt]));
-
-
-	currentFilt++;
-	if (currentFilt >= NUM_FILTERS)
-	{
-		currentFilt = 0;
-	}
-}
-///knob 1 = input gain (above 1)
-// knob 2 = spectral tilt
-// knob 3 = bandpass gain (center at 0db)
-// knob 4 = bandpass freq
-// knob 5 = output gain
 
 // CV input jacks 1-4 add to knobs 1-4.
-
+uint64_t sampleNum = 0;
 uint currentSampFilt = 0;
 float audioTick(float* samples)
 {
@@ -261,36 +237,14 @@ float audioTick(float* samples)
 	tempCount5 = DWT->CYCCNT;
 
 	//start of audio code
-	float sample = samples[0];
 	float output = 0.0f;
 
-
-
-	for (int i = 0; i < NUM_FILTERS; i++)
+	output = largeMemory[sampleNum];
+	sampleNum++;
+	if (sampleNum >= memoryPointer)
 	{
-		output += tVZFilter_tickEfficient(&filters[i], sample * tExpSmooth_tick(&filterGains[i]));
+		sampleNum = 0;
 	}
-	output *= params[5] * 6.0f;
-	output = fast_tanh4(output);
-
-    //non oversampled version
-	/*
-	//button B sets distortion mode
-	if (distortionMode > 0)
-	{
-		sample = LEAF_shaper(sample, 1.0f);
-	}
-	else
-	{
-		sample = tanhf(sample);
-	}
-
-	sample= tVZFilter_tickEfficient(&shelf1, sample); //put it through the low shelf
-	sample = tVZFilter_tickEfficient(&shelf2, sample); // now put that result through the high shelf
-	sample = tVZFilter_tickEfficient(&bell1, sample); // now add a bell (or peaking eq) filter
-
-	sample = tanhf(sample * 0.9f) * params[4];
-	*/
 
    	samples[0] = output;
    	samples[1] = output;

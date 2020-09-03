@@ -59,6 +59,8 @@ void MX_FMC_Init(void)
     Error_Handler( );
   }
 
+  HAL_SetFMCMemorySwappingConfig(FMC_SWAPBMAP_SDRAM_SRAM);
+
 }
 
 static uint32_t FMC_Initialized = 0;
