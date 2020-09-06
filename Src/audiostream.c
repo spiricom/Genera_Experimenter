@@ -40,9 +40,9 @@ LEAF leaf;
 char smallMemory[SMALL_MEM_SIZE];
 char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 float largeMemory[LARGE_MEM_SIZE_IN_FLOAT] __ATTR_SDRAM;
-char largeMemoryScratch[HALF_LARGE_MEM_SIZE] __ATTR_SDRAM;
+char largeMemoryScratch[SCRATCH_MEM_SIZE] __ATTR_SDRAM;
 uint32_t scratchPosition = 0;
-uint32_t remainingScratchBytes = HALF_LARGE_MEM_SIZE;
+
 //small memory will be the default LEAF mempool
 // need to create custom mempools for the medium and large memory
 tMempool mediumPool;
@@ -212,7 +212,7 @@ float audioTick(float* samples)
 	//start of audio code
 	float output = 0.0f;
 	float input = samples[0];
-
+/*
 	if ((input > 0.5f) && (prevInput < 0.5f))
 	{
 		//we got a trigger
@@ -246,21 +246,30 @@ float audioTick(float* samples)
 
 	tExpSmooth_setDest(&sampleGains[currentSample], (LEAF_clip(0.0f, smoothedADC[0] + smoothedADC[8], 1.0f) * 2.0f));
 	prevInput = input;
-	/*
-	output = largeMemory[sampleNum];
-	sampleNum++;
-	if (sampleNum >= memoryPointer)
-	{
-		sampleNum = 0;
-	}
-*/
+
+
 	for (int i = 0; i < MAX_WAV_FILES; i++)
 	{
 		output += 	(tMBSampler_tick(&mySamplers[i]) * tExpSmooth_tick(&sampleGains[i]));
 	}
 	output = tanhf(output);
-   	samples[0] = output;
-   	samples[1] = output;
+
+	*/
+
+
+
+	samples[0] = largeMemory[sampleNum];
+	sampleNum++;
+	if (sampleNum >= memoryPointer)
+	{
+		sampleNum = 0;
+	}
+	samples[1] = largeMemory[sampleNum];
+	sampleNum++;
+	if (sampleNum >= memoryPointer)
+	{
+		sampleNum = 0;
+	}
 
 
 

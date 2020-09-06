@@ -41,8 +41,9 @@
 #define MEDIUM_MEM_SIZE 519000
 #define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 //#define LARGE_MEM_SIZE_IN_FLOAT 8388608
-#define LARGE_MEM_SIZE_IN_FLOAT 4194304
-#define HALF_LARGE_MEM_SIZE 16777216
+#define LARGE_MEM_SIZE_IN_FLOAT 6291456
+#define SCRATCH_MEM_SIZE 8388608
+
 extern int32_t audioOutBuffer[AUDIO_BUFFER_SIZE];
 extern uint8_t codecReady;
 #define NUM_ADC_CHANNELS 12
@@ -54,9 +55,8 @@ extern int ADC_Ready;
 
 
 extern float largeMemory[LARGE_MEM_SIZE_IN_FLOAT] __ATTR_SDRAM;
-extern char largeMemoryScratch[HALF_LARGE_MEM_SIZE] __ATTR_SDRAM;
+extern char largeMemoryScratch[SCRATCH_MEM_SIZE] __ATTR_SDRAM;
 extern uint32_t scratchPosition;
-extern uint32_t remainingScratchBytes;
 extern tMempool mediumPool;
 /* Exported types ------------------------------------------------------------*/
 typedef enum

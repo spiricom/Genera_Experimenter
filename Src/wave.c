@@ -204,7 +204,6 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
  { // PCM
 
 	long i =0;
-	char data_buffer[size_of_each_sample];
 	int  size_is_correct = 1;
 
 	// make sure that the bytes-per-sample is completely divisible by num.of channels
@@ -243,76 +242,127 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 		}
 		inv_high_limit = 1.0f / high_limit;
 
-		if (header.data_size < remainingScratchBytes)
+		if (memoryPointer+(header.data_size / sizeof(float)) >= LARGE_MEM_SIZE_IN_FLOAT)
 		{
-			read = f_read(ptr, largeMemoryScratch[scratchPosition], sizeof(header.data_size), (void *)&numBytesRead);
+			//ran out of space in SDRAM
+			OutOfSpace = 1;
+			return 0;
+		}
+
+		if (header.data_size < SCRATCH_MEM_SIZE)
+		{
+			read = f_read(ptr, largeMemoryScratch, header.data_size, (void *)&numBytesRead);
 			//printf("\n\n.Valid range for data values : %ld to %ld \n", low_limit, high_limit);
-			for (i =1; i <= num_samples; i++)
+			scratchPosition = 0;
+			if (bytes_in_each_channel == 4)
 			{
-				// dump the data read
-				unsigned int  xchannels = 0;
+				for (i =1; i <= num_samples; i++)
+				{
+					// dump the data read
+					unsigned int  xchannels = 0;
 
-				int32_t data_in_channel_32 = 0;
-				int16_t data_in_channel_16 = 0;
-				int8_t data_in_channel_8 = 0;
-				float float_data = 0.0f;
+					int32_t data_in_channel_32 = 0;
+					float float_data = 0.0f;
 
-				for (xchannels = 0; xchannels < header.channels; xchannels ++ ) {
-					//printf("Channel#%d : ", (xchannels+1));
-					// convert data from little endian to big endian based on bytes in each channel sample
-					unsigned int byteOffset =  xchannels * bytes_in_each_channel;
-					if (bytes_in_each_channel == 4) {
-						data_in_channel_32 =	largeMemoryScratch[scratchPosition + byteOffset] |
-											(largeMemoryScratch[scratchPosition + 1 + byteOffset]<<8) |
-											(largeMemoryScratch[scratchPosition + 2 + byteOffset]<<16) |
-											(largeMemoryScratch[scratchPosition + 3 + byteOffset]<<24);
+					for (xchannels = 0; xchannels < header.channels; xchannels ++ )
+					{
+						//printf("Channel#%d : ", (xchannels+1));
+						// convert data from little endian to big endian based on bytes in each channel sample
+						unsigned int byteOffset =  xchannels * bytes_in_each_channel;
+
+						data_in_channel_32 =	largeMemoryScratch[scratchPosition] |
+											(largeMemoryScratch[scratchPosition + 1]<<8) |
+											(largeMemoryScratch[scratchPosition + 2]<<16) |
+											(largeMemoryScratch[scratchPosition + 3]<<24);
 						float_data = ((float)data_in_channel_32) * inv_high_limit;
 						scratchPosition = scratchPosition + 4;
+
+						largeMemory[memoryPointer] = float_data;
+						memoryPointer++;
 					}
-					if (bytes_in_each_channel == 3) {
-						data_in_channel_32 =	largeMemoryScratch[scratchPosition +  byteOffset]<<8 |
-											(largeMemoryScratch[scratchPosition + 1 + byteOffset]<<16) |
-											(largeMemoryScratch[scratchPosition + 2 + byteOffset]<<24);
+				}
+			}
+			else if (bytes_in_each_channel == 3)
+			{
+				for (i =1; i <= num_samples; i++)
+				{
+					// dump the data read
+					unsigned int  xchannels = 0;
+
+					int32_t data_in_channel_32 = 0;
+					float float_data = 0.0f;
+
+					for (xchannels = 0; xchannels < header.channels; xchannels ++ )
+					{
+						//printf("Channel#%d : ", (xchannels+1));
+						// convert data from little endian to big endian based on bytes in each channel sample
+
+						data_in_channel_32 =	largeMemoryScratch[scratchPosition]<<8 |
+												(largeMemoryScratch[scratchPosition + 1]<<16) |
+												(largeMemoryScratch[scratchPosition + 2]<<24);
 						float_data = ((float)data_in_channel_32) * inv_high_limit;
 						scratchPosition = scratchPosition + 3;
+
+						largeMemory[memoryPointer] = float_data;
+						memoryPointer++;
 					}
-					else if (bytes_in_each_channel == 2) {
-						data_in_channel_16 = (int16_t)(largeMemoryScratch[scratchPosition + byteOffset] |
-											(largeMemoryScratch[scratchPosition + 1 + byteOffset] << 8));
+				}
+			}
+			else if (bytes_in_each_channel == 2)
+			{
+				for (i =1; i <= num_samples; i++)
+				{
+					// dump the data read
+					unsigned int  xchannels = 0;
+
+					int16_t data_in_channel_16 = 0;
+					float float_data = 0.0f;
+
+					for (xchannels = 0; xchannels < header.channels; xchannels ++ )
+					{
+						//printf("Channel#%d : ", (xchannels+1));
+						// convert data from little endian to big endian based on bytes in each channel sample
+
+						data_in_channel_16 = (int16_t)(largeMemoryScratch[scratchPosition] |
+																		(largeMemoryScratch[scratchPosition + 1] << 8));
 						float_data = ((float)data_in_channel_16) * inv_high_limit;
 						scratchPosition = scratchPosition + 2;
 
+						largeMemory[memoryPointer] = float_data;
+						memoryPointer++;
 					}
-					else if (bytes_in_each_channel == 1) {
-						data_in_channel_8 = (int8_t)largeMemoryScratch[scratchPosition + byteOffset];
+				}
+			}
+			else if (bytes_in_each_channel == 1)
+			{
+				for (i =1; i <= num_samples; i++)
+				{
+					// dump the data read
+					unsigned int  xchannels = 0;
+
+					int8_t data_in_channel_8 = 0;
+					float float_data = 0.0f;
+
+					for (xchannels = 0; xchannels < header.channels; xchannels ++ )
+					{
+						//printf("Channel#%d : ", (xchannels+1));
+						// convert data from little endian to big endian based on bytes in each channel sample
+
+						data_in_channel_8 = (int8_t)largeMemoryScratch[scratchPosition];
 						float_data = ((float)data_in_channel_8) * inv_high_limit;
 						scratchPosition = scratchPosition + 1;
-					}
 
-					largeMemory[memoryPointer] = float_data;
-					memoryPointer++;
-					if (memoryPointer >= LARGE_MEM_SIZE_IN_FLOAT)
-					{
-						//ran out of space in SDRAM
-						OutOfSpace = 1;
-						return 0;
+						largeMemory[memoryPointer] = float_data;
+						memoryPointer++;
 					}
-
 				}
 			}
 
 		}
-
-		remainingScratchBytes -= header.data_size;
 		return 1;
 	 }
  }
 
- //printf("Closing file..\n");
- //fclose(ptr);
-
-  // cleanup before quitting
- //free(filename);
  return 0;
 
 }

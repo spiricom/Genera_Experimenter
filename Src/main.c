@@ -517,7 +517,6 @@ static void FS_FileOperations(void)
 						uint32_t LengthInFloats = (uint32_t)memoryPointer - waves[fileIndex][0];
 						waves[fileIndex][3] = LengthInFloats;
 						fileIndex++;
-						numWaves++;
 					}
 					f_close(&myFile);
 					/* Search for next item */
