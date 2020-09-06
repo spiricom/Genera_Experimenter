@@ -18,7 +18,9 @@ char* seconds_to_time(float seconds);
 
 struct tWaveHeader header;
 
-volatile int ErrorDebugz = 0;
+unsigned char garbageBuffer[2048];
+uint32_t waveTimeout = 2048;
+uint32_t numberOfGarbage = 0;
 
 int readWave(FIL *ptr) {
 
@@ -30,6 +32,10 @@ int readWave(FIL *ptr) {
  read = f_read(ptr, header.riff, sizeof(header.riff), &numBytesRead);
  //printf("(1-4): %s \n", header.riff);
 
+ if ((header.riff[0] != 'R') && (header.riff[1] != 'I') && (header.riff[2] != 'F') && (header.riff[3] != 'F'))
+ {
+	 return 0;
+ }
  read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
  //printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
@@ -44,7 +50,35 @@ int readWave(FIL *ptr) {
  read = f_read(ptr, header.wave, sizeof(header.wave), &numBytesRead);
  //printf("(9-12) Wave marker: %s\n", header.wave);
 
- read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
+read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
+int numIterations = 0;
+
+while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109) && (header.fmt_chunk_marker[2] != 116) && (header.fmt_chunk_marker[3] != 32))
+{
+	 //printf("(13-16) Fmt marker: %s\n", header.fmt_chunk_marker);
+
+	 read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
+	// printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
+
+	 // convert little endian to big endian 4 byte integer
+	 numberOfGarbage = buffer4[0] |
+								(buffer4[1] << 8) |
+								(buffer4[2] << 16) |
+								(buffer4[3] << 24);
+	 //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
+
+
+	 read = f_read(ptr, garbageBuffer, numberOfGarbage, &numBytesRead);
+
+	 read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
+	 numIterations++;
+	 if (numIterations > waveTimeout)
+	 {
+		 return 0;
+	 }
+
+}
+
  //printf("(13-16) Fmt marker: %s\n", header.fmt_chunk_marker);
 
  read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
@@ -113,6 +147,34 @@ int readWave(FIL *ptr) {
  read = f_read(ptr, header.data_chunk_header, sizeof(header.data_chunk_header), &numBytesRead);
  //printf("(37-40) Data Marker: %s \n", header.data_chunk_header);
 
+ numIterations = 0;
+
+ while ((header.data_chunk_header[0] != 'd') && (header.data_chunk_header[1] != 'a') && (header.data_chunk_header[2] != 't') && (header.data_chunk_header[3] != 'a'))
+ {
+ 	 //printf("(13-16) Fmt marker: %s\n", header.fmt_chunk_marker);
+
+ 	 read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
+ 	// printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
+
+ 	 // convert little endian to big endian 4 byte integer
+ 	 numberOfGarbage = buffer4[0] |
+ 								(buffer4[1] << 8) |
+ 								(buffer4[2] << 16) |
+ 								(buffer4[3] << 24);
+ 	 //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
+
+
+ 	 read = f_read(ptr, garbageBuffer, numberOfGarbage, &numBytesRead);
+
+ 	 read = f_read(ptr, header.data_chunk_header, sizeof(header.data_chunk_header), &numBytesRead);
+ 	 numIterations++;
+	 if (numIterations > waveTimeout)
+	 {
+		 return 0;
+	 }
+ }
+
+
  read = f_read(ptr, buffer4, sizeof(buffer4), &numBytesRead);
 // printf("%u %u %u %u\n", buffer4[0], buffer4[1], buffer4[2], buffer4[3]);
 
@@ -138,102 +200,113 @@ int readWave(FIL *ptr) {
 
 
  // read each sample from data chunk if PCM
- if (header.format_type == 1) { // PCM
-    //printf("Dump sample data? Y/N?");
-	char c = 'Y';
-	//scanf("%c", &c);
-	if (c == 'Y' || c == 'y') {
-		long i =0;
-		char data_buffer[size_of_each_sample];
-		int  size_is_correct = 1;
+ if (header.format_type == 1)
+ { // PCM
 
-		// make sure that the bytes-per-sample is completely divisible by num.of channels
-		long bytes_in_each_channel = (size_of_each_sample / header.channels);
-		if ((bytes_in_each_channel  * header.channels) != size_of_each_sample) {
-			//printf("Error: %ld x %ud <> %ld\n", bytes_in_each_channel, header.channels, size_of_each_sample);
-			size_is_correct = 0;
+	long i =0;
+	char data_buffer[size_of_each_sample];
+	int  size_is_correct = 1;
+
+	// make sure that the bytes-per-sample is completely divisible by num.of channels
+	long bytes_in_each_channel = (size_of_each_sample / header.channels);
+	if ((bytes_in_each_channel  * header.channels) != size_of_each_sample)
+	{
+		//printf("Error: %ld x %ud <> %ld\n", bytes_in_each_channel, header.channels, size_of_each_sample);
+		size_is_correct = 0;
+	}
+
+	if (size_is_correct)
+	{
+				// the valid amplitude range for values based on the bits per sample
+		long low_limit = 0l;
+		long high_limit = 0l;
+		float inv_high_limit = 1.0f;
+
+		switch (header.bits_per_sample) {
+			case 8:
+				low_limit = -128;
+				high_limit = 127;
+
+				break;
+			case 16:
+				low_limit = -32768;
+				high_limit = 32767;
+				break;
+			case 24: //packed left like a 32 bit
+				low_limit = -2147483648;
+				high_limit = 2147483647;
+				break;
+			case 32:
+				low_limit = -2147483648;
+				high_limit = 2147483647;
+				break;
 		}
+		inv_high_limit = 1.0f / high_limit;
 
-		if (size_is_correct) {
-					// the valid amplitude range for values based on the bits per sample
-			long low_limit = 0l;
-			long high_limit = 0l;
-			float inv_high_limit = 1.0f;
-
-			switch (header.bits_per_sample) {
-				case 8:
-					low_limit = -128;
-					high_limit = 127;
-
-					break;
-				case 16:
-					low_limit = -32768;
-					high_limit = 32767;
-					break;
-				case 24:
-					low_limit = -8388608;
-					high_limit = 8388607;
-					break;
-				case 32:
-					low_limit = -2147483648;
-					high_limit = 2147483647;
-					break;
-			}
-			inv_high_limit = 1.0f / high_limit;
-
-			//this will change for multiple files...
-			largeMemory[memoryPointer] = 0;
-
+		if (header.data_size < remainingScratchBytes)
+		{
+			read = f_read(ptr, largeMemoryScratch[scratchPosition], sizeof(header.data_size), (void *)&numBytesRead);
 			//printf("\n\n.Valid range for data values : %ld to %ld \n", low_limit, high_limit);
 			for (i =1; i <= num_samples; i++)
 			{
-				read = f_read(ptr, data_buffer, sizeof(data_buffer), (void *)&numBytesRead);
+				// dump the data read
+				unsigned int  xchannels = 0;
 
-				if (numBytesRead > 0)
-				{
-					// dump the data read
-					unsigned int  xchannels = 0;
-					int32_t data_in_channel_32 = 0;
-					int16_t data_in_channel_16 = 0;
-					int8_t data_in_channel_8 = 0;
-					float float_data = 0.0f;
+				int32_t data_in_channel_32 = 0;
+				int16_t data_in_channel_16 = 0;
+				int8_t data_in_channel_8 = 0;
+				float float_data = 0.0f;
 
-					for (xchannels = 0; xchannels < header.channels; xchannels ++ ) {
-						//printf("Channel#%d : ", (xchannels+1));
-						// convert data from little endian to big endian based on bytes in each channel sample
-						if (bytes_in_each_channel == 4) {
-							data_in_channel_32 =	data_buffer[0] |
-												(data_buffer[1]<<8) |
-												(data_buffer[2]<<16) |
-												(data_buffer[3]<<24);
-							float_data = ((float)data_in_channel_32) * inv_high_limit;
-						}
-						else if (bytes_in_each_channel == 2) {
-							data_in_channel_16 = (int16_t)(data_buffer[0] |
-												(data_buffer[1] << 8));
-							float_data = ((float)data_in_channel_16) * inv_high_limit;
-						}
-						else if (bytes_in_each_channel == 1) {
-							data_in_channel_8 = (int8_t)data_buffer[0];
-							float_data = ((float)data_in_channel_8) * inv_high_limit;
-						}
-
-						largeMemory[memoryPointer] = float_data;
-						memoryPointer++;
-						if (memoryPointer >= LARGE_MEM_SIZE_IN_FLOAT)
-						{
-							//ran out of space in SDRAM
-							return 0;
-						}
+				for (xchannels = 0; xchannels < header.channels; xchannels ++ ) {
+					//printf("Channel#%d : ", (xchannels+1));
+					// convert data from little endian to big endian based on bytes in each channel sample
+					unsigned int byteOffset =  xchannels * bytes_in_each_channel;
+					if (bytes_in_each_channel == 4) {
+						data_in_channel_32 =	largeMemoryScratch[scratchPosition + byteOffset] |
+											(largeMemoryScratch[scratchPosition + 1 + byteOffset]<<8) |
+											(largeMemoryScratch[scratchPosition + 2 + byteOffset]<<16) |
+											(largeMemoryScratch[scratchPosition + 3 + byteOffset]<<24);
+						float_data = ((float)data_in_channel_32) * inv_high_limit;
+						scratchPosition = scratchPosition + 4;
 					}
-				}
+					if (bytes_in_each_channel == 3) {
+						data_in_channel_32 =	largeMemoryScratch[scratchPosition +  byteOffset]<<8 |
+											(largeMemoryScratch[scratchPosition + 1 + byteOffset]<<16) |
+											(largeMemoryScratch[scratchPosition + 2 + byteOffset]<<24);
+						float_data = ((float)data_in_channel_32) * inv_high_limit;
+						scratchPosition = scratchPosition + 3;
+					}
+					else if (bytes_in_each_channel == 2) {
+						data_in_channel_16 = (int16_t)(largeMemoryScratch[scratchPosition + byteOffset] |
+											(largeMemoryScratch[scratchPosition + 1 + byteOffset] << 8));
+						float_data = ((float)data_in_channel_16) * inv_high_limit;
+						scratchPosition = scratchPosition + 2;
 
+					}
+					else if (bytes_in_each_channel == 1) {
+						data_in_channel_8 = (int8_t)largeMemoryScratch[scratchPosition + byteOffset];
+						float_data = ((float)data_in_channel_8) * inv_high_limit;
+						scratchPosition = scratchPosition + 1;
+					}
+
+					largeMemory[memoryPointer] = float_data;
+					memoryPointer++;
+					if (memoryPointer >= LARGE_MEM_SIZE_IN_FLOAT)
+					{
+						//ran out of space in SDRAM
+						OutOfSpace = 1;
+						return 0;
+					}
+
+				}
 			}
 
 		}
 
-	 } // if (c == 'Y' || c == 'y') {
- } //  if (header.format_type == 1) {
+		remainingScratchBytes -= header.data_size;
+		return 1;
+	 }
+ }
 
  //printf("Closing file..\n");
  //fclose(ptr);
@@ -250,29 +323,4 @@ int readWave(FIL *ptr) {
  *	seconds - seconds value
  * Returns: hms - formatted string
  **/
- char* seconds_to_time(float raw_seconds) {
-  //char *hms;
-  //int hours, hours_residue, minutes, seconds, milliseconds;
-  //hms = (char*) malloc(100);
 
-  //sprintf(hms, "%f", raw_seconds);
-
-  //hours = (int) raw_seconds/3600;
- // hours_residue = (int) raw_seconds % 3600;
-  //minutes = hours_residue/60;
-  //seconds = hours_residue % 60;
-  //milliseconds = 0;
-
-  // get the decimal part of raw_seconds to get milliseconds
-  //char *pos;
-  //pos = strchr(hms, '.');
-  //int ipos = (int) (pos - hms);
-  //char decimalpart[15];
-  //memset(decimalpart, ' ', sizeof(decimalpart));
-  //strncpy(decimalpart, &hms[ipos+1], 3);
-  //milliseconds = atoi(decimalpart);
-
-
-  //sprintf(hms, "%d:%d:%d.%d", hours, minutes, seconds, milliseconds);
-  //return hms;
-}

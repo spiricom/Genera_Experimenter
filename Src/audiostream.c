@@ -40,6 +40,9 @@ LEAF leaf;
 char smallMemory[SMALL_MEM_SIZE];
 char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 float largeMemory[LARGE_MEM_SIZE_IN_FLOAT] __ATTR_SDRAM;
+char largeMemoryScratch[HALF_LARGE_MEM_SIZE] __ATTR_SDRAM;
+uint32_t scratchPosition = 0;
+uint32_t remainingScratchBytes = HALF_LARGE_MEM_SIZE;
 //small memory will be the default LEAF mempool
 // need to create custom mempools for the medium and large memory
 tMempool mediumPool;
@@ -54,29 +57,10 @@ typedef enum BOOL {
 } BOOL;
 
 int distortionMode = 0;
-/*
-#define NUM_FILTERS 128
-int distortionMode = 0;
-tVZFilter filters[NUM_FILTERS];
-float freqs[NUM_FILTERS][4];
-tExpSmooth filterGains[NUM_FILTERS];
-float randomization[NUM_FILTERS];
-
-tExpSmooth wanderSmoothers[NUM_FILTERS];
-tExpSmooth freqSmoothers[NUM_FILTERS];
-tExpSmooth bandwidthSmoothers[NUM_FILTERS];
-//int currentFilt = 0;
-float adcHysteresisThreshold = 0.005f;
-float lastFloatADC[NUM_ADC_CHANNELS];
-float floatADC[NUM_ADC_CHANNELS];
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
-
-float smoothedADC[NUM_ADC_CHANNELS];
-
-float params[8];
-
-void updateFilter();
-*/
+tBuffer myWaves[MAX_WAV_FILES];
+tMBSampler mySamplers[MAX_WAV_FILES];
+tExpSmooth sampleGains[MAX_WAV_FILES];
 
 void CycleCounterTrackMinAndMax( int whichCount);
 
@@ -86,27 +70,20 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	LEAF_init(&leaf, SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
-	//tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
+	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
 	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
 
 	HAL_Delay(10);
 	leaf.clearOnAllocation = 1;
 
-	/*
-	for (int i = 0; i< NUM_FILTERS; i++)
+
+	for (int i = 0; i< MAX_WAV_FILES; i++)
 	{
-		for (int j = 0; j < 4; j++)
-		{
-			freqs[i][j] = mtof((randomNumber() * 110.0f) + 17.0f);
-		}
-		tVZFilter_init(&filters[i], BandpassPeak, freqs[i][0], 0.001f, &leaf);
-
-
-		tExpSmooth_init(&filterGains[i], 0.0f, 0.01f, &leaf);
-		tExpSmooth_init(&freqSmoothers[i], 220.0f, 0.9f, &leaf);
-		tExpSmooth_init(&bandwidthSmoothers[i], 0.3f, 0.05f, &leaf);
-		tExpSmooth_init(&wanderSmoothers[i], 220.0f, 0.05f, &leaf);
-		randomization[i] = randomNumber();
+		tBuffer_init(&myWaves[i], 1, &leaf);
+		tBuffer_setBuffer(&myWaves[i], &largeMemory[waves[i][0]], waves[i][3]);
+		tMBSampler_initToPool(&mySamplers[i], &myWaves[i], &mediumPool);
+		tMBSampler_setMode(&mySamplers[i], PlayNormal);
+		tExpSmooth_init(&sampleGains[i], 0.0f, 0.01f, &leaf);
 	}
 
 
@@ -114,7 +91,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	{
 		tExpSmooth_init(&adcSmooth[i], 0.0f, 0.1f, &leaf);
 	}
-*/
+
 	leaf.clearOnAllocation = 0;
 
 
@@ -144,14 +121,18 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 uint intVersion = 0;
 uint intVersionPlusOne = 1;
 float floatVersion = 0.0f;
-
+int currentSample = 0;
+float adcHysteresisThreshold = 0.001f;
+float lastFloatADC[NUM_ADC_CHANNELS];
+float floatADC[NUM_ADC_CHANNELS];
+float smoothedADC[NUM_ADC_CHANNELS];
 void audioFrame(uint16_t buffer_offset)
 {
 
 
 	int i;
 	buttonCheck();
-	/*
+
 	for (int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
 		floatADC[i] = ((ADC_values[i]>>6) * INV_TWO_TO_10);
@@ -164,16 +145,8 @@ void audioFrame(uint16_t buffer_offset)
 
 	}
 
-	for (int i = 0; i < 8; i++)
-	{
-		smoothedADC[i] = 1.0f - tExpSmooth_tick(&adcSmooth[i]);
-	}
 
-	for (int i = 8; i < 12; i++)
-	{
-		smoothedADC[i] = tExpSmooth_tick(&adcSmooth[i]);
-	}
-
+/*
 
 	params[0] = LEAF_clip(0.0f, (smoothedADC[0] + smoothedADC[8]), 1.0f) * 4000.0f;
     params[1] = LEAF_clip(0.0f, ((1.0f - floatADC[1]) + floatADC[9]), 1.0f) * 1.9f;
@@ -226,7 +199,7 @@ void audioFrame(uint16_t buffer_offset)
 
 // CV input jacks 1-4 add to knobs 1-4.
 uint64_t sampleNum = 0;
-uint currentSampFilt = 0;
+float prevInput = 0.0f;
 float audioTick(float* samples)
 {
 
@@ -238,16 +211,57 @@ float audioTick(float* samples)
 
 	//start of audio code
 	float output = 0.0f;
+	float input = samples[0];
 
+	if ((input > 0.5f) && (prevInput < 0.5f))
+	{
+		//we got a trigger
+		tMBSampler_play(&mySamplers[currentSample]);
+	}
+
+	if (distortionMode > 0)
+	{
+		if ((input < -0.1f) && (prevInput > -0.1f))
+		{
+			//we got a trigger
+			for (int i = 0; i < MAX_WAV_FILES; i++)
+			{
+				tMBSampler_stop(&mySamplers[i]);
+			}
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		smoothedADC[i] = 1.0f - tExpSmooth_tick(&adcSmooth[i]);
+	}
+
+	for (int i = 8; i < 12; i++)
+	{
+		smoothedADC[i] = tExpSmooth_tick(&adcSmooth[i]);
+	}
+
+	currentSample = LEAF_clip(0, (int)(LEAF_clip(0.0f, smoothedADC[1]+ smoothedADC[9], 1.0f) * MAX_WAV_FILES * .99f), MAX_WAV_FILES-1);
+
+	tMBSampler_setRate(&mySamplers[currentSample], (LEAF_clip(0.0f, smoothedADC[2]+ smoothedADC[10], 1.0f) * 4.0f));
+
+	tExpSmooth_setDest(&sampleGains[currentSample], (LEAF_clip(0.0f, smoothedADC[0] + smoothedADC[8], 1.0f) * 2.0f));
+	prevInput = input;
+	/*
 	output = largeMemory[sampleNum];
 	sampleNum++;
 	if (sampleNum >= memoryPointer)
 	{
 		sampleNum = 0;
 	}
-
+*/
+	for (int i = 0; i < MAX_WAV_FILES; i++)
+	{
+		output += 	(tMBSampler_tick(&mySamplers[i]) * tExpSmooth_tick(&sampleGains[i]));
+	}
+	output = tanhf(output);
    	samples[0] = output;
    	samples[1] = output;
+
 
 
    	//cycle counting stuff below. At 48k you have at most 10000 cycles per sample (when running at 480MHz). There is also overhead from the frame processing and function calls, so in reality less than that.

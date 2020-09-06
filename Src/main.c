@@ -82,7 +82,7 @@ FRESULT res;
   BYTE work[1024]; /* Work area (larger is better for processing time) */
   uint8_t workBuffer[1024];
 int finishSD = 0;
-
+uint32_t memoryPointer;
 /* USER CODE END 0 */
 
 /**
@@ -476,91 +476,71 @@ float randomNumber(void) {
 	return num;
 }
 
-volatile FRESULT res2;
-uint8_t rtext[100];                                   /* File read buffer */
+
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
-uint8_t wtext[48000]; /* File write buffer */
-uint8_t tempText[30];
-int testNumber = 55559;
-int8_t filename[30];
-uint8_t fileExt[] = ".txt";
+
+FILINFO fno;
+DIR dir;
+const TCHAR path = 0;
+uint32_t waves[MAX_WAV_FILES][4];
+uint32_t numWaves = 0;
+uint32_t OutOfSpace = 0;
 
 static void FS_FileOperations(void)
 {
-                                       /* FatFs function common result code */
-
-#if 0
-	res2 = FR_TOO_MANY_OPEN_FILES;
-  /* Open the text file object with read access */
-  f_open(&myFile, "s.wav", FA_READ);
-  {
-	/* Read data from the text file */
-	res2 = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
-	atoi(100, wtext, 10);
-	if((bytesread > 0) && (res2 == FR_OK))
+	statusH = disk_initialize(0);
+	if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
 	{
-	  /* Close the open text file */
-	  f_close(&myFile);
-	}
-  }
-#endif
-/*
-  int theNumber = randomNumber() * 65535;
-  itoa(theNumber,tempText, 10);
-  strncat(filename, tempText, sizeof(tempText));
-  strncat(filename, fileExt, sizeof(fileExt));
-  statusH = disk_initialize(0);
-  if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
-  {
-	   //FRESULT res;
+		FRESULT res;
 
-	   //res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
+		uint32_t fileIndex = 0;
 
+		/* Start to search for wave files */
 
-	  {
-		  if(f_open(&myFile, filename, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		res = f_findfirst(&dir, &fno, "", "*.wav");
+
+		/* Repeat while an item is found */
+		while (fno.fname[0])
+		{
+		  if(res == FR_OK)
 		  {
-			SDReady = 1;
-		  }
-	  }
-    	//f_close(&myFile);
-    // Write data to the text file
-      //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
-
-
-  }
-*/
-  statusH = disk_initialize(0);
-  if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
-  {
-	   //FRESULT res;
-
-	   //res = f_mkfs(SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
-
-
-	  {
-		  if(f_open(&myFile, "s.wav", FA_OPEN_ALWAYS | FA_READ) == FR_OK)
-		  {
-			SDReady = 1;
-		    readWave(&myFile);
-
-/*
-			res2 = f_read(&myFile, rtext, sizeof(rtext), (void *)&bytesread);
-			//atoi(100, wtext, 10);
-			if((bytesread > 0) && (res2 == FR_OK))
+			if((fileIndex < MAX_WAV_FILES) && (OutOfSpace == 0))
 			{
-			  f_close(&myFile);
+				if(f_open(&myFile, fno.fname, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
+				{
+					waves[fileIndex][0] = (uint32_t)memoryPointer;
+					if (readWave(&myFile) == 1)
+					{
+
+						waves[fileIndex][1] = header.channels;
+						waves[fileIndex][2] = header.sample_rate;
+						uint32_t LengthInFloats = (uint32_t)memoryPointer - waves[fileIndex][0];
+						waves[fileIndex][3] = LengthInFloats;
+						fileIndex++;
+						numWaves++;
+					}
+					f_close(&myFile);
+					/* Search for next item */
+
+
+					res = f_findnext(&dir, &fno);
+				}
 			}
-		  */
+			else
+			{
+				break;
+			}
+
 		  }
-	  }
-    	//f_close(&myFile);
-    // Write data to the text file
-      //res = f_write(&myFile, wtext, sizeof(wtext), (void *)&byteswritten);
-  }
-  /* Error */
-  //Error_Handler();
+		  else
+		  {
+			break;
+		  }
+		}
+		f_closedir(&dir);
+	}
 }
+
 void startTimersForLEDs(void)
 {
 
@@ -611,425 +591,7 @@ void startTimersForLEDs(void)
 	HAL_HRTIM_MspPostInit(&hhrtim);
 }
 
-uint8_t comma[] = ", ";
-uint8_t newline[] = "\r\n";
-uint64_t memoryPointer = 0;
-/*
-void writeToSD(int theIndex, int theNumber, int myPos, int lh, int rh, int whichString)
-{
-	if(finishSD == 1)
-	{
 
-		SDReady = 0;
-		largeMemory[memoryPointer] = 0;
-		memoryPointer++;
-
-		//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		__disable_irq();
-		 f_write(&myFile, largeMemory, memoryPointer, (void *)&byteswritten);
-		 res2 = f_close(&myFile);
-		 __enable_irq();
-		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-		 if (res2 == FR_OK)
-		 {
-			 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		 }
-
-	}
-	else if (whichString == 0)
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theIndex,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-
-		largeMemory[memoryPointer] = 44;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 5; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 1; i++)
-		{
-			largeMemory[memoryPointer] = tempText[i];
-			memoryPointer++;
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-	}
-	else if ((whichString > 0) && (whichString < 3))
-	{
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 1; i++)
-		{
-			largeMemory[memoryPointer] = tempText[i];
-			memoryPointer++;
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-
-	}
-	else
-	{
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 1; i++)
-		{
-			largeMemory[memoryPointer] = tempText[i];
-			memoryPointer++;
-		}
-
-		largeMemory[memoryPointer] = 59;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 13;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 10;
-		memoryPointer++;
-
-		SDWriteIndex++;
-	}
-}
-*/
-void writeToSD(int theIndex, int theNumber, int myPos, int lh, int rh, int whichString)
-{
-	if(finishSD == 1)
-	{
-
-		SDReady = 0;
-		largeMemory[memoryPointer] = 0;
-		memoryPointer++;
-
-		//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		__disable_irq();
-		 f_write(&myFile, largeMemory, memoryPointer, (void *)&byteswritten);
-		 res2 = f_close(&myFile);
-		 __enable_irq();
-		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-		 if (res2 == FR_OK)
-		 {
-			 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		 }
-
-	}
-	else if (whichString == 0)
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theIndex,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-
-		largeMemory[memoryPointer] = 44;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 5; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(myPos,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(lh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-	}
-	else if ((whichString > 0) && (whichString < 3))
-	{
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(myPos,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(lh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-	}
-	else
-	{
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(theNumber,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 1; i++)
-		{
-			tempText[i] = 0;
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(myPos,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 10; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(lh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-
-		for (int i = 0; i < 30; i++)
-		{
-			tempText[i] = 0;
-		}
-		itoa(rh,tempText, 10);
-		for (int i = 0; i < 10; i++)
-		{
-			if (tempText[i] != 0)
-			{
-				largeMemory[memoryPointer] = tempText[i];
-				memoryPointer++;
-			}
-		}
-		largeMemory[memoryPointer] = 32;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 59;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 13;
-		memoryPointer++;
-		largeMemory[memoryPointer] = 10;
-		memoryPointer++;
-
-		SDWriteIndex++;
-	}
-}
 void MPU_Conf(void)
 {
 	//code from Keshikan https://github.com/keshikan/STM32H7_DMA_sample

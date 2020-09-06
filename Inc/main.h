@@ -65,12 +65,15 @@ void writeToSD(int theIndex, int theNumber, int pos, int lh, int rh, int whichSt
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
+#define MAX_WAV_FILES 32
+extern uint32_t waves[MAX_WAV_FILES][4];
 extern uint8_t SPI_TX[16];
 extern uint8_t SPI_RX[16];
 extern int SDReady;
 extern uint32_t byteswritten, bytesread;                     /* File write/read counts */
 extern int finishSD;
-extern uint64_t memoryPointer;
+extern uint32_t memoryPointer;
+extern uint32_t OutOfSpace;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

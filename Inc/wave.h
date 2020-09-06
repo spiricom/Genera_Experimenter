@@ -40,6 +40,7 @@ struct tWaveHeader {
 
 };
 
+extern struct tWaveHeader header;
 int readWave(FIL *ptr);
 
 #endif /* WAVE_H_ */
