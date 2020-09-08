@@ -565,7 +565,10 @@ uint32_t SDMMC_CmdReadSingleBlock(SDMMC_TypeDef *SDMMCx, uint32_t ReadAdd)
   */
 uint32_t SDMMC_CmdReadMultiBlock(SDMMC_TypeDef *SDMMCx, uint32_t ReadAdd)
 {
-  SDMMC_CmdInitTypeDef  sdmmc_cmdinit;
+	uint32_t maskReg = SDMMCx->MASK; /* rjgMod per AHigg */
+  SDMMCx->MASK = 0;                /* rjgMod per AHigg */
+
+	SDMMC_CmdInitTypeDef  sdmmc_cmdinit;
   uint32_t errorstate;
 
   /* Set Block Size for Card */
@@ -613,7 +616,10 @@ uint32_t SDMMC_CmdWriteSingleBlock(SDMMC_TypeDef *SDMMCx, uint32_t WriteAdd)
   */
 uint32_t SDMMC_CmdWriteMultiBlock(SDMMC_TypeDef *SDMMCx, uint32_t WriteAdd)
 {
-  SDMMC_CmdInitTypeDef  sdmmc_cmdinit;
+	uint32_t maskReg = SDMMCx->MASK; /* rjgMod per AHigg */
+  SDMMCx->MASK = 0;                /* rjgMod per AHigg */
+
+	SDMMC_CmdInitTypeDef  sdmmc_cmdinit;
   uint32_t errorstate;
 
   /* Set Block Size for Card */

@@ -242,7 +242,7 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 		}
 		inv_high_limit = 1.0f / high_limit;
 
-		if (memoryPointer+(header.data_size / sizeof(float)) >= LARGE_MEM_SIZE_IN_FLOAT)
+		if ((memoryPointer + (num_samples*header.channels)) >= LARGE_MEM_SIZE_IN_FLOAT)
 		{
 			//ran out of space in SDRAM
 			OutOfSpace = 1;
@@ -279,6 +279,7 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 
 						largeMemory[memoryPointer] = float_data;
 						memoryPointer++;
+
 					}
 				}
 			}

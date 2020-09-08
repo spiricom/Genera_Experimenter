@@ -65,7 +65,8 @@ void writeToSD(int theIndex, int theNumber, int pos, int lh, int rh, int whichSt
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define MAX_WAV_FILES 32
+#define MAX_WAV_FILES 256
+extern uint32_t numWaves;
 extern uint32_t waves[MAX_WAV_FILES][4];
 extern uint8_t SPI_TX[16];
 extern uint8_t SPI_RX[16];

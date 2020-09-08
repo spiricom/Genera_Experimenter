@@ -62,11 +62,13 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
 void MPU_Conf(void);
 void startTimersForLEDs(void);
 void SDRAM_Initialization_sequence(void);
 static void FS_FileOperations(void);
 static void CycleCounterInit( void );
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -74,13 +76,13 @@ static void CycleCounterInit( void );
 uint8_t counter;
 int SDReady = 0;
 
-FRESULT res;
-  FATFS MMCFatFs;
-  FIL myFile;
-  FATFS fs;
-  DSTATUS statusH;
-  BYTE work[1024]; /* Work area (larger is better for processing time) */
-  uint8_t workBuffer[1024];
+//FRESULT res;
+  //FATFS MMCFatFs;
+  //FIL myFile;
+  //FATFS fs;
+  //DSTATUS statusH;
+  //BYTE work[1024]; /* Work area (larger is better for processing time) */
+  //uint8_t workBuffer[1024];
 int finishSD = 0;
 uint32_t memoryPointer;
 /* USER CODE END 0 */
@@ -122,15 +124,16 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_FMC_Init();
-  MX_SDMMC1_SD_Init();
-  MX_FATFS_Init();
+
   MX_SAI1_Init();
   MX_RNG_Init();
   MX_I2C2_Init();
   MX_ADC1_Init();
   MX_HRTIM_Init();
+  MX_SDMMC1_SD_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-	//HAL_Delay(200);
+  HAL_Delay(100);
   //pull reset pin on audio codec low to make sure it's stable
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 
@@ -258,18 +261,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  /*
+
 	  int tempIntGP = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
 	  if (tempIntGP)
 	  {
-		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 	  }
 	  else
 
 	  {
-		  //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 	  }
-	  */
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -488,9 +491,19 @@ uint32_t OutOfSpace = 0;
 
 static void FS_FileOperations(void)
 {
-	statusH = disk_initialize(0);
-	if(f_mount(&MMCFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
+	HAL_Delay(100);
+	//statusH = disk_initialize(0);
+
+    //statusH = disk_status(0);
+    //if (statusH != RES_OK)
+    //{
+      //ShowDiskStatus(status);
+    //}
+
+
+	if(f_mount(&SDFatFS, SDPath, 1) == FR_OK)
 	{
+
 		FRESULT res;
 
 		uint32_t fileIndex = 0;
@@ -506,10 +519,10 @@ static void FS_FileOperations(void)
 		  {
 			if((fileIndex < MAX_WAV_FILES) && (OutOfSpace == 0))
 			{
-				if(f_open(&myFile, fno.fname, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
+				if(f_open(&SDFile, fno.fname, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
 				{
 					waves[fileIndex][0] = (uint32_t)memoryPointer;
-					if (readWave(&myFile) == 1)
+					if (readWave(&SDFile) == 1)
 					{
 
 						waves[fileIndex][1] = header.channels;
@@ -517,8 +530,9 @@ static void FS_FileOperations(void)
 						uint32_t LengthInFloats = (uint32_t)memoryPointer - waves[fileIndex][0];
 						waves[fileIndex][3] = LengthInFloats;
 						fileIndex++;
+						numWaves++;
 					}
-					f_close(&myFile);
+					f_close(&SDFile);
 					/* Search for next item */
 
 
