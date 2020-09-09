@@ -11,14 +11,15 @@
 //#include "stdio.h"
 // WAVE header structure
 
-unsigned char buffer4[4];
-unsigned char buffer2[2];
+unsigned char buffer4[4] __ATTR_RAM_D1;
+unsigned char buffer2[2] __ATTR_RAM_D1;
+
+unsigned char garbageBuffer[2048] __ATTR_RAM_D1;
 
 char* seconds_to_time(float seconds);
 
-struct tWaveHeader header;
+struct tWaveHeader header __ATTR_RAM_D1;
 
-unsigned char garbageBuffer[2048];
 uint32_t waveTimeout = 2048;
 uint32_t numberOfGarbage = 0;
 

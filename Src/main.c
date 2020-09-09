@@ -25,6 +25,7 @@
 #include "fatfs.h"
 #include "hrtim.h"
 #include "i2c.h"
+#include "mdma.h"
 #include "rng.h"
 #include "sai.h"
 #include "sdmmc.h"
@@ -123,15 +124,15 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
+  MX_MDMA_Init();
   MX_FMC_Init();
-
+  MX_SDMMC1_SD_Init();
+  MX_FATFS_Init();
   MX_SAI1_Init();
   MX_RNG_Init();
   MX_I2C2_Init();
   MX_ADC1_Init();
   MX_HRTIM_Init();
-  MX_SDMMC1_SD_Init();
-  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(100);
   //pull reset pin on audio codec low to make sure it's stable
@@ -482,8 +483,8 @@ float randomNumber(void) {
 
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
 
-FILINFO fno;
-DIR dir;
+FILINFO fno __ATTR_RAM_D1;
+DIR dir __ATTR_RAM_D1;
 const TCHAR path = 0;
 uint32_t waves[MAX_WAV_FILES][4];
 uint32_t numWaves = 0;
@@ -492,16 +493,16 @@ uint32_t OutOfSpace = 0;
 static void FS_FileOperations(void)
 {
 	HAL_Delay(100);
-	//statusH = disk_initialize(0);
+	disk_initialize(0);
 
-    //statusH = disk_status(0);
+    disk_status(0);
     //if (statusH != RES_OK)
     //{
       //ShowDiskStatus(status);
     //}
 
 
-	if(f_mount(&SDFatFS, SDPath, 1) == FR_OK)
+	if(f_mount(&SDFatFS,  &SDPath, 1) == FR_OK)
 	{
 
 		FRESULT res;
@@ -510,7 +511,7 @@ static void FS_FileOperations(void)
 
 		/* Start to search for wave files */
 
-		res = f_findfirst(&dir, &fno, "", "*.wav");
+		res = f_findfirst(&dir, &fno, &SDPath, "*.wav");
 
 		/* Repeat while an item is found */
 		while (fno.fname[0])

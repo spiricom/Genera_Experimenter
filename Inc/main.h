@@ -53,6 +53,8 @@ extern "C" {
 #define __ATTR_RAM_D3	__attribute__ ((section(".RAM_D3"))) __attribute__ ((aligned (32)))
 #define __ATTR_SDRAM	__attribute__ ((section(".SDRAM"))) __attribute__ ((aligned (32)))
 
+#define ENABLE_SD_DMA_CACHE_MAINTENANCE 1
+#define ENABLE_SCRATCH_BUFFER 0
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

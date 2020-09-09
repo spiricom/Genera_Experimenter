@@ -16,7 +16,7 @@
 / The copyright owner or contributors be NOT LIABLE for any damages caused
 / by use of this software.
 /----------------------------------------------------------------------------*/
-
+#include "main.h"
 
 #ifndef _FATFS
 #define _FATFS	68300	/* Revision ID */
@@ -83,29 +83,29 @@ typedef DWORD FSIZE_t;
 /* File system object structure (FATFS) */
 
 typedef struct {
-	BYTE	fs_type;		/* File system type (0:N/A) */
-	BYTE	drv;			/* Physical drive number */
-	BYTE	n_fats;			/* Number of FATs (1 or 2) */
-	BYTE	wflag;			/* win[] flag (b0:dirty) */
-	BYTE	fsi_flag;		/* FSINFO flags (b7:disabled, b0:dirty) */
-	WORD	id;				/* File system mount ID */
-	WORD	n_rootdir;		/* Number of root directory entries (FAT12/16) */
-	WORD	csize;			/* Cluster size [sectors] */
+	BYTE	fs_type __attribute__ ((aligned (32)));		/* File system type (0:N/A) */
+	BYTE	drv __attribute__ ((aligned (32)));			/* Physical drive number */
+	BYTE	n_fats __attribute__ ((aligned (32)));			/* Number of FATs (1 or 2) */
+	BYTE	wflag __attribute__ ((aligned (32)));			/* win[] flag (b0:dirty) */
+	BYTE	fsi_flag __attribute__ ((aligned (32)));		/* FSINFO flags (b7:disabled, b0:dirty) */
+	WORD	id __attribute__ ((aligned (32)));				/* File system mount ID */
+	WORD	n_rootdir __attribute__ ((aligned (32)));		/* Number of root directory entries (FAT12/16) */
+	WORD	csize __attribute__ ((aligned (32)));			/* Cluster size [sectors] */
 #if _MAX_SS != _MIN_SS
 	WORD	ssize;			/* Sector size (512, 1024, 2048 or 4096) */
 #endif
 #if _USE_LFN != 0
-	WCHAR*	lfnbuf;			/* LFN working buffer */
+	WCHAR*	lfnbuf __attribute__ ((aligned (32)));			/* LFN working buffer */
 #endif
 #if _FS_EXFAT
-	BYTE*	dirbuf;			/* Directory entry block scratchpad buffer */
+	BYTE*	dirbuf __attribute__ ((aligned (32)));			/* Directory entry block scratchpad buffer */
 #endif
 #if _FS_REENTRANT
 	_SYNC_t	sobj;			/* Identifier of sync object */
 #endif
 #if !_FS_READONLY
-	DWORD	last_clst;		/* Last allocated cluster */
-	DWORD	free_clst;		/* Number of free clusters */
+	DWORD	last_clst __attribute__ ((aligned (32)));		/* Last allocated cluster */
+	DWORD	free_clst __attribute__ ((aligned (32)));		/* Number of free clusters */
 #endif
 #if _FS_RPATH != 0
 	DWORD	cdir;			/* Current directory start cluster (0:root) */
@@ -115,14 +115,14 @@ typedef struct {
 	DWORD	cdc_ofs;		/* Offset in the containing directory (invalid when cdir is 0) */
 #endif
 #endif
-	DWORD	n_fatent;		/* Number of FAT entries (number of clusters + 2) */
-	DWORD	fsize;			/* Size of an FAT [sectors] */
-	DWORD	volbase;		/* Volume base sector */
-	DWORD	fatbase;		/* FAT base sector */
-	DWORD	dirbase;		/* Root directory base sector/cluster */
-	DWORD	database;		/* Data base sector */
-	DWORD	winsect;		/* Current sector appearing in the win[] */
-	BYTE	win[_MAX_SS];	/* Disk access window for Directory, FAT (and file data at tiny cfg) */
+	DWORD	n_fatent __attribute__ ((aligned (32)));		/* Number of FAT entries (number of clusters + 2) */
+	DWORD	fsize __attribute__ ((aligned (32)));			/* Size of an FAT [sectors] */
+	DWORD	volbase __attribute__ ((aligned (32)));		/* Volume base sector */
+	DWORD	fatbase __attribute__ ((aligned (32)));		/* FAT base sector */
+	DWORD	dirbase __attribute__ ((aligned (32)));		/* Root directory base sector/cluster */
+	DWORD	database __attribute__ ((aligned (32)));		/* Data base sector */
+	DWORD	winsect __attribute__ ((aligned (32)));		/* Current sector appearing in the win[] */
+	BYTE	win[_MAX_SS] __attribute__ ((aligned (32)));	/* Disk access window for Directory, FAT (and file data at tiny cfg) */
 } FATFS;
 
 
@@ -153,21 +153,21 @@ typedef struct {
 /* File object structure (FIL) */
 
 typedef struct {
-	_FDID	obj;			/* Object identifier (must be the 1st member to detect invalid object pointer) */
-	BYTE	flag;			/* File status flags */
-	BYTE	err;			/* Abort flag (error code) */
-	FSIZE_t	fptr;			/* File read/write pointer (Zeroed on file open) */
-	DWORD	clust;			/* Current cluster of fpter (invalid when fptr is 0) */
-	DWORD	sect;			/* Sector number appearing in buf[] (0:invalid) */
+	_FDID	obj __attribute__ ((aligned (32)));			/* Object identifier (must be the 1st member to detect invalid object pointer) */
+	BYTE	flag __attribute__ ((aligned (32)));			/* File status flags */
+	BYTE	err __attribute__ ((aligned (32)));			/* Abort flag (error code) */
+	FSIZE_t	fptr __attribute__ ((aligned (32)));			/* File read/write pointer (Zeroed on file open) */
+	DWORD	clust __attribute__ ((aligned (32)));			/* Current cluster of fpter (invalid when fptr is 0) */
+	DWORD	sect __attribute__ ((aligned (32)));			/* Sector number appearing in buf[] (0:invalid) */
 #if !_FS_READONLY
-	DWORD	dir_sect;		/* Sector number containing the directory entry */
-	BYTE*	dir_ptr;		/* Pointer to the directory entry in the win[] */
+	DWORD	dir_sect __attribute__ ((aligned (32)));		/* Sector number containing the directory entry */
+	BYTE*	dir_ptr __attribute__ ((aligned (32)));		/* Pointer to the directory entry in the win[] */
 #endif
 #if _USE_FASTSEEK
-	DWORD*	cltbl;			/* Pointer to the cluster link map table (nulled on open, set by application) */
+	DWORD*	cltbl __attribute__ ((aligned (32)));			/* Pointer to the cluster link map table (nulled on open, set by application) */
 #endif
 #if !_FS_TINY
-	BYTE	buf[_MAX_SS];	/* File private data read/write window */
+	BYTE	buf[_MAX_SS] __attribute__ ((aligned (32)));	/* File private data read/write window */
 #endif
 } FIL;
 
