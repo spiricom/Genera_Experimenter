@@ -37,8 +37,8 @@
 #define HALF_BUFFER_SIZE      AUDIO_FRAME_SIZE * 2 //number of samples per half of the "double-buffer" (twice the audio frame size because there are interleaved samples for both left and right channels)
 #define AUDIO_BUFFER_SIZE     AUDIO_FRAME_SIZE * 4 //number of samples in the whole data structure (four times the audio frame size because of stereo and also double-buffering/ping-ponging)
 
-#define SMALL_MEM_SIZE 20000 //can make this bigger as long as there is room in DTCM-RAM
-#define MEDIUM_MEM_SIZE 419000 //519000
+#define SMALL_MEM_SIZE 60000 //can make this bigger as long as there is room in DTCM-RAM
+#define MEDIUM_MEM_SIZE 519000 //519000
 #define LARGE_MEM_SIZE 33554432 //32 MBytes - size of SDRAM IC
 //#define LARGE_MEM_SIZE_IN_FLOAT 8388608
 #define LARGE_MEM_SIZE_IN_FLOAT 6291456
@@ -49,7 +49,7 @@ extern uint8_t codecReady;
 #define NUM_ADC_CHANNELS 12
 extern int32_t ADC_values[NUM_ADC_CHANNELS];
 extern uint32_t currentADCBufferPos;
-extern int distortionMode;
+extern int mode[3];
 extern uint64_t SDWriteIndex;
 extern int ADC_Ready;
 

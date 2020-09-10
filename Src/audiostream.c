@@ -29,8 +29,7 @@ float audioTick(float* input);
 HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
 
-volatile int32_t cycleCountVals[4];
-volatile int32_t cycleCountMinMax[4][2];
+
 uint8_t codecReady = 0;
 
 //LEAF instance
@@ -56,13 +55,14 @@ typedef enum BOOL {
 	TRUE
 } BOOL;
 
-int distortionMode = 0;
+int mode[3] = {0,0,0};
 tExpSmooth adcSmooth[NUM_ADC_CHANNELS];
 tBuffer myWaves[MAX_WAV_FILES];
 tSampler mySamplers[MAX_WAV_FILES];
 tExpSmooth sampleGains[MAX_WAV_FILES];
 uint32_t half_numWaves = 0;
-void CycleCounterTrackMinAndMax( int whichCount);
+tSVF lowpasses[2];
+
 
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn)
 {
@@ -90,6 +90,10 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 		tExpSmooth_init(&sampleGains[i], 0.0f, 0.01f, &leaf);
 	}
 
+	for (int i = 0 ; i < 2; i++)
+	{
+		tSVF_init(&lowpasses[i], SVFTypeLowpass, 18000.0f, 0.5f, &leaf);
+	}
 
 	for(int i = 0; i < NUM_ADC_CHANNELS; i++)
 	{
@@ -239,7 +243,7 @@ float audioTick(float* samples)
 		}
 
 
-		if (distortionMode > 0)
+		if (mode[0] > 0)
 		{
 			if ((samples[i] < -0.1f) && (prevInput[i] > -0.1f))
 			{
@@ -254,12 +258,15 @@ float audioTick(float* samples)
 
 
 	float tempRate[2];
+
 	tempRate[0] = LEAF_clip(0.0f, smoothedADC[2] + smoothedADC[10], 1.0f) * 4.0f;
 	tempRate[1] = LEAF_clip(0.0f, smoothedADC[6] + smoothedADC[11], 1.0f) * 4.0f;
 
+	tSVF_setFreq(&lowpasses[0], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
+	tSVF_setFreq(&lowpasses[1], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
 	for (int i = 0; i < numWaves; i++)
 	{
-		if (mySamplers[i]->active)
+		if ((mySamplers[i]->active != 0) || (mySamplers[i]->retrigger == 1))
 		{
 
 			if (i < half_numWaves)
@@ -275,38 +282,12 @@ float audioTick(float* samples)
 	}
 
 
-
-/*
-	for (int i = 0; i < MAX_WAV_FILES; i++)
-	{
-		output += 	(tSampler_tick(&mySamplers[i]) * tExpSmooth_tick(&sampleGains[i]));
-	}
-	output = tanhf(output);
-*/
-
-
-
-/*
-	samples[0] = largeMemory[sampleNum];
-	sampleNum++;
-	if (sampleNum >= memoryPointer)
-	{
-		sampleNum = 0;
-	}
-	samples[1] = largeMemory[sampleNum];
-	sampleNum++;
-	if (sampleNum >= memoryPointer)
-	{
-		sampleNum = 0;
-	}
-	*/
-
 	samples[0] = 0.0f;
 	samples[1] = 0.0f;
 	for (int i = 0; i < numWaves; i++)
 	{
 
-		if (mySamplers[i]->active)
+		if ((mySamplers[i]->active != 0) || (mySamplers[i]->retrigger == 1))
 		{
 			float tempSamples[2] = {0.0f, 0.0f};
 			if (mySamplers[i]->channels == 2)
@@ -319,13 +300,25 @@ float audioTick(float* samples)
 				tempSamples[1] = samples[0];
 			}
 			float myGain = tExpSmooth_tick(&sampleGains[i]);
-			if (i < half_numWaves)
+			if (!mode[1])
 			{
-				samples[0] += (tempSamples[0] * myGain);
+				if (i < half_numWaves)
+				{
+					tempSamples[0] = tSVF_tick(&lowpasses[0], tempSamples[0]);
+					samples[0] += (tempSamples[0] * myGain);
+				}
+				else
+				{
+					tempSamples[0] = tSVF_tick(&lowpasses[1], tempSamples[0]);
+					samples[1] += (tempSamples[0] * myGain);
+				}
 			}
 			else
 			{
-				samples[1] += (tempSamples[0] * myGain);
+				tempSamples[0] = tSVF_tick(&lowpasses[0], tempSamples[0]);
+				tempSamples[1] = tSVF_tick(&lowpasses[1], tempSamples[1]);
+				samples[0] += (tempSamples[0] * myGain);
+				samples[1] += (tempSamples[1] * myGain);
 			}
 		}
 
@@ -348,22 +341,6 @@ float audioTick(float* samples)
 }
 
 
-//this keeps min and max, but doesn't do the array for averaging - a bit less expensive
-void CycleCounterTrackMinAndMax( int whichCount)
-{
-	if (cycleCountVals[whichCount] > 0)
-	{
-		if ((cycleCountVals[whichCount] < cycleCountMinMax[whichCount][0]) || (cycleCountMinMax[whichCount][0] == 0))
-		{
-			cycleCountMinMax[whichCount][0] = cycleCountVals[whichCount];
-		}
-		//update max value ([2])
-		if (cycleCountVals[whichCount] > cycleCountMinMax[whichCount][1])
-		{
-			cycleCountMinMax[whichCount][1] = cycleCountVals[whichCount];
-		}
-	}
-}
 
 
 void HAL_SAI_ErrorCallback(SAI_HandleTypeDef *hsai)

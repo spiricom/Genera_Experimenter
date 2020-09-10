@@ -69,14 +69,15 @@ void startTimersForLEDs(void);
 void SDRAM_Initialization_sequence(void);
 static void FS_FileOperations(void);
 static void CycleCounterInit( void );
-
+void CycleCounterTrackMinAndMax( int whichCount);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t counter;
 int SDReady = 0;
-
+volatile uint32_t cycleCountVals[4];
+volatile uint32_t cycleCountMinMax[4][2];
 //FRESULT res;
   //FATFS MMCFatFs;
   //FIL myFile;
@@ -186,7 +187,7 @@ int main(void)
 
 
 */
-
+  CycleCounterInit();
 	 if(BSP_SD_IsDetected())
 	 {
 
@@ -255,7 +256,7 @@ int main(void)
   //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
    */
     startTimersForLEDs();
-     CycleCounterInit();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -480,6 +481,22 @@ float randomNumber(void) {
 	return num;
 }
 
+//this keeps min and max, but doesn't do the array for averaging - a bit less expensive
+void CycleCounterTrackMinAndMax( int whichCount)
+{
+	if (cycleCountVals[whichCount] > 0)
+	{
+		if ((cycleCountVals[whichCount] < cycleCountMinMax[whichCount][0]) || (cycleCountMinMax[whichCount][0] == 0))
+		{
+			cycleCountMinMax[whichCount][0] = cycleCountVals[whichCount];
+		}
+		//update max value ([2])
+		if (cycleCountVals[whichCount] > cycleCountMinMax[whichCount][1])
+		{
+			cycleCountMinMax[whichCount][1] = cycleCountVals[whichCount];
+		}
+	}
+}
 
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
 
@@ -489,6 +506,7 @@ const TCHAR path = 0;
 uint32_t waves[MAX_WAV_FILES][4];
 uint32_t numWaves = 0;
 uint32_t OutOfSpace = 0;
+uint32_t tooBigForScratch = 0;
 
 static void FS_FileOperations(void)
 {
@@ -502,8 +520,11 @@ static void FS_FileOperations(void)
     //}
 
 
-	if(f_mount(&SDFatFS,  &SDPath, 1) == FR_OK)
+	if(f_mount(&SDFatFS,  SDPath, 1) == FR_OK)
 	{
+		volatile uint32_t tempCount5 = 0;
+		volatile uint32_t tempCount6 = 0;
+		tempCount5 = DWT->CYCCNT;
 
 		FRESULT res;
 
@@ -511,7 +532,7 @@ static void FS_FileOperations(void)
 
 		/* Start to search for wave files */
 
-		res = f_findfirst(&dir, &fno, &SDPath, "*.wav");
+		res = f_findfirst(&dir, &fno, SDPath, "*.wav");
 
 		/* Repeat while an item is found */
 		while (fno.fname[0])
@@ -552,7 +573,12 @@ static void FS_FileOperations(void)
 		  }
 		}
 		f_closedir(&dir);
+		tempCount6 = DWT->CYCCNT;
+
+		cycleCountVals[0] = tempCount6-tempCount5;
+		CycleCounterTrackMinAndMax(0);
 	}
+	f_mount(0, "", 0); //unmount
 }
 
 void startTimersForLEDs(void)

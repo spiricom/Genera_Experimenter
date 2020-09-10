@@ -11,14 +11,13 @@
 //#include "stdio.h"
 // WAVE header structure
 
-unsigned char buffer4[4] __ATTR_RAM_D1;
-unsigned char buffer2[2] __ATTR_RAM_D1;
+unsigned char buffer4[4];
+unsigned char buffer2[2];
 
-unsigned char garbageBuffer[2048] __ATTR_RAM_D1;
 
 char* seconds_to_time(float seconds);
 
-struct tWaveHeader header __ATTR_RAM_D1;
+struct tWaveHeader header;
 
 uint32_t waveTimeout = 2048;
 uint32_t numberOfGarbage = 0;
@@ -69,7 +68,7 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 	 //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
 
 
-	 read = f_read(ptr, garbageBuffer, numberOfGarbage, &numBytesRead);
+	 ptr->fptr += numberOfGarbage;
 
 	 read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
 	 numIterations++;
@@ -164,8 +163,11 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
  								(buffer4[3] << 24);
  	 //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
 
-
+/*
  	 read = f_read(ptr, garbageBuffer, numberOfGarbage, &numBytesRead);
+*/
+ 	 //move pointer ahead by that size
+ 	 ptr->fptr += numberOfGarbage;
 
  	 read = f_read(ptr, header.data_chunk_header, sizeof(header.data_chunk_header), &numBytesRead);
  	 numIterations++;
@@ -360,6 +362,11 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 				}
 			}
 
+		}
+		else
+		{
+			tooBigForScratch = 1;
+			return 0;
 		}
 		return 1;
 	 }

@@ -63,6 +63,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN EFP */
 float randomNumber(void);
 void writeToSD(int theIndex, int theNumber, int pos, int lh, int rh, int whichString);
+void CycleCounterTrackMinAndMax( int whichCount);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -77,6 +78,7 @@ extern uint32_t byteswritten, bytesread;                     /* File write/read 
 extern int finishSD;
 extern uint32_t memoryPointer;
 extern uint32_t OutOfSpace;
+extern uint32_t tooBigForScratch;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -18,10 +18,10 @@
 
 #include "fatfs.h"
 
-uint8_t retSD __ATTR_RAM_D1;    /* Return value for SD */
-char SDPath[4] __ATTR_RAM_D1;   /* SD logical drive path */
-FATFS SDFatFS __ATTR_RAM_D1;    /* File system object for SD logical drive */
-FIL SDFile __ATTR_RAM_D1;       /* File object for SD */
+uint8_t retSD;    /* Return value for SD */
+char SDPath[4];   /* SD logical drive path */
+FATFS SDFatFS;    /* File system object for SD logical drive */
+FIL SDFile;       /* File object for SD */
 
 /* USER CODE BEGIN Variables */
 

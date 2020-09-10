@@ -157,21 +157,25 @@ void buttonCheck(void)
 		// B button
 		if (buttonPressed[1] == 1)
 		{
-			distortionMode = !distortionMode;
-			setLED_B(distortionMode * 255);
+			mode[0] = !mode[0];
+			setLED_B(mode[0] * 255);
 			buttonPressed[1] = 0;
 		}
 
 		// C button
 		if (buttonPressed[2] == 1)
 		{
-
+			mode[1] = !mode[1];
+			setLED_C(mode[1] * 255);
+			buttonPressed[2] = 0;
 		}
 
 		// D button
 		if (buttonPressed[2] == 1)
 		{
-
+			mode[2] = !mode[2];
+			setLED_C(mode[2] * 255);
+			buttonPressed[3] = 0;
 		}
 
 
