@@ -475,6 +475,8 @@ float randomNumber(void) {
 	float num = (float)rand * INV_TWO_TO_32;
 	return num;
 }
+
+
 volatile FRESULT res2;
 uint8_t rtext[100];                                   /* File read buffer */
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
