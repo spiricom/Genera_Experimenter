@@ -24,8 +24,8 @@
 #define ATODB_TABLE_SIZE 512
 #define ATODB_TABLE_SIZE_MINUS_ONE 511
 
-#define LHMUTE_COUNTLIM 100
-#define RHMUTE_COUNTLIM 1
+#define LHMUTE_COUNTLIM 128
+#define RHMUTE_COUNTLIM 256
 
 float atodbTable[ATODB_TABLE_SIZE];
 
@@ -44,26 +44,22 @@ float processString(int whichString);
 HAL_StatusTypeDef transmit_status;
 HAL_StatusTypeDef receive_status;
 
-#define NUM_COUNTER_CYCLES_TO_AVERAGE 1024
 volatile int64_t cycleCountVals[4];
-volatile int64_t cycleCountValsAverager[4][NUM_COUNTER_CYCLES_TO_AVERAGE];
-volatile uint16_t cycleCountAveragerCounter[4] = {0,0,0,0};
 float cycleCountAverages[4][3];
 
 uint8_t codecReady = 0;
-float sample = 0.0f;
-float rightIn = 0.0f;
 
-#define NUM_SAWTOOTHS 4
-tSVF myLowpass[NUM_STRINGS];
-tSawtooth mySaw[NUM_STRINGS][NUM_SAWTOOTHS];
-tCycle mySine[NUM_STRINGS];
-tHighpass dcBlock[NUM_STRINGS];
-tEnvelopeFollower myFollower[NUM_STRINGS];
-tExpSmooth pitchSmoother[NUM_STRINGS];
-tNoise noise[NUM_STRINGS];
-tADSR envelope[NUM_STRINGS];
-tSVF lowpass[NUM_STRINGS];
+volatile int lockOutCountdown = 0;
+
+#define NUM_SAWTOOTHS 1
+tSVF myLowpass;
+tSawtooth mySaw[NUM_SAWTOOTHS];
+tCycle mySine;
+tExpSmooth pitchSmoother;
+tNoise noise;
+tADSR pitchEnvelope;
+tADSR noiseEnvelope;
+tADSR filterEnvelope;
 
 tSimplePoly poly;
 
@@ -77,22 +73,6 @@ uint8_t stringTouchLH[NUM_STRINGS] = {0,0,0,0};
 uint8_t stringTouchRH[NUM_STRINGS] = {0,0,0,0};
 float openStringFrequencies[NUM_STRINGS] = {41.204f, 55.0f, 73.416f, 97.999f};
 float octave = 1.0f;
-
-float noiseFloor = -40.0f;
-float status[NUM_STRINGS] = {0.0f, 0.0f, 0.0f, 0.0f};
-int outOfThreshPositiveChange[NUM_STRINGS] = {0,0,0,0};
-int delayCounter[NUM_STRINGS] = {0,0,0,0};
-float currentMaximum[NUM_STRINGS] = {-120.f,-120.f, -120.f, -120.f};
-int sahArmed[NUM_STRINGS] = {0,0,0,0};
-int previousOutOfThresh[NUM_STRINGS] = {0,0,0,0};
-int attackDelay = 400;
-int offLockout[NUM_STRINGS] = {0,0,0,0};
-int offLockoutDelay = 1000;
-float finalFreqs[NUM_STRINGS];
-int noteOnHappened[NUM_STRINGS] = {0,0,0,0};
-int noteOffHappened[NUM_STRINGS] = {0,0,0,0};
-float noteOnAmplitude[NUM_STRINGS] = {0.0f, 0.0f, 0.0f, 0.0f};
-int outOfThresh[NUM_STRINGS] = {0,0,0,0};
 
 float knobParams[2];
 float joy_x;
@@ -121,20 +101,21 @@ tExpSmooth gainSmoothed;
 int waitTimeOver = 0;
 
 //MEMPOOLS
-#define SMALL_MEM_SIZE 10000
+#define SMALL_MEM_SIZE 80000
 char smallMemory[SMALL_MEM_SIZE];
 
-#define MEDIUM_MEM_SIZE 400000
+#define MEDIUM_MEM_SIZE 519000
 char mediumMemory[MEDIUM_MEM_SIZE] __ATTR_RAM_D1;
 
 
 char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
-//char largeMemory[LARGE_MEM_SIZE] __ATTR_RAM_D1;
+
 tMempool mediumPool;
 tMempool largePool;
 
 
 tPluckDetectorInt pluck[NUM_STRINGS];
+tLockhartWavefolder folder;
 
 LEAF leaf;
 
@@ -169,51 +150,37 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	tSimplePoly_setNumVoices(&poly,1);
 	poly->recover_stolen = 0;
 	tExpSmooth_init(&gainSmoothed, 0.0f, 0.01f, &leaf);
-	/*
-	for (int i = 0; i < 2; i++)
-	{
-		tSawtooth_init(&mySaw[i]);
-		tEnvelopeFollower_init(&myFollower[i], 0.01f, 0.9995f);
-		tHighpass_init(&dcBlock[i], 250.0f);
-		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.01f);
-		tMedianFilter_init(&median[i], 80);
-		tNoise_init(&noise[i], WhiteNoise);
-		tThreshold_init(&threshold[i],1.0f, 2.5f);
-		tADSR_init(&envelope[i], 0.0f, 100.0f, 0.4f, 20.0f);
-		tADSR_setLeakFactor(&envelope[i], 0.999999f);
-		tSlide_init(&fastSlide[i],1.0f,4410.0f);
-		tSlide_init(&slowSlide[i],1.0f,4410.0f);
-		tSVF_init(&lowpass[i], SVFTypeLowpass, 1000.0f, 1.0f);
-	}
-	*/
-
+	tLockhartWavefolder_init(&folder, &leaf);
 
 	for (int i = 0; i < NUM_STRINGS; i++)
 	{
 		tPluckDetectorInt_initToPool(&pluck[i], &mediumPool);
-		/*
-		for (int j = 0; j < NUM_SAWTOOTHS; j++)
-		{
-			tSawtooth_init(&mySaw[i][j]);
-		}
-		tSVF_init(&myLowpass[i], SVFTypeLowpass, 5000.0f, 0.5f);
-		tCycle_init(&mySine[i]);
-		tHighpass_init(&dcBlock[i], 3000.0f);
-		tExpSmooth_init(&pitchSmoother[i], 80.0f, 0.002f);
-		tNoise_init(&noise[i], WhiteNoise);
-		tThreshold_init(&threshold[i],0.5f, 8.0f);
-		tADSR_init(&envelope[i], 6.0f, 100.0f, 0.6f, 20.0f);
-		tADSR_setLeakFactor(&envelope[i], 0.99998f);
-		tSlide_init(&fastSlide[i],1.0f,1110.0f);
-		tSlide_init(&slowSlide[i],500.0f,1.0f);
-		tSVF_init(&lowpass[i], SVFTypeLowpass, 4000.0f, 1.0f);
-		tRampUpDown_init(&updownRamp[i], 0.0f, 104.0f, 1); //5000 samples should be 104 ms
-		*/
+
 	}
 
 
+	for (int j = 0; j < NUM_SAWTOOTHS; j++)
+	{
+		tSawtooth_init(&mySaw[j], &leaf);
+	}
+
+	//the monophonic synth voice
+	tSVF_init(&myLowpass, SVFTypeLowpass, 5000.0f, 0.5f, &leaf);
+	tCycle_init(&mySine, &leaf);
+	tExpSmooth_init(&pitchSmoother, 80.0f, 0.002f, &leaf);
+	tNoise_init(&noise, PinkNoise, &leaf);
+	tADSR_init(&pitchEnvelope, 6.0f, 200.0f, 0.8f, 20.0f, &leaf);
+	tADSR_setLeakFactor(&pitchEnvelope, 0.999997f);
+	tADSR_init(&noiseEnvelope, 0.0f, 20.0f, 0.0f, 8.0f, &leaf);
+	tADSR_init(&filterEnvelope, 1.0f, 500.0f, 0.25f, 100.0f, &leaf);
 
 	HAL_Delay(1);
+
+	//clear the buffer
+	for (int i = 0; i < (AUDIO_BUFFER_SIZE); i++)
+	{
+		audioOutBuffer[i] = 0;
+	}
 
 	// set up the I2S driver to send audio data to the codec (and retrieve input as well)
 	transmit_status = HAL_SAI_Transmit_DMA(hsaiOut, (uint8_t *)&audioOutBuffer[0], AUDIO_BUFFER_SIZE);
@@ -251,122 +218,50 @@ void audioFrame(uint16_t buffer_offset)
 
 		for (i = 0; i < (HALF_BUFFER_SIZE); i = i + 2)
 		{
-			//inputSamples[1] = (audioInBuffer[buffer_offset + i] << 8) * INV_TWO_TO_31;
-			//inputSamples[0] = (audioInBuffer[buffer_offset + i + 1] << 8) * INV_TWO_TO_31;
-
-			//audioOutBuffer[buffer_offset + i] = (int32_t)(audioTick() * TWO_TO_23);
-			//audioOutBuffer[buffer_offset + i + 1] = 0;
+			audioOutBuffer[buffer_offset + i] = (int32_t)(audioTick() * TWO_TO_23);
+			//audioOutBuffer[buffer_offset + i + 1] = 0; // don't need to since buffer was cleared
 		}
 
 	}
 }
-float intoThresh1 = 0.0f;
 
-int sampleNumGlobal = 0;
-
-
-int distanceBetweenReadAndWrite = 0;
 float audioTick()
 {
-	sample = 0.0f;
-/*
-	if (ADC_Ready)
-	{
-		//distanceBetweenReadAndWrite = currentADCBufferPos - sampleNumGlobal;
-		//if (distanceBetweenReadAndWrite < 0)
-		//{
-		//	distanceBetweenReadAndWrite += ADC_RING_BUFFER_SIZE;
-		//}
-		for (int i = 0; i < NUM_STRINGS; i++)
-		{
-			//float tempSamp = audioADCInputs[i][sampleNumGlobal];
-			//attackDetect2(i, tempSamp);
-			//processString(i, tempSamp);
-			float tempSample = 0.0f;
-			//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
-			float theEnv = tADSR_tick(&envelope[i]);
-			for (int j = 0; j < NUM_SAWTOOTHS; j++)
-			{
-				tempSample += tSawtooth_tick(&mySaw[i][j]) * theEnv;
-			}
-			//tempSample += tCycle_tick(&mySine[i]) * theEnv;
-			//tempSample = tSVF_tick(&myLowpass[i], tempSample);
-			//}
-			sample += tempSample;
-			//sample +=  SFXRhodesTick(whichString);
-		}
-		sampleNumGlobal++;
-		//do this as a mask instead to protect the data from COVID
-		if (sampleNumGlobal >= ADC_RING_BUFFER_SIZE)
-		{
-			sampleNumGlobal = 0;
-		}
-
-	}
-*/
-
-	/*
-	for (int whichString = 0; whichString < 2; whichString ++)
-	{
-		//sample = audioIn;
-		//sample = processString(0, audioIn);
-
-		//sample = audioIn;
-
-		attackDetect2(whichString, inputSamples[whichString]);
-		processString(whichString, inputSamples[whichString]);
-		float tempSample = 0.0f;
-		//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
-		for (int i = 0; i < NUM_SAWTOOTHS; i++)
-		{
-			tempSample += tSawtooth_tick(&mySaw[whichString][i]) * tADSR_tick(&envelope[whichString]);
-			tempSample += tCycle_tick(&mySine[whichString]) * tADSR_tick(&envelope[whichString]);
-			tempSample = tSVF_tick(&myLowpass[whichString], tempSample);
-		}
-		sample += tempSample;
-		//sample +=  SFXRhodesTick(whichString);
-
-
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, outOfThreshPositiveChange[1] & 1);
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, sahArmed[1] & 1);
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, outOfThresh[1] & 1);
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, stringTouchRH[1] & 1);
-
-
-		//sample = tanhf(sample * 1.6f);
-		//sample = LEAF_clip(-1.0f, dbtoa(intoThresh1) * 0.5f, 1.0f);
-		//sample = 0.0f;
-		//sample = smoothed;
-
-		//sample = tRampUpDown_sample(&updownRamp[0]);
-		//sample = powf(sample, 0.5f);
-		//sample += outOfThreshPositiveChange[0];
-		//sample -= noteOnHappened[0];
-	}
-	*/
-/*
 	float tempSample = 0.0f;
-	//sample += tNoise_tick(&noise[whichString]);// * tADSR_tick(&envelope[whichString]);
 
-	tExpSmooth_setDest(&gainSmoothed, tSimplePoly_getVelocity(&poly, 0) * 0.2f);
+	//attack click
+	for (int i = 0; i < NUM_STRINGS; i++)
+	{
+		processString(i);
+	}
+	tempSample += tNoise_tick(&noise) * tADSR_tick(&noiseEnvelope);
+
+
 	int myString = tSimplePoly_getPitch(&poly, 0);
-	float theFreq = stringFreqs[myString];
+	float theFreq = stringFrequencies[myString];
+	float pitchEnv = tADSR_tick(&pitchEnvelope);
+	float filterEnv = tADSR_tick(&filterEnvelope);
 	for (int i = 0; i < NUM_SAWTOOTHS; i++)
 	{
-		tSawtooth_setFreq(&mySaw[0][i], theFreq * detuneAmounts[i]);
+		tSawtooth_setFreq(&mySaw[i], theFreq * detuneAmounts[i]);
+
+		tempSample += tSawtooth_tick(&mySaw[i]) * pitchEnv;
 	}
+	tCycle_setFreq(&mySine, theFreq);
+	tempSample += tCycle_tick(&mySine) * pitchEnv;
 
-	//float theEnv = tExpSmooth_tick(&gainSmoothed);
+	tSVF_setFreq(&myLowpass, LEAF_clip(20.0f, theFreq * ((filterEnv * 60.0f) + 1.0f), 19000.0f));
+	tempSample = tSVF_tick(&myLowpass, tempSample);
+	tempSample = tLockhartWavefolder_tick(&folder, tempSample);
+	tempSample = tanhf(tempSample);
 
-	float theEnv = tADSR_tick(&envelope[0]);
-	for (int j = 0; j < NUM_SAWTOOTHS; j++)
+	if (lockOutCountdown > 0)
 	{
-		tempSample += tSawtooth_tick(&mySaw[0][j]) * theEnv;
+		lockOutCountdown--;
 	}
-	sample = tempSample;
-	sample = tanhf(sample);
-	*/
-	return sample;
+
+
+	return tempSample;
 
 }
 
@@ -389,62 +284,8 @@ void CycleCounterTrackMinAndMax( int whichCount)
 	}
 }
 
-//these are expensive but give an average of several counts
-void CycleCounterAddToAverage( int whichCount)
-{
-	if (cycleCountVals[whichCount] > 0) //the [2] spot in the array will be set to 1 if an interrupt happened during the cycle count -- need to set that in any higher-priority interrupts to make that true
-	{
-		cycleCountValsAverager[whichCount][cycleCountAveragerCounter[whichCount]] = cycleCountVals[whichCount];
-	}
-	else
-	{
-		cycleCountValsAverager[whichCount][cycleCountAveragerCounter[whichCount]] = -1;
-	}
-	cycleCountAveragerCounter[whichCount]++;
-	if (cycleCountAveragerCounter[whichCount] >= NUM_COUNTER_CYCLES_TO_AVERAGE)
-	{
-		cycleCountAveragerCounter[whichCount]  = 0;
-	}
-}
-
-//these are expensive but give an average of several counts
-void CycleCounterAverage( int whichCount)
-{
-	float totalCycles = 0.0f;
-	float numberOfCountedSamples = 0.0f;
-	for (int i = 0; i < NUM_COUNTER_CYCLES_TO_AVERAGE; i++)
-	{
-		if (cycleCountValsAverager[whichCount][i] >= 0) //check if the count is valid (not interrupted by an interrupt)
-		{
-			totalCycles += cycleCountValsAverager[whichCount][i];
-
-			//update min value ([1])
-			if ((cycleCountValsAverager[whichCount][i] < cycleCountAverages[whichCount][1]) || (cycleCountAverages[whichCount][1] == 0))
-			{
-				cycleCountAverages[whichCount][1] = cycleCountValsAverager[whichCount][i];
-			}
-			//update max value ([2])
-			if (cycleCountValsAverager[whichCount][i] > cycleCountAverages[whichCount][2])
-			{
-				cycleCountAverages[whichCount][2] = cycleCountValsAverager[whichCount][i];
-			}
-			numberOfCountedSamples++;
-		}
-	}
-	if (numberOfCountedSamples > 0.0f)
-	{
-		cycleCountAverages[whichCount][0] = totalCycles / numberOfCountedSamples;
-	}
-	else
-	{
-		cycleCountAverages[whichCount][0] = 0.0f;
-	}
-
-}
-
-
-
-
+float maxAmp[NUM_STRINGS];
+int offLockout[NUM_STRINGS];
 int prevPolyOn = 0;
 
 float processString(int whichString)
@@ -472,7 +313,7 @@ float processString(int whichString)
 	}
 
 
-	noteOffHappened[whichString] = 0;
+	//noteOffHappened[whichString] = 0;
 
 
 	stringPositions[whichString] =  ((uint16_t)SPI_RX[whichString * 2] << 8) + ((uint16_t)SPI_RX[(whichString * 2) + 1] & 0xff);
@@ -493,9 +334,9 @@ float processString(int whichString)
 	}
 
 	//check for muting
-	if ((stringTouchLH[whichString]) || (stringPositions[whichString] == 65535))
+	if ((stringTouchLH[whichString]) && (stringPositions[whichString] == 65535))
 	{
-		//LHmuteCounter[whichString]++;
+		LHmuteCounter[whichString]++;
 	}
 	else
 	{
@@ -519,7 +360,9 @@ float processString(int whichString)
 			tSimplePoly_noteOff(&poly, whichString);
 			if (tSimplePoly_getNumActiveVoices(&poly) == 0)
 			{
-				tADSR_off(&envelope[0]);
+				tADSR_off(&pitchEnvelope);
+				tADSR_off(&filterEnvelope);
+				tADSR_off(&noiseEnvelope);
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 			}
 			//tADSR_off(&envelope[whichString]);
@@ -555,9 +398,12 @@ float processString(int whichString)
 	//joy_y = ((SPI_RX[11] << 8) + (SPI_RX[12])) * 0.00025f;
 	//knobParams[0] = faster_mtof(joy_x * 230.0f) ; //brightness
 	//tSVF_setFreq(&myLowpass[whichString], LEAF_clip(50.0f, (knobParams[0] + (myFreq * 3.0f)) * tADSR_tick(&envelope[whichString]), 18000.0f));
-
-
+	if (offLockout[whichString] > 0)
+	{
+		offLockout[whichString]--;
+	}
 	//stringFreqs[whichString] = myFreq;
+
 
 	return 0.0f;
 
@@ -597,6 +443,9 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 }
 
 volatile int myTempResult = 0;
+float invMaxAmp[NUM_STRINGS];
+volatile int alreadyPlaying = 0;
+
 void ADC_Frame(int offset)
 {
 	//HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_11);
@@ -624,10 +473,38 @@ void ADC_Frame(int offset)
 			//stringTouchLH[j] = (SPI_RX[8] >> j) & 1;
 			//stringTouchRH[j] = (SPI_RX[8] >> (j + 4)) & 1;
 			myTempResult = tPluckDetectorInt_tick(&pluck[j], tempInt);
-			if (myTempResult > 0)
+			if (lockOutCountdown == 0)
 			{
-				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-				tSimplePoly_noteOn(&poly, j, (uint8_t)((float)myTempResult * 0.001953125f));
+
+				if (myTempResult > 0)
+				{
+					alreadyPlaying = (tSimplePoly_getPitchAndCheckActive(&poly, 0) == j);
+					if (alreadyPlaying)
+					{
+						HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+					}
+					else
+					{
+
+						float tempAmplitude = ((float)myTempResult * INV_TWO_TO_16);
+						if (tempAmplitude > maxAmp[j])
+						{
+							maxAmp[j] = tempAmplitude;
+							invMaxAmp[j] = 1.0f / maxAmp[j];
+						}
+						tempAmplitude = tempAmplitude * invMaxAmp[j];
+						int intVersionOfAmp = (int)(tempAmplitude * 127.0f);
+						tSimplePoly_noteOn(&poly, j, intVersionOfAmp);
+
+						tADSR_on(&pitchEnvelope, tempAmplitude);
+						tADSR_on(&filterEnvelope, tempAmplitude);
+						tADSR_on(&noiseEnvelope, tempAmplitude);
+
+						lockOutCountdown = 512;
+						offLockout[j] == 512;
+						HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+					}
+				}
 			}
 
 
@@ -646,7 +523,7 @@ void ADC_Frame(int offset)
 			}
 */
 
-			processString(j);
+			//processString(j);
 
 		}
 

@@ -189,7 +189,7 @@ int main(void)
 
 
 */
-
+#ifdef DATA_LOGGING
 	 if(BSP_SD_IsDetected())
 	 {
 
@@ -199,7 +199,7 @@ int main(void)
 	   FS_FileOperations();
 
 	 }
-
+#endif
      audioInit(&hi2c2, &hsai_BlockA1, &hsai_BlockB1);
 
 
@@ -476,7 +476,7 @@ float randomNumber(void) {
 	return num;
 }
 
-
+#ifdef DATA_LOGGING
 volatile FRESULT res2;
 uint8_t rtext[100];                                   /* File read buffer */
 uint32_t byteswritten, bytesread;                     /* File write/read counts */
@@ -485,6 +485,7 @@ uint8_t tempText[30];
 int testNumber = 55559;
 int8_t filename[30];
 uint8_t fileExt[] = ".txt";
+
 static void FS_FileOperations(void)
 {
                                        /* FatFs function common result code */
@@ -954,6 +955,7 @@ void writeToSD(int theIndex, int theNumber, int myPos, int lh, int rh, int which
 		SDWriteIndex++;
 	}
 }
+#endif
 void MPU_Conf(void)
 {
 	//code from Keshikan https://github.com/keshikan/STM32H7_DMA_sample
