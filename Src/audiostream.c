@@ -61,7 +61,7 @@ tBuffer myWaves[MAX_WAV_FILES];
 tSampler mySamplers[MAX_WAV_FILES];
 tExpSmooth sampleGains[MAX_WAV_FILES];
 uint32_t half_numWaves = 0;
-tSVF lowpasses[2];
+tSVF lowpasses[2][2];
 
 
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn)
@@ -92,7 +92,10 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	for (int i = 0 ; i < 2; i++)
 	{
-		tSVF_init(&lowpasses[i], SVFTypeLowpass, 18000.0f, 0.5f, &leaf);
+		for (int j = 0; j < 2; j++)
+		{
+			tSVF_init(&lowpasses[i][j], SVFTypeLowpass, 18000.0f, 0.5f, &leaf);
+		}
 	}
 
 	for(int i = 0; i < NUM_ADC_CHANNELS; i++)
@@ -129,6 +132,7 @@ uint intVersion = 0;
 uint intVersionPlusOne = 1;
 float floatVersion = 0.0f;
 int currentSample[2] = {0,0};
+int prevCurrentSample[2] = {0,0};
 float adcHysteresisThreshold = 0.001f;
 float lastFloatADC[NUM_ADC_CHANNELS];
 float floatADC[NUM_ADC_CHANNELS];
@@ -235,19 +239,21 @@ float audioTick(float* samples)
 
 	for (int i = 0; i < 2; i++)
 	{
-		if ((samples[i] > 0.5f) && (prevInput[i] < 0.5f))
+		if ((samples[i] > 0.12f) && (prevInput[i] < 0.1f))
 		{
 			//we got a trigger
 			tSampler_play(&mySamplers[currentSample[i]]);
 			tExpSmooth_setDest(&sampleGains[currentSample[i]], (LEAF_clip(0.0f, smoothedADC[0 + (i*4)]+ smoothedADC[8], 1.0f)));
+			prevCurrentSample[i] = currentSample[i];
 		}
 
 
 		if (mode[0] > 0)
 		{
-			if ((samples[i] < -0.1f) && (prevInput[i] > -0.1f))
+			if ((samples[i] < -0.12f) && (prevInput[i] > -0.1f))
 			{
 				tSampler_stop(&mySamplers[currentSample[i]]);
+				tSampler_stop(&mySamplers[prevCurrentSample[i]]);
 			}
 		}
 	}
@@ -262,8 +268,10 @@ float audioTick(float* samples)
 	tempRate[0] = LEAF_clip(0.0f, smoothedADC[2] + smoothedADC[10], 1.0f) * 4.0f;
 	tempRate[1] = LEAF_clip(0.0f, smoothedADC[6] + smoothedADC[11], 1.0f) * 4.0f;
 
-	tSVF_setFreq(&lowpasses[0], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
-	tSVF_setFreq(&lowpasses[1], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
+	tSVF_setFreq(&lowpasses[0][0], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
+	tSVF_setFreq(&lowpasses[1][0], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
+	tSVF_setFreq(&lowpasses[0][1], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
+	tSVF_setFreq(&lowpasses[1][1], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
 	for (int i = 0; i < numWaves; i++)
 	{
 		if ((mySamplers[i]->active != 0) || (mySamplers[i]->retrigger == 1))
@@ -300,23 +308,25 @@ float audioTick(float* samples)
 				tempSamples[1] = samples[0];
 			}
 			float myGain = tExpSmooth_tick(&sampleGains[i]);
+			int whichChannel = (i < half_numWaves);
 			if (!mode[1])
 			{
-				if (i < half_numWaves)
+
+				if (whichChannel == 0)
 				{
-					tempSamples[0] = tSVF_tick(&lowpasses[0], tempSamples[0]);
+					tempSamples[0] = tSVF_tick(&lowpasses[0][0], tempSamples[0]);
 					samples[0] += (tempSamples[0] * myGain);
 				}
 				else
 				{
-					tempSamples[0] = tSVF_tick(&lowpasses[1], tempSamples[0]);
+					tempSamples[0] = tSVF_tick(&lowpasses[1][0], tempSamples[0]);
 					samples[1] += (tempSamples[0] * myGain);
 				}
 			}
 			else
 			{
-				tempSamples[0] = tSVF_tick(&lowpasses[0], tempSamples[0]);
-				tempSamples[1] = tSVF_tick(&lowpasses[1], tempSamples[1]);
+ 				tempSamples[0] = tSVF_tick(&lowpasses[whichChannel][0], tempSamples[0]);
+				tempSamples[1] = tSVF_tick(&lowpasses[whichChannel][1], tempSamples[1]);
 				samples[0] += (tempSamples[0] * myGain);
 				samples[1] += (tempSamples[1] * myGain);
 			}

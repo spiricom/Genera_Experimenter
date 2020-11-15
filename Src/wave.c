@@ -68,7 +68,7 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
 	 //printf("(17-20) Length of Fmt header: %u \n", header.length_of_fmt);
 
 
-	 ptr->fptr += numberOfGarbage;
+	 read = f_read(ptr, largeMemoryScratch, numberOfGarbage, (void *)&numBytesRead);
 
 	 read = f_read(ptr, header.fmt_chunk_marker, sizeof(header.fmt_chunk_marker), &numBytesRead);
 	 numIterations++;
@@ -167,7 +167,7 @@ while ((header.fmt_chunk_marker[0] != 102) && (header.fmt_chunk_marker[1] != 109
  	 read = f_read(ptr, garbageBuffer, numberOfGarbage, &numBytesRead);
 */
  	 //move pointer ahead by that size
- 	 ptr->fptr += numberOfGarbage;
+ 	 read = f_read(ptr, largeMemoryScratch, numberOfGarbage, (void *)&numBytesRead);
 
  	 read = f_read(ptr, header.data_chunk_header, sizeof(header.data_chunk_header), &numBytesRead);
  	 numIterations++;
