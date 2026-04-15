@@ -1,0 +1,5 @@
+../Core/Src/vocal.c:23:21:audioInitVocal	16	static
+../Core/Src/vocal.c:31:21:audioFreeVocal	0	static
+../Core/Src/vocal.c:36:21:audioSwitchToVocal	48	static
+../Core/Src/vocal.c:151:22:audioTickVocal	48	static
+../Core/Src/vocal.c:55:21:audioFrameVocal	80	static

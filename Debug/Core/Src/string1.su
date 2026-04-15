@@ -1,0 +1,5 @@
+../Core/Src/string1.c:24:21:audioInitString1	64	static
+../Core/Src/string1.c:61:21:audioFreeString1	24	static
+../Core/Src/string1.c:71:21:audioSwitchToString1	40	static
+../Core/Src/string1.c:189:22:audioTickString1	128	dynamic
+../Core/Src/string1.c:98:21:audioFrameString1	72	static

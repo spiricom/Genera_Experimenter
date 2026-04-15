@@ -1,0 +1,5 @@
+../Core/Src/string4.c:58:21:audioInitString4	24	static
+../Core/Src/string4.c:86:21:audioFreeString4	0	static
+../Core/Src/string4.c:94:21:audioSwitchToString4	40	static
+../Core/Src/string4.c:165:22:audioTickString4	72	static
+../Core/Src/string4.c:117:21:audioFrameString4	48	static
