@@ -1,5 +1,0 @@
-../Core/Src/string3.c:42:21:audioInitString3	24	static
-../Core/Src/string3.c:52:21:audioFreeString3	16	static
-../Core/Src/string3.c:60:21:audioSwitchToString3	40	static
-../Core/Src/string3.c:205:22:audioTickString3	48	static
-../Core/Src/string3.c:78:21:audioFrameString3	112	static
