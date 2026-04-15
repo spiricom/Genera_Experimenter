@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ScratchFile FileVersion="3.0">
   <FileVersion>3.0</FileVersion>
   <Workspace>
@@ -6,17 +6,90 @@
     <WorkspacePath>/Users/josnyder/dev/Genera_Experimenter/</WorkspacePath>
     <underRoot>true</underRoot>
     <TrustZone>0</TrustZone>
-    <HAL_Driver>/Users/josnyder/STM32Cube/Repository//STM32Cube_FW_H7_V1.7.0</HAL_Driver>
+    <HAL_Driver>/Users/josnyder/STM32Cube/Repository//STM32Cube_FW_H7_V1.12.1</HAL_Driver>
     <CMSIS>Drivers/CMSIS</CMSIS>
     <Toolchain>STM32CubeIDE</Toolchain>
     <IocFile>cube_for_new_genera_brain4.ioc</IocFile>
     <Project>
       <ProjectName>cube_for_new_genera_brain4</ProjectName>
       <ProjectNature>C</ProjectNature>
-      <Secure/>
-      <filestoremove/>
+      <Secure />
+      <filestoremove>
+        <file>
+          <name>Src/debug.c</name>
+        </file>
+        <file>
+          <name>../Src/custom.c</name>
+        </file>
+        <file>
+          <name>Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c</name>
+        </file>
+        <file>
+          <name>Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c</name>
+        </file>
+        <file>
+          <name>gpio.h</name>
+        </file>
+        <file>
+          <name>debug.h</name>
+        </file>
+        <file>
+          <name>dma.h</name>
+        </file>
+        <file>
+          <name>ffconf.h</name>
+        </file>
+        <file>
+          <name>bsp_driver_sd.h</name>
+        </file>
+        <file>
+          <name>sd_diskio.h</name>
+        </file>
+        <file>
+          <name>fatfs.h</name>
+        </file>
+        <file>
+          <name>fatfs_platform.h</name>
+        </file>
+        <file>
+          <name>fmc.h</name>
+        </file>
+        <file>
+          <name>i2c.h</name>
+        </file>
+        <file>
+          <name>rng.h</name>
+        </file>
+        <file>
+          <name>sai.h</name>
+        </file>
+        <file>
+          <name>sdmmc.h</name>
+        </file>
+        <file>
+          <name>spi.h</name>
+        </file>
+        <file>
+          <name>stm32h7xx_it.h</name>
+        </file>
+        <file>
+          <name>stm32h7xx_hal_conf.h</name>
+        </file>
+        <file>
+          <name>main.h</name>
+        </file>
+        <file>
+          <name>adc.h</name>
+        </file>
+        <file>
+          <name>hrtim.h</name>
+        </file>
+        <file>
+          <name>mdma.h</name>
+        </file>
+      </filestoremove>
       <sourceEntriesToRemove>
-        <sourceEntry/>
+        <sourceEntry />
       </sourceEntriesToRemove>
       <configs>
         <config>
@@ -27,31 +100,31 @@
           <cpucore>ARM Cortex-M7</cpucore>
           <fpu>DP</fpu>
           <memories>
-            <memory access="xrw" name="DTCMRAM" size="128" start="0x20000000"/>
-            <memory access="xrw" name="RAM_D1" size="512" start="0x24000000"/>
-            <memory access="xrw" name="RAM_D2" size="288" start="0x30000000"/>
-            <memory access="xrw" name="RAM_D3" size="64" start="0x38000000"/>
-            <memory access="xrw" name="ITCMRAM" size="64" start="0x00000000"/>
-            <memory access="rx" name="FLASH" size="2048" start="0x8000000"/>
+            <memory access="xrw" name="DTCMRAM" size="131072" start="0x20000000" />
+            <memory access="xrw" name="RAM" size="524288" start="0x24000000" />
+            <memory access="xrw" name="RAM_D2" size="294912" start="0x30000000" />
+            <memory access="xrw" name="RAM_D3" size="65536" start="0x38000000" />
+            <memory access="xrw" name="ITCMRAM" size="65536" start="0x00000000" />
+            <memory access="rx" name="FLASH" size="2097152" start="0x8000000" />
           </memories>
-          <startup>/Users/josnyder/STM32Cube/Repository//STM32Cube_FW_H7_V1.7.0/Drivers/CMSIS/Device\ST\STM32H7xx\Source\Templates\gcc\startup_stm32h743xx.s</startup>
+          <startup>/Users/josnyder/STM32Cube/Repository/STM32Cube_FW_H7_V1.12.1/Drivers/CMSIS/Device\ST\STM32H7xx\Source\Templates\gcc\startup_stm32h743xx.s</startup>
           <LinkSettings>
-            <LinkAdditionalLibs/>
+            <LinkAdditionalLibs />
           </LinkSettings>
           <heapSize>0x200</heapSize>
           <stackSize>0x400</stackSize>
+          <cpuclock>240</cpuclock>
           <board>custom</board>
           <debugprobe>swd</debugprobe>
-          <optimization/>
-          <Aincludes>
-            <include/>
-          </Aincludes>
-          <Adefines/>
+          <optimization />
+          <Aincludes />
+          <Adefines />
           <Cdefines>
+            <define>USE_PWR_LDO_SUPPLY</define>
             <define>USE_HAL_DRIVER</define>
             <define>STM32H743xx</define>
           </Cdefines>
-          <Ldefines/>
+          <Ldefines />
           <Cincludes>
             <include>Inc</include>
             <include>Drivers/STM32H7xx_HAL_Driver/Inc</include>
@@ -61,19 +134,18 @@
             <include>Drivers/CMSIS/Include</include>
           </Cincludes>
           <definestoremove>
-            <Adefines/>
+            <Adefines />
             <Cdefines>
               <define>USE_FULL_LL_DRIVER</define>
-              <define>MBEDTLS_CONFIG_FILE="mbedtls_config.h"</define>
               <define>USE_FULL_ASSERT=1U</define>
             </Cdefines>
-            <Ldefines/>
+            <Ldefines />
           </definestoremove>
           <inctoremove>
             <Aincludes>
-              <include/>
+              <include />
             </Aincludes>
-            <Cincludes/>
+            <Cincludes />
           </inctoremove>
         </config>
       </configs>
@@ -89,7 +161,8 @@
           <name>Middlewares</name>
         </sourceEntry>
       </sourceEntries>
-      <Groups/>
+      <Groups />
     </Project>
   </Workspace>
 </ScratchFile>
+

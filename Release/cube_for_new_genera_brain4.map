@@ -14314,7 +14314,7 @@ Discarded input sections
  .group         0x00000000        0xc ./leaf/Src/leaf-physical.o
  .text          0x00000000        0x0 ./leaf/Src/leaf-physical.o
  .data          0x00000000        0x0 ./leaf/Src/leaf-physical.o
- .bss           0x00000000        0x0 ./leaf/Src/leaf-physical.o
+ .bss           0x00000000      0x190 ./leaf/Src/leaf-physical.o
  .text.fastExp3
                 0x00000000       0x4c ./leaf/Src/leaf-physical.o
  .text.fastExp4
@@ -14830,27 +14830,49 @@ Discarded input sections
  .text.tStereoRotation_setGain
                 0x00000000        0x6 ./leaf/Src/leaf-physical.o
  .text.tPattiString_tick
-                0x00000000       0xf4 ./leaf/Src/leaf-physical.o
+                0x00000000      0x360 ./leaf/Src/leaf-physical.o
  .text.tPattiString_setPickupPos
-                0x00000000       0x16 ./leaf/Src/leaf-physical.o
+                0x00000000       0x1a ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setPickupFilterAmount
+                0x00000000       0x12 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setNonlinearityAmount
+                0x00000000       0x12 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setVerticalGain
+                0x00000000        0x6 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setHorizontalGain
+                0x00000000        0x6 ./leaf/Src/leaf-physical.o
  .text.tPattiString_setFullStringFreq
                 0x00000000       0x12 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setFreq
+                0x00000000      0x104 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setDecay
+                0x00000000       0x8c ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setBrightness
+                0x00000000        0x6 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setNonlinearScalingV
+                0x00000000       0x32 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setNonlinearScalingH
+                0x00000000       0x3e ./leaf/Src/leaf-physical.o
+ .text.tPattiString_mute
+                0x00000000       0x20 ./leaf/Src/leaf-physical.o
  .text.tPattiString_pluck
-                0x00000000       0xcc ./leaf/Src/leaf-physical.o
+                0x00000000      0x12c ./leaf/Src/leaf-physical.o
  .text.tPattiString_setPickupWidth
-                0x00000000       0xa4 ./leaf/Src/leaf-physical.o
+                0x00000000       0x74 ./leaf/Src/leaf-physical.o
+ .text.tPattiString_setPluckPos
+                0x00000000       0x1a ./leaf/Src/leaf-physical.o
  .text.tPattiString_initToPool
-                0x00000000      0x138 ./leaf/Src/leaf-physical.o
+                0x00000000      0x2c0 ./leaf/Src/leaf-physical.o
  .text.tPattiString_init
                 0x00000000        0xa ./leaf/Src/leaf-physical.o
- .debug_info    0x00000000    0x108a2 ./leaf/Src/leaf-physical.o
- .debug_abbrev  0x00000000      0x52b ./leaf/Src/leaf-physical.o
+ .debug_info    0x00000000    0x1161a ./leaf/Src/leaf-physical.o
+ .debug_abbrev  0x00000000      0x53e ./leaf/Src/leaf-physical.o
  .debug_loclists
-                0x00000000     0x7c50 ./leaf/Src/leaf-physical.o
+                0x00000000     0x7fe6 ./leaf/Src/leaf-physical.o
  .debug_aranges
-                0x00000000      0x858 ./leaf/Src/leaf-physical.o
+                0x00000000      0x8b0 ./leaf/Src/leaf-physical.o
  .debug_rnglists
-                0x00000000      0x7cb ./leaf/Src/leaf-physical.o
+                0x00000000      0x83a ./leaf/Src/leaf-physical.o
  .debug_macro   0x00000000      0x298 ./leaf/Src/leaf-physical.o
  .debug_macro   0x00000000      0xaea ./leaf/Src/leaf-physical.o
  .debug_macro   0x00000000       0x22 ./leaf/Src/leaf-physical.o
@@ -14896,10 +14918,10 @@ Discarded input sections
  .debug_macro   0x00000000       0x11 ./leaf/Src/leaf-physical.o
  .debug_macro   0x00000000       0x12 ./leaf/Src/leaf-physical.o
  .debug_macro   0x00000000       0xb3 ./leaf/Src/leaf-physical.o
- .debug_line    0x00000000     0x6a68 ./leaf/Src/leaf-physical.o
- .debug_str     0x00000000     0xd30e ./leaf/Src/leaf-physical.o
+ .debug_line    0x00000000     0x709e ./leaf/Src/leaf-physical.o
+ .debug_str     0x00000000     0xd73d ./leaf/Src/leaf-physical.o
  .comment       0x00000000       0x44 ./leaf/Src/leaf-physical.o
- .debug_frame   0x00000000     0x1f60 ./leaf/Src/leaf-physical.o
+ .debug_frame   0x00000000     0x20b0 ./leaf/Src/leaf-physical.o
  .ARM.attributes
                 0x00000000       0x32 ./leaf/Src/leaf-physical.o
  .group         0x00000000        0xc ./leaf/Src/leaf-reverb.o
