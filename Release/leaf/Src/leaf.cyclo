@@ -1,0 +1,7 @@
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:62:6:LEAF_defaultErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:21:6:LEAF_init	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:50:6:LEAF_setSampleRate	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:57:8:LEAF_getSampleRate	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:68:6:LEAF_internalErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:74:6:LEAF_setErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:79:14:getNextUuid	1

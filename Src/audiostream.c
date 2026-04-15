@@ -68,7 +68,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	LEAF_init(&leaf, SAMPLE_RATE, AUDIO_FRAME_SIZE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
+	LEAF_init(&leaf, SAMPLE_RATE, smallMemory, SMALL_MEM_SIZE, &randomNumber);
 
 	tMempool_init (&mediumPool, mediumMemory, MEDIUM_MEM_SIZE, &leaf);
 	//tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
@@ -80,13 +80,13 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	for (int i = 0; i< MAX_WAV_FILES; i++)
 	{
-		tBuffer_initToPool(&myWaves[i], 1, &mediumPool, &leaf);
+		tBuffer_initToPool(&myWaves[i], 1, &mediumPool);
 		if (numWaves > i)
 		{
-			tBuffer_setBuffer(&myWaves[i], &largeMemory[waves[i][0]], waves[i][3], waves[i][1], waves[i][2]);
+			tBuffer_setBuffer(myWaves[i], &largeMemory[waves[i][0]], waves[i][3], waves[i][1], waves[i][2]);
 		}
 		tSampler_initToPool(&mySamplers[i], &myWaves[i], &mediumPool, &leaf);
-		tSampler_setMode(&mySamplers[i], PlayNormal);
+		tSampler_setMode(mySamplers[i], PlayNormal);
 		tExpSmooth_init(&sampleGains[i], 0.0f, 0.01f, &leaf);
 	}
 
@@ -110,7 +110,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	{
 		audioOutBuffer[i] = 0;
 	}
-	tSampler_play(&mySamplers[0]);
+	tSampler_play(mySamplers[0]);
 
 	HAL_Delay(1);
 
@@ -128,8 +128,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 }
 
-uint intVersion = 0;
-uint intVersionPlusOne = 1;
+uint32_t intVersion = 0;
+uint32_t intVersionPlusOne = 1;
 float floatVersion = 0.0f;
 int currentSample[2] = {0,0};
 int prevCurrentSample[2] = {0,0};
@@ -150,7 +150,7 @@ void audioFrame(uint16_t buffer_offset)
 
 		//if (fastabsf(floatADC[i] - lastFloatADC[i]) > adcHysteresisThreshold)
 		{
-			tExpSmooth_setDest(&adcSmooth[i], floatADC[i]);
+			tExpSmooth_setDest(adcSmooth[i], floatADC[i]);
 			//lastFloatADC[i] = floatADC[i];
 		}
 
@@ -226,12 +226,12 @@ float audioTick(float* samples)
 
 	for (int i = 0; i < 8; i++)
 	{
-		smoothedADC[i] = 1.0f - tExpSmooth_tick(&adcSmooth[i]);
+		smoothedADC[i] = 1.0f - tExpSmooth_tick(adcSmooth[i]);
 	}
 
 	for (int i = 8; i < 12; i++)
 	{
-		smoothedADC[i] = tExpSmooth_tick(&adcSmooth[i]);
+		smoothedADC[i] = tExpSmooth_tick(adcSmooth[i]);
 	}
 
 	currentSample[0] = LEAF_clip(0, (int)(LEAF_clip(0.0f, smoothedADC[1]+ smoothedADC[9], 1.0f) * half_numWaves * .99f), half_numWaves-1);
@@ -242,8 +242,8 @@ float audioTick(float* samples)
 		if ((samples[i] > 0.12f) && (prevInput[i] < 0.1f))
 		{
 			//we got a trigger
-			tSampler_play(&mySamplers[currentSample[i]]);
-			tExpSmooth_setDest(&sampleGains[currentSample[i]], (LEAF_clip(0.0f, smoothedADC[0 + (i*4)]+ smoothedADC[8], 1.0f)));
+			tSampler_play(mySamplers[currentSample[i]]);
+			tExpSmooth_setDest(sampleGains[currentSample[i]], (LEAF_clip(0.0f, smoothedADC[0 + (i*4)]+ smoothedADC[8], 1.0f)));
 			prevCurrentSample[i] = currentSample[i];
 		}
 
@@ -252,8 +252,8 @@ float audioTick(float* samples)
 		{
 			if ((samples[i] < -0.12f) && (prevInput[i] > -0.1f))
 			{
-				tSampler_stop(&mySamplers[currentSample[i]]);
-				tSampler_stop(&mySamplers[prevCurrentSample[i]]);
+				tSampler_stop(mySamplers[currentSample[i]]);
+				tSampler_stop(mySamplers[prevCurrentSample[i]]);
 			}
 		}
 	}
@@ -268,10 +268,10 @@ float audioTick(float* samples)
 	tempRate[0] = LEAF_clip(0.0f, smoothedADC[2] + smoothedADC[10], 1.0f) * 4.0f;
 	tempRate[1] = LEAF_clip(0.0f, smoothedADC[6] + smoothedADC[11], 1.0f) * 4.0f;
 
-	tSVF_setFreq(&lowpasses[0][0], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
-	tSVF_setFreq(&lowpasses[1][0], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
-	tSVF_setFreq(&lowpasses[0][1], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
-	tSVF_setFreq(&lowpasses[1][1], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
+	tSVF_setFreq(lowpasses[0][0], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
+	tSVF_setFreq(lowpasses[1][0], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
+	tSVF_setFreq(lowpasses[0][1], LEAF_clip(0.001f, tempRate[0], 0.99f) * 18000.0f);
+	tSVF_setFreq(lowpasses[1][1], LEAF_clip(0.001f, tempRate[1], 0.99f) * 18000.0f);
 	for (int i = 0; i < numWaves; i++)
 	{
 		if ((mySamplers[i]->active != 0) || (mySamplers[i]->retrigger == 1))
@@ -279,11 +279,11 @@ float audioTick(float* samples)
 
 			if (i < half_numWaves)
 			{
-				tSampler_setRate(&mySamplers[i], tempRate[0]);
+				tSampler_setRate(mySamplers[i], tempRate[0]);
 			}
 			else
 			{
-				tSampler_setRate(&mySamplers[i], tempRate[1]);
+				tSampler_setRate(mySamplers[i], tempRate[1]);
 			}
 		}
 
@@ -300,33 +300,33 @@ float audioTick(float* samples)
 			float tempSamples[2] = {0.0f, 0.0f};
 			if (mySamplers[i]->channels == 2)
 			{
-				tSampler_tickStereo(&mySamplers[i], tempSamples);
+				tSampler_tickStereo(mySamplers[i], tempSamples);
 			}
 			else
 			{
-				tempSamples[0] = tSampler_tick(&mySamplers[i]);
+				tempSamples[0] = tSampler_tick(mySamplers[i]);
 				tempSamples[1] = samples[0];
 			}
-			float myGain = tExpSmooth_tick(&sampleGains[i]);
+			float myGain = tExpSmooth_tick(sampleGains[i]);
 			int whichChannel = (i < half_numWaves);
 			if (!mode[1])
 			{
 
 				if (whichChannel == 0)
 				{
-					tempSamples[0] = tSVF_tick(&lowpasses[0][0], tempSamples[0]);
+					tempSamples[0] = tSVF_tick(lowpasses[0][0], tempSamples[0]);
 					samples[0] += (tempSamples[0] * myGain);
 				}
 				else
 				{
-					tempSamples[0] = tSVF_tick(&lowpasses[1][0], tempSamples[0]);
+					tempSamples[0] = tSVF_tick(lowpasses[1][0], tempSamples[0]);
 					samples[1] += (tempSamples[0] * myGain);
 				}
 			}
 			else
 			{
- 				tempSamples[0] = tSVF_tick(&lowpasses[whichChannel][0], tempSamples[0]);
-				tempSamples[1] = tSVF_tick(&lowpasses[whichChannel][1], tempSamples[1]);
+ 				tempSamples[0] = tSVF_tick(lowpasses[whichChannel][0], tempSamples[0]);
+				tempSamples[1] = tSVF_tick(lowpasses[whichChannel][1], tempSamples[1]);
 				samples[0] += (tempSamples[0] * myGain);
 				samples[1] += (tempSamples[1] * myGain);
 			}
@@ -348,6 +348,7 @@ float audioTick(float* samples)
 	__enable_irq();
    	return 0.0f;
    	*/
+	return 0.0f;
 }
 
 

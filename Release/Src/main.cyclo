@@ -1,0 +1,12 @@
+../Drivers/CMSIS/Include/core_cm7.h:2229:22:SCB_EnableICache	1
+../Drivers/CMSIS/Include/core_cm7.h:2281:22:SCB_EnableDCache	3
+../Src/main.c:458:13:CycleCounterInit	2
+../Src/main.c:390:6:SDRAM_Initialization_sequence	1
+../Src/main.c:476:7:randomNumber	1
+../Src/main.c:485:6:CycleCounterTrackMinAndMax	5
+../Src/main.c:511:13:FS_FileOperations	8
+../Src/main.c:584:6:startTimersForLEDs	1
+../Src/main.c:635:6:MPU_Conf	1
+../Src/main.c:730:6:Error_Handler	1
+../Src/main.c:289:6:SystemClock_Config	2
+../Src/main.c:96:5:main	3

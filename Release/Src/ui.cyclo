@@ -1,0 +1,6 @@
+../Src/ui.c:34:6:RGB_LED_setColor	1
+../Src/ui.c:66:6:setLED_B	2
+../Src/ui.c:79:6:setLED_C	2
+../Src/ui.c:92:6:setLED_D	2
+../Src/ui.c:185:6:displayColorsForCurrentPreset	1
+../Src/ui.c:108:6:buttonCheck	13

@@ -1,0 +1,17 @@
+/Users/josnyder/dev/LEAF/leaf/Src/../Inc/leaf-math.h:899:22:ftom	2
+/Users/josnyder/dev/LEAF/leaf/Src/../Inc/leaf-math.h:882:22:mtof	3
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:23:6:LEAF_generate_sine	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:33:6:LEAF_generate_sawtooth	3
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:55:6:LEAF_generate_triangle	4
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:84:6:LEAF_generate_square	3
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:108:6:LEAF_generate_exp	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:120:6:LEAF_generate_table_skew_non_sym_double	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:135:6:LEAF_generate_table_skew_non_sym	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:150:6:LEAF_generate_atodb	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:161:6:LEAF_generate_dbtoa	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:173:6:LEAF_generate_atodbPositiveClipped	4
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:188:6:LEAF_generate_mtof	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:201:6:LEAF_generate_ftom	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:215:7:fast_sinf2	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:242:6:place_step_dd	2
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c:266:6:place_slope_dd	2
