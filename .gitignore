@@ -50,3 +50,4 @@ TouchGFX/simulator/msvs/.vs
 # These are not needed in the repository.
 *.bak
 
+.cproject
