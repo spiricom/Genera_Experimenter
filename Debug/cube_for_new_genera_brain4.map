@@ -1296,7 +1296,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
  .debug_line    0x00000000     0x140f ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
- .debug_str     0x00000000   0x17b3b0 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
+ .debug_str     0x00000000   0x17b3b7 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
  .debug_frame   0x00000000      0x100 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o
  .ARM.attributes
@@ -1486,7 +1486,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
  .debug_line    0x00000000     0x117c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
- .debug_str     0x00000000   0x17b0fa ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
+ .debug_str     0x00000000   0x17b101 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
  .debug_frame   0x00000000       0xec ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o
  .ARM.attributes
@@ -1686,7 +1686,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
  .debug_line    0x00000000     0x12a8 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
- .debug_str     0x00000000   0x17b2cd ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
+ .debug_str     0x00000000   0x17b2d4 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
  .debug_frame   0x00000000      0x150 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o
  .ARM.attributes
@@ -1914,7 +1914,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
  .debug_line    0x00000000     0x16fc ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
- .debug_str     0x00000000   0x17b57d ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
+ .debug_str     0x00000000   0x17b584 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
  .debug_frame   0x00000000      0x244 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o
  .ARM.attributes
@@ -2454,7 +2454,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
  .debug_line    0x00000000      0xbed ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
- .debug_str     0x00000000   0x17af28 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
+ .debug_str     0x00000000   0x17af2f ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
  .debug_frame   0x00000000       0xc8 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o
  .ARM.attributes
@@ -3132,7 +3132,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
  .debug_line    0x00000000     0x1cc0 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
- .debug_str     0x00000000   0x17b61d ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
+ .debug_str     0x00000000   0x17b624 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
  .debug_frame   0x00000000      0x268 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o
  .ARM.attributes
@@ -3338,7 +3338,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
  .debug_line    0x00000000      0xcc0 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
- .debug_str     0x00000000   0x17b267 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
+ .debug_str     0x00000000   0x17b26e ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
  .debug_frame   0x00000000      0x128 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o
  .ARM.attributes
@@ -4286,7 +4286,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
  .debug_line    0x00000000      0xa53 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
- .debug_str     0x00000000   0x17ad7d ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
+ .debug_str     0x00000000   0x17ad84 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
  .ARM.attributes
                 0x00000000       0x32 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o
@@ -4678,7 +4678,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
  .debug_line    0x00000000      0xaea ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
- .debug_str     0x00000000   0x17b4de ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
+ .debug_str     0x00000000   0x17b4e5 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
  .debug_frame   0x00000000       0x30 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o
  .ARM.attributes
@@ -5073,7 +5073,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
  .debug_line    0x00000000      0xd54 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
- .debug_str     0x00000000   0x17b281 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
+ .debug_str     0x00000000   0x17b288 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
  .debug_frame   0x00000000       0x80 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o
  .ARM.attributes
@@ -5705,7 +5705,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
  .debug_line    0x00000000      0xbf5 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
- .debug_str     0x00000000   0x17b470 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
+ .debug_str     0x00000000   0x17b477 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
  .debug_frame   0x00000000       0x60 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.o
  .ARM.attributes
@@ -6943,7 +6943,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x68 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
  .debug_macro   0x00000000      0x58b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
  .debug_line    0x00000000      0xbd6 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
- .debug_str     0x00000000   0x17ae84 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
+ .debug_str     0x00000000   0x17ae8b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
  .comment       0x00000000       0x44 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
  .debug_frame   0x00000000       0x60 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o
  .ARM.attributes
@@ -7809,7 +7809,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x28 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
  .debug_macro   0x00000000      0x211 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
  .debug_line    0x00000000     0x2590 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
- .debug_str     0x00000000   0x17e65c ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
+ .debug_str     0x00000000   0x17e663 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
  .comment       0x00000000       0x44 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
  .debug_frame   0x00000000      0x378 ./Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src/usbh_audio.o
  .ARM.attributes
@@ -8808,7 +8808,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x12 ./Middlewares/Third_Party/FatFs/src/diskio.o
  .debug_macro   0x00000000       0xe2 ./Middlewares/Third_Party/FatFs/src/diskio.o
  .debug_line    0x00000000      0xbf1 ./Middlewares/Third_Party/FatFs/src/diskio.o
- .debug_str     0x00000000   0x17b849 ./Middlewares/Third_Party/FatFs/src/diskio.o
+ .debug_str     0x00000000   0x17b850 ./Middlewares/Third_Party/FatFs/src/diskio.o
  .comment       0x00000000       0x44 ./Middlewares/Third_Party/FatFs/src/diskio.o
  .debug_frame   0x00000000       0xa0 ./Middlewares/Third_Party/FatFs/src/diskio.o
  .ARM.attributes
@@ -9108,7 +9108,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x8e ./Middlewares/Third_Party/FatFs/src/ff.o
  .debug_macro   0x00000000       0x58 ./Middlewares/Third_Party/FatFs/src/ff.o
  .debug_line    0x00000000     0x4ab5 ./Middlewares/Third_Party/FatFs/src/ff.o
- .debug_str     0x00000000   0x17cac0 ./Middlewares/Third_Party/FatFs/src/ff.o
+ .debug_str     0x00000000   0x17cac7 ./Middlewares/Third_Party/FatFs/src/ff.o
  .comment       0x00000000       0x44 ./Middlewares/Third_Party/FatFs/src/ff.o
  .debug_frame   0x00000000      0x7b8 ./Middlewares/Third_Party/FatFs/src/ff.o
  .ARM.attributes
@@ -9482,7 +9482,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x12 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
  .debug_macro   0x00000000       0xe2 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
  .debug_line    0x00000000      0xaf3 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
- .debug_str     0x00000000   0x17b5e9 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
+ .debug_str     0x00000000   0x17b5f0 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
  .comment       0x00000000       0x44 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
  .ARM.attributes
                 0x00000000       0x32 ./Middlewares/Third_Party/FatFs/src/option/syscall.o
@@ -10607,7 +10607,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x58b ./Src/debug.o
  .debug_macro   0x00000000       0x1c ./Src/debug.o
  .debug_line    0x00000000      0xa4e ./Src/debug.o
- .debug_str     0x00000000   0x17aeba ./Src/debug.o
+ .debug_str     0x00000000   0x17aec1 ./Src/debug.o
  .comment       0x00000000       0x44 ./Src/debug.o
  .debug_frame   0x00000000       0x20 ./Src/debug.o
  .ARM.attributes
@@ -14467,7 +14467,7 @@ Discarded input sections
  .debug_macro   0x00000000      0xaea ./compact-leaf/Externals/d_fft_mayer.o
  .debug_macro   0x00000000       0x6a ./compact-leaf/Externals/d_fft_mayer.o
  .debug_line    0x00000000      0x8e8 ./compact-leaf/Externals/d_fft_mayer.o
- .debug_str     0x00000000     0x3383 ./compact-leaf/Externals/d_fft_mayer.o
+ .debug_str     0x00000000     0x338a ./compact-leaf/Externals/d_fft_mayer.o
  .comment       0x00000000       0x44 ./compact-leaf/Externals/d_fft_mayer.o
  .debug_frame   0x00000000       0xb4 ./compact-leaf/Externals/d_fft_mayer.o
  .ARM.attributes
@@ -14856,7 +14856,7 @@ Discarded input sections
  .debug_macro   0x00000000       0xb3 ./compact-leaf/Src/leaf-analysis.o
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-analysis.o
  .debug_line    0x00000000     0x3cb9 ./compact-leaf/Src/leaf-analysis.o
- .debug_str     0x00000000     0xac9a ./compact-leaf/Src/leaf-analysis.o
+ .debug_str     0x00000000     0xaca1 ./compact-leaf/Src/leaf-analysis.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-analysis.o
  .debug_frame   0x00000000      0xf60 ./compact-leaf/Src/leaf-analysis.o
  .ARM.attributes
@@ -15172,7 +15172,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-delay.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-delay.o
  .debug_line    0x00000000     0x2750 ./compact-leaf/Src/leaf-delay.o
- .debug_str     0x00000000     0xa0a7 ./compact-leaf/Src/leaf-delay.o
+ .debug_str     0x00000000     0xa0ae ./compact-leaf/Src/leaf-delay.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-delay.o
  .debug_frame   0x00000000      0x81c ./compact-leaf/Src/leaf-delay.o
  .ARM.attributes
@@ -15346,7 +15346,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x6a ./compact-leaf/Src/leaf-distortion.o
  .debug_macro   0x00000000      0x172 ./compact-leaf/Src/leaf-distortion.o
  .debug_line    0x00000000     0x15d0 ./compact-leaf/Src/leaf-distortion.o
- .debug_str     0x00000000     0x9942 ./compact-leaf/Src/leaf-distortion.o
+ .debug_str     0x00000000     0x9949 ./compact-leaf/Src/leaf-distortion.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-distortion.o
  .debug_frame   0x00000000      0x3f4 ./compact-leaf/Src/leaf-distortion.o
  .ARM.attributes
@@ -15502,7 +15502,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x172 ./compact-leaf/Src/leaf-dynamics.o
  .debug_macro   0x00000000       0xb3 ./compact-leaf/Src/leaf-dynamics.o
  .debug_line    0x00000000     0x1160 ./compact-leaf/Src/leaf-dynamics.o
- .debug_str     0x00000000     0x9a39 ./compact-leaf/Src/leaf-dynamics.o
+ .debug_str     0x00000000     0x9a40 ./compact-leaf/Src/leaf-dynamics.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-dynamics.o
  .debug_frame   0x00000000      0x2a0 ./compact-leaf/Src/leaf-dynamics.o
  .ARM.attributes
@@ -15801,7 +15801,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-effects.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-effects.o
  .debug_line    0x00000000     0x3f4f ./compact-leaf/Src/leaf-effects.o
- .debug_str     0x00000000     0xaa86 ./compact-leaf/Src/leaf-effects.o
+ .debug_str     0x00000000     0xaa8d ./compact-leaf/Src/leaf-effects.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-effects.o
  .debug_frame   0x00000000      0xb10 ./compact-leaf/Src/leaf-effects.o
  .ARM.attributes
@@ -15989,7 +15989,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-electrical.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-electrical.o
  .debug_line    0x00000000     0x142b ./compact-leaf/Src/leaf-electrical.o
- .debug_str     0x00000000     0x9dcb ./compact-leaf/Src/leaf-electrical.o
+ .debug_str     0x00000000     0x9dd2 ./compact-leaf/Src/leaf-electrical.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-electrical.o
  .debug_frame   0x00000000      0x464 ./compact-leaf/Src/leaf-electrical.o
  .ARM.attributes
@@ -16877,7 +16877,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-filters.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-filters.o
  .debug_line    0x00000000     0x7a13 ./compact-leaf/Src/leaf-filters.o
- .debug_str     0x00000000     0xb2c0 ./compact-leaf/Src/leaf-filters.o
+ .debug_str     0x00000000     0xb2c7 ./compact-leaf/Src/leaf-filters.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-filters.o
  .debug_frame   0x00000000     0x1a84 ./compact-leaf/Src/leaf-filters.o
  .ARM.attributes
@@ -17126,7 +17126,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x12 ./compact-leaf/Src/leaf-instruments.o
  .debug_macro   0x00000000       0xb3 ./compact-leaf/Src/leaf-instruments.o
  .debug_line    0x00000000     0x18e0 ./compact-leaf/Src/leaf-instruments.o
- .debug_str     0x00000000     0xa459 ./compact-leaf/Src/leaf-instruments.o
+ .debug_str     0x00000000     0xa460 ./compact-leaf/Src/leaf-instruments.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-instruments.o
  .debug_frame   0x00000000      0x8b8 ./compact-leaf/Src/leaf-instruments.o
  .ARM.attributes
@@ -17258,7 +17258,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x6a ./compact-leaf/Src/leaf-math.o
  .debug_macro   0x00000000      0x172 ./compact-leaf/Src/leaf-math.o
  .debug_line    0x00000000      0xf4a ./compact-leaf/Src/leaf-math.o
- .debug_str     0x00000000     0x954d ./compact-leaf/Src/leaf-math.o
+ .debug_str     0x00000000     0x9554 ./compact-leaf/Src/leaf-math.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-math.o
  .debug_frame   0x00000000      0x374 ./compact-leaf/Src/leaf-math.o
  .ARM.attributes
@@ -17577,7 +17577,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x172 ./compact-leaf/Src/leaf-midi.o
  .debug_macro   0x00000000       0xb3 ./compact-leaf/Src/leaf-midi.o
  .debug_line    0x00000000     0x1b97 ./compact-leaf/Src/leaf-midi.o
- .debug_str     0x00000000     0x9bc1 ./compact-leaf/Src/leaf-midi.o
+ .debug_str     0x00000000     0x9bc8 ./compact-leaf/Src/leaf-midi.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-midi.o
  .debug_frame   0x00000000      0x4ac ./compact-leaf/Src/leaf-midi.o
  .ARM.attributes
@@ -18781,7 +18781,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x12 ./compact-leaf/Src/leaf-physical.o
  .debug_macro   0x00000000       0xb3 ./compact-leaf/Src/leaf-physical.o
  .debug_line    0x00000000     0x6b58 ./compact-leaf/Src/leaf-physical.o
- .debug_str     0x00000000     0xd2a9 ./compact-leaf/Src/leaf-physical.o
+ .debug_str     0x00000000     0xd2b0 ./compact-leaf/Src/leaf-physical.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-physical.o
  .debug_frame   0x00000000     0x1f64 ./compact-leaf/Src/leaf-physical.o
  .ARM.attributes
@@ -18960,7 +18960,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-reverb.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-reverb.o
  .debug_line    0x00000000     0x1ec7 ./compact-leaf/Src/leaf-reverb.o
- .debug_str     0x00000000     0x9ff8 ./compact-leaf/Src/leaf-reverb.o
+ .debug_str     0x00000000     0x9fff ./compact-leaf/Src/leaf-reverb.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-reverb.o
  .debug_frame   0x00000000      0x508 ./compact-leaf/Src/leaf-reverb.o
  .ARM.attributes
@@ -19192,7 +19192,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-sampling.o
  .debug_macro   0x00000000       0x16 ./compact-leaf/Src/leaf-sampling.o
  .debug_line    0x00000000     0x2dea ./compact-leaf/Src/leaf-sampling.o
- .debug_str     0x00000000     0xa0c1 ./compact-leaf/Src/leaf-sampling.o
+ .debug_str     0x00000000     0xa0c8 ./compact-leaf/Src/leaf-sampling.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-sampling.o
  .debug_frame   0x00000000      0x638 ./compact-leaf/Src/leaf-sampling.o
  .ARM.attributes
@@ -19491,7 +19491,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x2d ./compact-leaf/Src/leaf-vocal.o
  .debug_macro   0x00000000       0x10 ./compact-leaf/Src/leaf-vocal.o
  .debug_line    0x00000000     0x26ef ./compact-leaf/Src/leaf-vocal.o
- .debug_str     0x00000000     0xa283 ./compact-leaf/Src/leaf-vocal.o
+ .debug_str     0x00000000     0xa28a ./compact-leaf/Src/leaf-vocal.o
  .comment       0x00000000       0x44 ./compact-leaf/Src/leaf-vocal.o
  .debug_frame   0x00000000      0x558 ./compact-leaf/Src/leaf-vocal.o
  .ARM.attributes
@@ -22916,71 +22916,71 @@ LOAD C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_line    0x00057522      0x949 ./compact-leaf/Src/leaf.o
  .debug_line    0x00057e6b       0x77 ./startup/startup_stm32h743xx.o
 
-.debug_str      0x00000000   0x191462
- .debug_str     0x00000000   0x191462 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
-                             0x17c27b (size before relaxing)
- .debug_str     0x00191462   0x17c077 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.o
- .debug_str     0x00191462   0x17c0fa ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.o
- .debug_str     0x00191462   0x17bc01 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.o
- .debug_str     0x00191462   0x17ba23 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.o
- .debug_str     0x00191462   0x17b375 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.o
- .debug_str     0x00191462   0x17b705 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hcd.o
- .debug_str     0x00191462   0x17c2a1 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.o
- .debug_str     0x00191462   0x17b6f9 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.o
- .debug_str     0x00191462   0x17b75b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.o
- .debug_str     0x00191462   0x17b684 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.o
- .debug_str     0x00191462   0x17bb3c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.o
- .debug_str     0x00191462   0x17b05c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng.o
- .debug_str     0x00191462   0x17b8ff ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai.o
- .debug_str     0x00191462   0x17bcc5 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.o
- .debug_str     0x00191462   0x17b76e ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sdram.o
- .debug_str     0x00191462   0x17b965 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.o
- .debug_str     0x00191462   0x17c251 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.o
- .debug_str     0x00191462   0x17bb71 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.o
- .debug_str     0x00191462   0x17c0ab ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.o
- .debug_str     0x00191462   0x17b642 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.o
- .debug_str     0x00191462   0x17b81e ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.o
- .debug_str     0x00191462   0x17b42d ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.o
- .debug_str     0x00191462   0x17b85c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.o
- .debug_str     0x00191462   0x17d2a8 ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_core.o
- .debug_str     0x00191462   0x17d21d ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.o
- .debug_str     0x00191462   0x17d051 ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ioreq.o
- .debug_str     0x00191462   0x17cfe7 ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.o
- .debug_str     0x00191462   0x17b8ae ./Middlewares/Third_Party/FatFs/src/ff_gen_drv.o
- .debug_str     0x00191462   0x17e854 ./Src/MIDI_application.o
- .debug_str     0x00191462   0x17c175 ./Src/adc.o
- .debug_str     0x00191462   0x17d9ca ./Src/audiostream.o
- .debug_str     0x00191462   0x17b4a2 ./Src/bsp_driver_sd.o
- .debug_str     0x00191462   0x17d20e ./Src/codec.o
- .debug_str     0x00191462   0x17b941 ./Src/dma.o
- .debug_str     0x00191462   0x17b93c ./Src/fatfs.o
- .debug_str     0x00191462   0x17ae8d ./Src/fatfs_platform.o
- .debug_str     0x00191462   0x17b7e2 ./Src/fmc.o
- .debug_str     0x00191462   0x17b1c0 ./Src/gpio.o
- .debug_str     0x00191462   0x17b809 ./Src/i2c.o
- .debug_str     0x00191462   0x17f308 ./Src/main.o
- .debug_str     0x00191462   0x17b28a ./Src/rng.o
- .debug_str     0x00191462   0x17b8a8 ./Src/sai.o
- .debug_str     0x00191462   0x17b977 ./Src/sd_diskio.o
- .debug_str     0x00191462   0x17b49c ./Src/sdmmc.o
- .debug_str     0x00191462   0x17b7f6 ./Src/spi.o
- .debug_str     0x00191462   0x17b0f7 ./Src/stm32h7xx_hal_msp.o
- .debug_str     0x00191462   0x17ba8b ./Src/stm32h7xx_it.o
- .debug_str     0x00191462     0x99d0 ./Src/syscalls.o
- .debug_str     0x00191462   0x17b1ac ./Src/system_stm32h7xx.o
- .debug_str     0x00191462   0x17ba72 ./Src/tim.o
- .debug_str     0x00191462   0x17aeeb ./Src/ui.o
- .debug_str     0x00191462   0x17b7b8 ./Src/usart.o
- .debug_str     0x00191462   0x17da4c ./Src/usb_host.o
- .debug_str     0x00191462   0x17d52c ./Src/usbh_MIDI.o
- .debug_str     0x00191462   0x17e365 ./Src/usbh_conf.o
- .debug_str     0x00191462   0x17ae42 ./Src/usbh_platform.o
- .debug_str     0x00191462     0xa1d2 ./compact-leaf/Src/leaf-envelopes.o
- .debug_str     0x00191462     0x983b ./compact-leaf/Src/leaf-mempool.o
- .debug_str     0x00191462     0xb47c ./compact-leaf/Src/leaf-oscillators.o
- .debug_str     0x00191462     0x9523 ./compact-leaf/Src/leaf-tables.o
- .debug_str     0x00191462     0x9742 ./compact-leaf/Src/leaf.o
- .debug_str     0x00191462       0x8c ./startup/startup_stm32h743xx.o
+.debug_str      0x00000000   0x191469
+ .debug_str     0x00000000   0x191469 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
+                             0x17c282 (size before relaxing)
+ .debug_str     0x00191469   0x17c07e ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.o
+ .debug_str     0x00191469   0x17c101 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.o
+ .debug_str     0x00191469   0x17bc08 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.o
+ .debug_str     0x00191469   0x17ba2a ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.o
+ .debug_str     0x00191469   0x17b37c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.o
+ .debug_str     0x00191469   0x17b70c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hcd.o
+ .debug_str     0x00191469   0x17c2a8 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.o
+ .debug_str     0x00191469   0x17b700 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.o
+ .debug_str     0x00191469   0x17b762 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.o
+ .debug_str     0x00191469   0x17b68b ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.o
+ .debug_str     0x00191469   0x17bb43 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.o
+ .debug_str     0x00191469   0x17b063 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng.o
+ .debug_str     0x00191469   0x17b906 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai.o
+ .debug_str     0x00191469   0x17bccc ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.o
+ .debug_str     0x00191469   0x17b775 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sdram.o
+ .debug_str     0x00191469   0x17b96c ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.o
+ .debug_str     0x00191469   0x17c258 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.o
+ .debug_str     0x00191469   0x17bb78 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.o
+ .debug_str     0x00191469   0x17c0b2 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.o
+ .debug_str     0x00191469   0x17b649 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.o
+ .debug_str     0x00191469   0x17b825 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.o
+ .debug_str     0x00191469   0x17b434 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.o
+ .debug_str     0x00191469   0x17b863 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.o
+ .debug_str     0x00191469   0x17d2af ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_core.o
+ .debug_str     0x00191469   0x17d224 ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.o
+ .debug_str     0x00191469   0x17d058 ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ioreq.o
+ .debug_str     0x00191469   0x17cfee ./Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.o
+ .debug_str     0x00191469   0x17b8b5 ./Middlewares/Third_Party/FatFs/src/ff_gen_drv.o
+ .debug_str     0x00191469   0x17e85b ./Src/MIDI_application.o
+ .debug_str     0x00191469   0x17c17c ./Src/adc.o
+ .debug_str     0x00191469   0x17d9d1 ./Src/audiostream.o
+ .debug_str     0x00191469   0x17b4a9 ./Src/bsp_driver_sd.o
+ .debug_str     0x00191469   0x17d215 ./Src/codec.o
+ .debug_str     0x00191469   0x17b948 ./Src/dma.o
+ .debug_str     0x00191469   0x17b943 ./Src/fatfs.o
+ .debug_str     0x00191469   0x17ae94 ./Src/fatfs_platform.o
+ .debug_str     0x00191469   0x17b7e9 ./Src/fmc.o
+ .debug_str     0x00191469   0x17b1c7 ./Src/gpio.o
+ .debug_str     0x00191469   0x17b810 ./Src/i2c.o
+ .debug_str     0x00191469   0x17f30f ./Src/main.o
+ .debug_str     0x00191469   0x17b291 ./Src/rng.o
+ .debug_str     0x00191469   0x17b8af ./Src/sai.o
+ .debug_str     0x00191469   0x17b97e ./Src/sd_diskio.o
+ .debug_str     0x00191469   0x17b4a3 ./Src/sdmmc.o
+ .debug_str     0x00191469   0x17b7fd ./Src/spi.o
+ .debug_str     0x00191469   0x17b0fe ./Src/stm32h7xx_hal_msp.o
+ .debug_str     0x00191469   0x17ba92 ./Src/stm32h7xx_it.o
+ .debug_str     0x00191469     0x99d7 ./Src/syscalls.o
+ .debug_str     0x00191469   0x17b1b3 ./Src/system_stm32h7xx.o
+ .debug_str     0x00191469   0x17ba79 ./Src/tim.o
+ .debug_str     0x00191469   0x17aef2 ./Src/ui.o
+ .debug_str     0x00191469   0x17b7bf ./Src/usart.o
+ .debug_str     0x00191469   0x17da53 ./Src/usb_host.o
+ .debug_str     0x00191469   0x17d533 ./Src/usbh_MIDI.o
+ .debug_str     0x00191469   0x17e36c ./Src/usbh_conf.o
+ .debug_str     0x00191469   0x17ae49 ./Src/usbh_platform.o
+ .debug_str     0x00191469     0xa1d9 ./compact-leaf/Src/leaf-envelopes.o
+ .debug_str     0x00191469     0x9842 ./compact-leaf/Src/leaf-mempool.o
+ .debug_str     0x00191469     0xb483 ./compact-leaf/Src/leaf-oscillators.o
+ .debug_str     0x00191469     0x952a ./compact-leaf/Src/leaf-tables.o
+ .debug_str     0x00191469     0x9749 ./compact-leaf/Src/leaf.o
+ .debug_str     0x00191469       0x93 ./startup/startup_stm32h743xx.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
@@ -23124,6 +23124,6 @@ LOAD C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_frame   0x00009398       0x34 C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+dp/hard\libgcc.a(_udivmoddi4.o)
 
 .debug_line_str
-                0x00000000       0x70
+                0x00000000       0x77
  .debug_line_str
-                0x00000000       0x70 ./startup/startup_stm32h743xx.o
+                0x00000000       0x77 ./startup/startup_stm32h743xx.o
