@@ -120,7 +120,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   Appli_state = APPLICATION_DISCONNECT;
   //reset the USB stuff - to handle cases where disconnection put USB into an unrecoverable state for some reason
 	USBH_Stop(&hUsbHostFS);
-	for (uint i = 0; i < RX_BUFF_SIZE; i++)
+	for (uint32_t i = 0; i < RX_BUFF_SIZE; i++)
 	{
 		MIDI_RX_Buffer[i] = 0;
 	}

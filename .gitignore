@@ -1,0 +1,4 @@
+# STM32CubeIDE
+.metadata/
+.settings/
+*.id
