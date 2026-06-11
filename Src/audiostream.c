@@ -60,7 +60,7 @@ char largeMemory[LARGE_MEM_SIZE] __ATTR_SDRAM;
 
 tMempool smallPool;
 tMempool largePool;
-
+LEAF leaf;
 
 /**********************************************/
 
@@ -74,10 +74,10 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	LEAF_init(SAMPLE_RATE, AUDIO_FRAME_SIZE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
+	LEAF_init(&leaf, SAMPLE_RATE, mediumMemory, MEDIUM_MEM_SIZE, &randomNumber);
 
-	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE);
-	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE);
+	tMempool_init (&smallPool, smallMemory, SMALL_MEM_SIZE, &leaf);
+	tMempool_init (&largePool, largeMemory, LARGE_MEM_SIZE, &leaf);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -88,7 +88,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	for (int i = 0; i < 6; i++)
 	{
 		tCycle_initToPool(&mySine[i], &smallPool);
-		tCycle_setFreq(&mySine[i], 440.0f);
+		tCycle_setFreq(mySine[i], 440.0f);
 	}
 
 	HAL_Delay(10);
@@ -130,7 +130,7 @@ void audioFrame(uint16_t buffer_offset)
 	//read the analog inputs and smooth them with ramps
 	for (i = 0; i < 6; i++)
 	{
-		tRamp_setDest(&adc[i], (ADC_values[i] * INV_TWO_TO_16));
+		tRamp_setDest(adc[i], (ADC_values[i] * INV_TWO_TO_16));
 	}
 
 
@@ -163,8 +163,8 @@ float audioTickL(float audioIn)
 	sample = 0.0f;
 	for (int i = 0; i < 6; i = i+2) // even numbered knobs (left side of board)
 	{
-		tCycle_setFreq(&mySine[i], (tRamp_tick(&adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i]); // tick the oscillator
+		tCycle_setFreq(mySine[i], (tRamp_tick(adc[i]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
+		sample += tCycle_tick(mySine[i]); // tick the oscillator
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
 
@@ -184,8 +184,8 @@ float audioTickR(float audioIn)
 
 	for (int i = 0; i < 6; i = i+2) // odd numbered knobs (right side of board)
 	{
-		tCycle_setFreq(&mySine[i+1], (tRamp_tick(&adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
-		sample += tCycle_tick(&mySine[i+1]); // tick the oscillator
+		tCycle_setFreq(mySine[i+1], (tRamp_tick(adc[i+1]) * 500.0f) + 100.0f); // use knob to set frequency between 100 and 600 Hz
+		sample += tCycle_tick(mySine[i+1]); // tick the oscillator
 	}
 	sample *= 0.33f; // drop the gain because we've got three full volume sine waves summing here
 
