@@ -1,6 +1,9 @@
 [submodule "Src/leaf"]
 	path = Src/leaf
-	url = https://github.com/spiricom/leaf
+	url = https://github.com/MrKahoobadoo/compact-leaf
 [submodule "leaf"]
 	path = leaf
-	url = https://github.com/spiricom/leaf
+	url = https://github.com/MrKahoobadoo/compact-leaf
+[submodule "compact-leaf"]
+	path = compact-leaf
+	url = https://github.com/MrKahoobadoo/compact-leaf

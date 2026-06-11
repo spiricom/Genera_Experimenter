@@ -10,8 +10,8 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include startup/subdir.mk
--include leaf/Src/subdir.mk
--include leaf/Externals/subdir.mk
+-include compact-leaf/Src/subdir.mk
+-include compact-leaf/Externals/subdir.mk
 -include Src/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/option/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/subdir.mk
