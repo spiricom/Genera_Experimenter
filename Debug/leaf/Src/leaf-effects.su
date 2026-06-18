@@ -88,7 +88,7 @@
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1691:6:tFormantShifter_init	8	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1735:6:tFormantShifter_free	16	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1760:8:tFormantShifter_remove	8	static
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1798:8:tFormantShifter_add	8	static
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1798:8:tFormantShifter_add	16	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1755:8:tFormantShifter_tick	8	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1894:6:tFormantShifter_setShiftFactor	0	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c:1899:6:tFormantShifter_setIntensity	0	static

@@ -245,7 +245,7 @@
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3763:9:tStereoRotation_initToPool	32	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3757:9:tStereoRotation_init	8	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3787:9:tStereoRotation_tick	40	static
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3816:9:tStereoRotation_tickIn	32	static
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3816:9:tStereoRotation_tickIn	40	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3835:9:tStereoRotation_tickOut	24	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3852:9:tStereoRotation_setAngle	0	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c:3857:9:tStereoRotation_setDelayX	8	static

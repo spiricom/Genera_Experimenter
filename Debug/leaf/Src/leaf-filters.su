@@ -139,7 +139,7 @@
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1616:8:tHighpass_getFreq	0	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1622:8:tHighpass_tick	0	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1629:6:tHighpass_setSampleRate	0	static
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1647:6:tButterworth_initToPool	40	static
+/Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1647:6:tButterworth_initToPool	32	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1641:6:tButterworth_init	8	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1674:6:tButterworth_free	16	static
 /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c:1684:8:tButterworth_tick	16	static

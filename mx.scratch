@@ -14,122 +14,7 @@
       <ProjectName>cube_for_new_genera_brain4</ProjectName>
       <ProjectNature>C</ProjectNature>
       <Secure />
-      <filestoremove>
-        <file>
-          <name>Src/main.c</name>
-        </file>
-        <file>
-          <name>../Src/custom.c</name>
-        </file>
-        <file>
-          <name>Src/gpio.c</name>
-        </file>
-        <file>
-          <name>Src/adc.c</name>
-        </file>
-        <file>
-          <name>Src/dma.c</name>
-        </file>
-        <file>
-          <name>Src/bsp_driver_sd.c</name>
-        </file>
-        <file>
-          <name>Src/sd_diskio.c</name>
-        </file>
-        <file>
-          <name>Src/fatfs.c</name>
-        </file>
-        <file>
-          <name>Src/fatfs_platform.c</name>
-        </file>
-        <file>
-          <name>Src/fmc.c</name>
-        </file>
-        <file>
-          <name>Src/hrtim.c</name>
-        </file>
-        <file>
-          <name>Src/i2c.c</name>
-        </file>
-        <file>
-          <name>Src/mdma.c</name>
-        </file>
-        <file>
-          <name>Src/rng.c</name>
-        </file>
-        <file>
-          <name>Src/sai.c</name>
-        </file>
-        <file>
-          <name>Src/sdmmc.c</name>
-        </file>
-        <file>
-          <name>Src/stm32h7xx_it.c</name>
-        </file>
-        <file>
-          <name>Src/stm32h7xx_hal_msp.c</name>
-        </file>
-        <file>
-          <name>Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hrtim.c</name>
-        </file>
-        <file>
-          <name>Src/system_stm32h7xx.c</name>
-        </file>
-        <file>
-          <name>gpio.h</name>
-        </file>
-        <file>
-          <name>adc.h</name>
-        </file>
-        <file>
-          <name>dma.h</name>
-        </file>
-        <file>
-          <name>ffconf.h</name>
-        </file>
-        <file>
-          <name>bsp_driver_sd.h</name>
-        </file>
-        <file>
-          <name>sd_diskio.h</name>
-        </file>
-        <file>
-          <name>fatfs.h</name>
-        </file>
-        <file>
-          <name>fatfs_platform.h</name>
-        </file>
-        <file>
-          <name>fmc.h</name>
-        </file>
-        <file>
-          <name>hrtim.h</name>
-        </file>
-        <file>
-          <name>i2c.h</name>
-        </file>
-        <file>
-          <name>mdma.h</name>
-        </file>
-        <file>
-          <name>rng.h</name>
-        </file>
-        <file>
-          <name>sai.h</name>
-        </file>
-        <file>
-          <name>sdmmc.h</name>
-        </file>
-        <file>
-          <name>stm32h7xx_it.h</name>
-        </file>
-        <file>
-          <name>stm32h7xx_hal_conf.h</name>
-        </file>
-        <file>
-          <name>main.h</name>
-        </file>
-      </filestoremove>
+      <filestoremove />
       <sourceEntriesToRemove>
         <sourceEntry />
       </sourceEntriesToRemove>
@@ -189,9 +74,7 @@
             <Aincludes>
               <include />
             </Aincludes>
-            <Cincludes>
-              <include>Inc</include>
-            </Cincludes>
+            <Cincludes />
           </inctoremove>
         </config>
       </configs>
