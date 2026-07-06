@@ -5,25 +5,25 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-analysis.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-delay.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-distortion.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-dynamics.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-electrical.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-envelopes.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-instruments.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-mempool.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-midi.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-oscillators.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-reverb.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-sampling.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-tables.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf-vocal.c \
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c 
+../leaf/Src/leaf-analysis.c \
+../leaf/Src/leaf-delay.c \
+../leaf/Src/leaf-distortion.c \
+../leaf/Src/leaf-dynamics.c \
+../leaf/Src/leaf-effects.c \
+../leaf/Src/leaf-electrical.c \
+../leaf/Src/leaf-envelopes.c \
+../leaf/Src/leaf-filters.c \
+../leaf/Src/leaf-instruments.c \
+../leaf/Src/leaf-math.c \
+../leaf/Src/leaf-mempool.c \
+../leaf/Src/leaf-midi.c \
+../leaf/Src/leaf-oscillators.c \
+../leaf/Src/leaf-physical.c \
+../leaf/Src/leaf-reverb.c \
+../leaf/Src/leaf-sampling.c \
+../leaf/Src/leaf-tables.c \
+../leaf/Src/leaf-vocal.c \
+../leaf/Src/leaf.c 
 
 OBJS += \
 ./leaf/Src/leaf-analysis.o \
@@ -69,44 +69,8 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-leaf/Src/leaf-analysis.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-analysis.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-delay.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-delay.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-distortion.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-distortion.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-dynamics.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-dynamics.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-effects.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-effects.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-electrical.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-electrical.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-envelopes.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-envelopes.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-filters.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-filters.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-instruments.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-instruments.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-math.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-math.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-mempool.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-mempool.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-midi.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-midi.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-oscillators.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-oscillators.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-physical.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-physical.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-reverb.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-reverb.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-sampling.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-sampling.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-tables.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-tables.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf-vocal.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf-vocal.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
-leaf/Src/leaf.o: /Users/josnyder/dev/LEAF/leaf/Src/leaf.c leaf/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -c -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Device/ST/STM32H7xx/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/CMSIS/Include" -I"/Users/josnyder/dev/Genera_Experimenter/Core/Inc" -I"/Users/josnyder/dev/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc" -I/Users/josnyder/dev/LEAF/leaf -I../Inc -Og -ffunction-sections -fdata-sections -fno-strict-aliasing -Wall -v -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
+leaf/Src/%.o leaf/Src/%.su leaf/Src/%.cyclo: ../leaf/Src/%.c leaf/Src/subdir.mk
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu99 -g3 -DUSE_HAL_DRIVER -DSTM32H743xx -DDEBUG -DUSE_PWR_LDO_SUPPLY -c -I../Inc -I"/Users/josnyder/dev/Vocodec/leaf" -I../Drivers/CMSIS/Include -I../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Inc -I../Middlewares/Third_Party/FatFs/src -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc -Ofast -ffunction-sections -fdata-sections -mslow-flash-data -fno-strict-aliasing -Wall -Wextra -fwrapv -fno-finite-math-only -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-leaf-2f-Src
 

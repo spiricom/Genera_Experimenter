@@ -17206,7 +17206,7 @@
 		(uuid "0501a253-7bfa-48cf-ae07-a58d3294cd86")
 		(at 121.67235 140.5636)
 		(property "Reference" "JP7"
-			(at 1.905 1.5875 -90)
+			(at 1.905 1.5875 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "cf4e1e07-dc1d-460f-8a86-15d11984598d")
@@ -17503,7 +17503,7 @@
 		(at 177.86985 111.3536 -90)
 		(descr "CAPACITOR\n\ngrid 2.5 mm, outline 3 x 5 mm")
 		(property "Reference" "C17"
-			(at -1.651 1.905 -90)
+			(at -1.651 1.905 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "e08bc088-0713-4d47-a645-bfa6b2c76aa5")
@@ -17516,7 +17516,7 @@
 			)
 		)
 		(property "Value" "0.01uf"
-			(at -2.9845 -1.651 -0)
+			(at -2.9845 -1.651 0)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "f97e821c-e737-463f-8e14-53fb49c7b7db")
@@ -17754,7 +17754,7 @@
 		(at 148.97735 136.1186 180)
 		(descr "PIN HEADER")
 		(property "Reference" "JP12"
-			(at -5.08 2.54 -0)
+			(at -5.08 2.54 0)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "2a792c5e-8b71-4864-9dcb-87be49b61d64")
@@ -17767,7 +17767,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -5.08 -4.445 -0)
+			(at -5.08 -4.445 0)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "457ec12f-98c6-47db-856d-4d9a85eeb524")
@@ -18324,7 +18324,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -19.05 -4.445 -90)
+			(at -19.05 -4.445 270)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "f58034a9-2252-48ea-bc36-e63a46888764")
@@ -20209,7 +20209,7 @@
 		(uuid "836042d4-267d-4f00-baa3-8aa8e7972fb9")
 		(at 175.64735 132.6261 180)
 		(property "Reference" "JP8"
-			(at -1.27 2.54 -0)
+			(at -1.27 2.54 0)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "6809056a-9c50-4e06-ba84-27e3a8f86a00")
@@ -20222,7 +20222,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -1.27 1.27 -0)
+			(at -1.27 1.27 0)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "0da98ffc-b881-47ee-bc25-c510ebb4dff0")
@@ -20506,7 +20506,7 @@
 		(at 148.97735 141.1986 180)
 		(descr "PIN HEADER")
 		(property "Reference" "JP6"
-			(at -5.08 -4.1275 -0)
+			(at -5.08 -4.1275 0)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "a459b70e-9632-422c-8ad2-bde1d4bc57d2")
@@ -20519,7 +20519,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -5.08 -4.445 -0)
+			(at -5.08 -4.445 0)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "57259485-df4e-4cd1-abf4-43da5f3b024c")
@@ -21063,7 +21063,7 @@
 		(at 122.62485 68.8086)
 		(descr "TO 200 vertical")
 		(property "Reference" "IC2"
-			(at 6.3627 -6.0325 -90)
+			(at 6.3627 -6.0325 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "50bd5958-e9c2-4b45-a39f-7bc526485a43")
@@ -23025,7 +23025,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -19.05 -4.445 -90)
+			(at -19.05 -4.445 270)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "6aaa4b95-528d-40f5-b32a-eed55de786f4")
@@ -25375,7 +25375,7 @@
 			)
 		)
 		(property "Value" ""
-			(at -12.7 -4.445 -0)
+			(at -12.7 -4.445 0)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "b732ea7f-9688-4f19-907b-03d78391871e")
@@ -26651,7 +26651,7 @@
 		(at 177.86985 121.5136 -90)
 		(descr "CAPACITOR\n\ngrid 2.5 mm, outline 3 x 5 mm")
 		(property "Reference" "C16"
-			(at -3.429 0.9525 -90)
+			(at -3.429 0.9525 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "61c71884-1d97-4bfc-bc72-d2d0dc9d2acc")
@@ -26664,7 +26664,7 @@
 			)
 		)
 		(property "Value" "0.01uf"
-			(at -6.4135 1.7145 -90)
+			(at -6.4135 1.7145 270)
 			(unlocked yes)
 			(layer "B.Fab")
 			(uuid "84e5c831-3845-41b8-96c2-519a06c7753e")
