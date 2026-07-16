@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "stm32H7_experimenter10")(type "KiCad")(uri "$(KIPRJMOD)/stm32H7_experimenter10.pretty")(options "")(descr ""))
+)
