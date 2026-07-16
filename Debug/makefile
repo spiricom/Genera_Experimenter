@@ -11,6 +11,7 @@ RM := rm -rf
 -include sources.mk
 -include leaf/Src/subdir.mk
 -include leaf/Externals/subdir.mk
+-include leaf/subdir.mk
 -include Startup/subdir.mk
 -include Src/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/option/subdir.mk
@@ -58,6 +59,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 cube_for_new_genera_brain4.list \
 
+OBJCOPY_HEX += \
+cube_for_new_genera_brain4.hex \
+
 
 # All Target
 all: main-build
@@ -66,8 +70,8 @@ all: main-build
 main-build: cube_for_new_genera_brain4.elf secondary-outputs
 
 # Tool invocations
-cube_for_new_genera_brain4.elf cube_for_new_genera_brain4.map: $(OBJS) $(USER_OBJS) /Users/josnyder/dev/Vocodec/STM32H743ZITx_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "cube_for_new_genera_brain4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/Users/josnyder/dev/Vocodec/STM32H743ZITx_FLASH.ld" --specs=nosys.specs -Wl,-Map="cube_for_new_genera_brain4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+cube_for_new_genera_brain4.elf cube_for_new_genera_brain4.map: $(OBJS) $(USER_OBJS) ../STM32H743ZITx_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "cube_for_new_genera_brain4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"../STM32H743ZITx_FLASH.ld" --specs=nosys.specs -Wl,-Map="cube_for_new_genera_brain4.map" -Wl,--gc-sections -static -L"/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/leaf" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -81,12 +85,17 @@ cube_for_new_genera_brain4.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL
 	@echo 'Finished building: $@'
 	@echo ' '
 
+cube_for_new_genera_brain4.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "cube_for_new_genera_brain4.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) cube_for_new_genera_brain4.elf cube_for_new_genera_brain4.list cube_for_new_genera_brain4.map default.size.stdout
+	-$(RM) cube_for_new_genera_brain4.elf cube_for_new_genera_brain4.hex cube_for_new_genera_brain4.list cube_for_new_genera_brain4.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

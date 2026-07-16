@@ -1,17 +1,23 @@
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:126:19:HAL_ADCEx_Calibration_Start	9
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:200:10:HAL_ADCEx_Calibration_GetValue	5
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:216:19:HAL_ADCEx_LinearCalibration_GetValue	11
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:2859:22:LL_ADC_SetCalibrationOffsetFactor	1
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:2925:22:LL_ADC_SetCalibrationLinearFactor	3
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:2965:26:LL_ADC_GetCalibrationLinearFactor	3
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:3062:26:LL_ADC_GetResolution	3
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:5409:22:LL_ADC_SetChannelSamplingTime	1
+/Users/matthewmcweeney/Documents/GitHub/Genera/New Version/Genera_Experimenter/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:3243:22:LL_ADC_SetChannelPreselection	3
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:126:19:HAL_ADCEx_Calibration_Start	8
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:200:10:HAL_ADCEx_Calibration_GetValue	4
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:216:19:HAL_ADCEx_LinearCalibration_GetValue	8
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:263:19:HAL_ADCEx_Calibration_SetValue	10
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:326:19:HAL_ADCEx_LinearCalibration_SetValue	20
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:417:19:HAL_ADCEx_LinearCalibration_FactorLoad	2
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:463:19:HAL_ADCEx_InjectedStart	18
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:326:19:HAL_ADCEx_LinearCalibration_SetValue	13
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:417:19:HAL_ADCEx_LinearCalibration_FactorLoad	5
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:463:19:HAL_ADCEx_InjectedStart	19
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:600:19:HAL_ADCEx_InjectedStop	7
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:655:19:HAL_ADCEx_InjectedPollForConversion	22
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:789:19:HAL_ADCEx_InjectedStart_IT	20
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:655:19:HAL_ADCEx_InjectedPollForConversion	26
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:789:19:HAL_ADCEx_InjectedStart_IT	21
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:950:19:HAL_ADCEx_InjectedStop_IT	7
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1019:19:HAL_ADCEx_MultiModeStart_DMA	12
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1156:19:HAL_ADCEx_MultiModeStop_DMA	12
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1280:10:HAL_ADCEx_MultiModeGetValue	4
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1019:19:HAL_ADCEx_MultiModeStart_DMA	17
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1156:19:HAL_ADCEx_MultiModeStop_DMA	16
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1280:10:HAL_ADCEx_MultiModeGetValue	3
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1326:10:HAL_ADCEx_InjectedGetValue	9
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1361:13:HAL_ADCEx_InjectedConvCpltCallback	1
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1380:13:HAL_ADCEx_InjectedQueueOverflowCallback	1
@@ -21,10 +27,10 @@
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1443:19:HAL_ADCEx_RegularStop	7
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1501:19:HAL_ADCEx_RegularStop_IT	7
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1561:19:HAL_ADCEx_RegularStop_DMA	9
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1647:19:HAL_ADCEx_RegularMultiModeStop_DMA	15
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1831:19:HAL_ADCEx_InjectedConfigChannel	131
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2394:19:HAL_ADCEx_MultiModeConfigChannel	27
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2507:19:HAL_ADCEx_EnableInjectedQueue	5
-../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2548:19:HAL_ADCEx_DisableInjectedQueue	5
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1647:19:HAL_ADCEx_RegularMultiModeStop_DMA	20
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:1831:19:HAL_ADCEx_InjectedConfigChannel	180
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2394:19:HAL_ADCEx_MultiModeConfigChannel	34
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2507:19:HAL_ADCEx_EnableInjectedQueue	6
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2548:19:HAL_ADCEx_DisableInjectedQueue	6
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2585:19:HAL_ADCEx_DisableVoltageRegulator	4
 ../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c:2622:19:HAL_ADCEx_EnterADCDeepPowerDownMode	4

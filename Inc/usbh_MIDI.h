@@ -33,7 +33,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbh_core.h"
+#include "../Middlewares/ST/STM32_USB_HOST_LIBRARY/Core/Inc/usbh_core.h"
 //#include "stm32f7xx_nucleo_144.h"
 
 /*-------------------------------------------------------------------------------*/

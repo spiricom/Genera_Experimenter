@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="35969601-63a5-49ff-8799-9aa0bb7621cb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../.cproject" beforeDir="false" afterPath="$PROJECT_DIR$/../../.cproject" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.settings/language.settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.settings/language.settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mmc_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nand.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nand.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nand.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nor.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nor.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_nor.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rng_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sai_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sdram.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sdram.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sdram.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sram.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sram.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sram.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk" beforeDir="false" afterPath="$PROJECT_DIR$/../../Debug/Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/cube_for_new_genera_brain4.elf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/cube_for_new_genera_brain4.list" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/cube_for_new_genera_brain4.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-analysis.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-analysis.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-analysis.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-delay.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-delay.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-delay.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-distortion.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-distortion.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-distortion.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-dynamics.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-dynamics.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-dynamics.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-effects.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-effects.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-effects.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-electrical.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-electrical.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-electrical.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-envelopes.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-envelopes.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-envelopes.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-filters.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-filters.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-filters.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-instruments.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-instruments.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-instruments.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-math.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-math.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-math.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-mempool.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-mempool.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-mempool.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-midi.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-midi.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-midi.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-oscillators.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-oscillators.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-oscillators.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-physical.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-physical.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-physical.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-reverb.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-reverb.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-reverb.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-sampling.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-sampling.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-sampling.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-tables.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-tables.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-tables.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-vocal.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-vocal.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf-vocal.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf.cyclo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf.d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/leaf.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/leaf/Src/subdir.mk" beforeDir="false" afterPath="$PROJECT_DIR$/../../Debug/leaf/Src/subdir.mk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/makefile" beforeDir="false" afterPath="$PROJECT_DIR$/../../Debug/makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/objects.list" beforeDir="false" afterPath="$PROJECT_DIR$/../../Debug/objects.list" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Debug/sources.mk" beforeDir="false" afterPath="$PROJECT_DIR$/../../Debug/sources.mk" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="h44yEPbL" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2026" />
+    <option name="minorVersion" value="1.4" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3GBnROW5pik92y6mteBduKwXAAI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "oldElectrosynth",
+    "org.rust.first.attach.projects": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <module name="" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <option name="RUN_TOOL" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="35969601-63a5-49ff-8799-9aa0bb7621cb" name="Changes" comment="" />
+      <created>1783453820928</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1783453820928</updated>
+      <workItem from="1783453821957" duration="5000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

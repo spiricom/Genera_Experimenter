@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "stdio.h"
+//#include "../Middlewares/ST/STM32_USB_HOST_LIBRARY/Core/Inc/usbh_core.h"
 #include "usbh_core.h"
 #include "usb_host.h"
 #include "usbh_MIDI.h"
