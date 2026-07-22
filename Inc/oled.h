@@ -18,7 +18,7 @@
             NilLine
         } OLEDLine;
 
-        void OLED_init(  I2C_HandleTypeDef* hi2c);
+        void OLED_init(  I2C_HandleTypeDef* hi2c, uint8_t flipped);
 
         void initUIFunctionPointers();
 

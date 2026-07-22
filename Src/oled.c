@@ -31,11 +31,11 @@ GFX theGFX;
 char oled_buffer[32];
 
 
-        void OLED_init(I2C_HandleTypeDef* hi2c)
+        void OLED_init(I2C_HandleTypeDef* hi2c, uint8_t flipped)
         {
 
             //start up that OLED display
-            ssd1306_begin(hi2c, SSD1306_SWITCHCAPVCC, SSD1306_I2C_ADDRESS);
+            ssd1306_begin(hi2c, SSD1306_SWITCHCAPVCC, SSD1306_I2C_ADDRESS, flipped);
 
 
             //HAL_Delay(5);

@@ -420,7 +420,7 @@ int main(void)
   presetNumberToLoad = currentPreset;
   presetWaitingToLoad = 1;
 
-  OLED_init(&hi2c2);
+  OLED_init(&hi2c2, 1); // 1 for plug on bottom, 0 for plug on top orientation
 
   OLED_writePreset();
 

@@ -113,9 +113,9 @@
 extern volatile uint32_t OLED_writing;
 extern volatile uint32_t OLED_writeWaiting;
 
-void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr);
+void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr, uint8_t flipped);
 void ssd1306_drawPixel(int16_t x, int16_t y, uint16_t color);
-void sdd1306_invertDisplay(uint8_t i);
+void ssd1306_invertDisplay(uint8_t i);
 void ssd1306_command(uint8_t c);
 void ssd1306_dim(uint8_t dim);
 void ssd1306_display_full_buffer(unsigned char* buffer);

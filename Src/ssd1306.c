@@ -89,7 +89,7 @@ void HAL_I2C_MASTER_RxCpltCallback ( I2C_HandleTypeDef * hi2c )
 		OLED_changed = 0;
 	}
 }
-void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr)
+void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr, uint8_t flipped)
 {
 	OLED_i2c_address = i2caddr;
 	OLED_externalVCC = vccstate;
@@ -142,8 +142,12 @@ void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr)
 	ssd1306_command(0x00);                                  // 0x0 act like ks0108
 	//ssd1306_command(SSD1306_COMSCANDEC);
 
-	ssd1306_command(SSD1306_SEGREMAP | 0x1);
-	ssd1306_command(SSD1306_COMSCANDEC);
+	if (flipped)
+	{ssd1306_command(SSD1306_SEGREMAP);						// 0xA0
+	ssd1306_command(SSD1306_COMSCANINC);}					// 0xC0
+	else
+	{ssd1306_command(SSD1306_SEGREMAP | 0x1);				// 0xA1
+	ssd1306_command(SSD1306_COMSCANDEC);}					// 0xC8
 
 	#if defined SSD1306_128_32
 	ssd1306_command(SSD1306_SETCOMPINS);                    // 0xDA
@@ -187,13 +191,14 @@ void ssd1306_begin(I2C_HandleTypeDef* hi2c, uint8_t vccstate, uint8_t i2caddr)
 }
 
 
-void sdd1306_invertDisplay(uint8_t i) {
+void ssd1306_invertDisplay(uint8_t i) {
   if (i) {
     ssd1306_command(SSD1306_INVERTDISPLAY);
   } else {
     ssd1306_command(SSD1306_NORMALDISPLAY);
   }
 }
+
 
 void ssd1306_command(uint8_t c) {
 	// I2C
