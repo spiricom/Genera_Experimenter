@@ -5,6 +5,432 @@
 	(uuid "490aeca9-6421-4538-a9ff-ec23cdbc5f12")
 	(paper "User" 341.706 238.684)
 	(lib_symbols
+		(symbol "Snapeda:SJ1-3555NG"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at -7.8829 8.1347 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "SJ1-3555NG"
+				(at -7.6253 -10.9273 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "Snapeda:CUI_SJ1-3555NG"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify bottom)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "PARTREV" "1.05"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify bottom)
+					(hide yes)
+				)
+			)
+			(property "STANDARD" "Manufacturer Recommendations"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify bottom)
+					(hide yes)
+				)
+			)
+			(property "MAXIMUM_PACKAGE_HEIGHT" "10 mm"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify bottom)
+					(hide yes)
+				)
+			)
+			(property "MANUFACTURER" "CUI Devices"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify bottom)
+					(hide yes)
+				)
+			)
+			(symbol "SJ1-3555NG_0_0"
+				(rectangle
+					(start -7.62 -7.62)
+					(end 7.62 7.62)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -4.445 0.889) (xy -3.81 0.889)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -4.445 -3.556) (xy -4.445 0.889)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 5.08) (xy -3.81 0.889)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 0.889) (xy -3.175 0.889)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.175 0.889) (xy -3.175 -3.556)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.175 -3.556) (xy -4.445 -3.556)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.143 1.27) (xy -2.413 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.127 2.54) (xy -1.143 1.27)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.127 -3.81) (xy -1.143 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.397 -5.08) (xy 0.127 -3.81)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 2.54) (xy 3.175 1.27) (xy 4.445 1.27) (xy 3.81 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 0) (xy 3.81 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -2.54) (xy 3.81 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -5.08) (xy 3.175 -3.81) (xy 4.445 -3.81) (xy 3.81 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 5.08) (xy -3.81 5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 2.54) (xy 0.127 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 0) (xy 3.81 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 -2.54) (xy 3.81 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 -5.08) (xy 1.397 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 12.7 5.08 180)
+					(length 5.08)
+					(name "~"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 2.54 180)
+					(length 5.08)
+					(name "~"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 0 180)
+					(length 5.08)
+					(name "~"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -2.54 180)
+					(length 5.08)
+					(name "~"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -5.08 180)
+					(length 5.08)
+					(name "~"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "stm32H7_experimenter10-eagle-import:+5V"
 			(power)
 			(exclude_from_sim no)
@@ -6545,6 +6971,12 @@
 		(uuid "500549f3-3818-4eab-8eca-84611a933073")
 	)
 	(junction
+		(at 269.24 173.99)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "50579d06-82e8-40f2-ac6e-5a14551eb165")
+	)
+	(junction
 		(at 63.5 167.64)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7096,6 +7528,16 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 180.34) (xy 259.08 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0982fbb3-173e-4e3a-8377-e33496bce9fb")
+	)
+	(wire
+		(pts
 			(xy 144.78 45.72) (xy 144.78 53.34)
 		)
 		(stroke
@@ -7226,6 +7668,16 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 166.37) (xy 255.27 166.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "175a2a56-fc0c-497b-abc9-fc61e4448014")
+	)
+	(wire
+		(pts
 			(xy 180.34 104.14) (xy 208.28 104.14)
 		)
 		(stroke
@@ -7243,6 +7695,16 @@
 			(type solid)
 		)
 		(uuid "189241f2-9264-4e6f-86ad-e7edf33a2510")
+	)
+	(wire
+		(pts
+			(xy 254 172.72) (xy 248.92 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "198e9238-4ba6-4092-80e1-60eeea8183b0")
 	)
 	(wire
 		(pts
@@ -7856,6 +8318,16 @@
 	)
 	(wire
 		(pts
+			(xy 280.67 173.99) (xy 269.24 173.99)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "58985fa0-b51a-4f1c-91fe-671620490d8b")
+	)
+	(wire
+		(pts
 			(xy 81.28 76.2) (xy 88.9 76.2)
 		)
 		(stroke
@@ -7863,6 +8335,16 @@
 			(type solid)
 		)
 		(uuid "5a11319d-459c-490a-a618-603af4cad767")
+	)
+	(wire
+		(pts
+			(xy 248.92 170.18) (xy 248.92 166.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5ae500dd-fdcc-441d-89fa-89c509d6b6be")
 	)
 	(wire
 		(pts
@@ -7936,16 +8418,6 @@
 	)
 	(wire
 		(pts
-			(xy 238.76 144.78) (xy 246.38 144.78)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "5f6f1705-7fa3-4587-9cd9-bf21c26347da")
-	)
-	(wire
-		(pts
 			(xy 254 33.02) (xy 256.54 33.02)
 		)
 		(stroke
@@ -8016,16 +8488,6 @@
 	)
 	(wire
 		(pts
-			(xy 233.68 142.24) (xy 238.76 142.24)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "65f1b9ad-09c9-443f-a64a-f00baee4234a")
-	)
-	(wire
-		(pts
 			(xy 157.48 45.72) (xy 157.48 55.88)
 		)
 		(stroke
@@ -8066,6 +8528,16 @@
 	)
 	(wire
 		(pts
+			(xy 264.16 163.83) (xy 269.24 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "69cd48ba-ef6b-4c53-9ad0-e65f1262012a")
+	)
+	(wire
+		(pts
 			(xy 160.02 142.24) (xy 167.64 142.24)
 		)
 		(stroke
@@ -8093,6 +8565,16 @@
 			(type solid)
 		)
 		(uuid "6dbcb64d-1e7e-4063-83b1-ee8c650fba34")
+	)
+	(wire
+		(pts
+			(xy 254 185.42) (xy 254 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6dede070-968b-4f99-85c2-a4c9f1ac3d2e")
 	)
 	(wire
 		(pts
@@ -8143,6 +8625,16 @@
 			(type solid)
 		)
 		(uuid "7024f89d-1514-4674-a4e6-68c30c1ec757")
+	)
+	(wire
+		(pts
+			(xy 248.92 177.8) (xy 264.16 177.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "72319633-2939-4b9e-bf67-3991c0934c8b")
 	)
 	(wire
 		(pts
@@ -8626,6 +9118,16 @@
 	)
 	(wire
 		(pts
+			(xy 269.24 185.42) (xy 254 185.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9e9c1f6e-8d5a-4661-b6ce-dd6b4f35fc0f")
+	)
+	(wire
+		(pts
 			(xy 279.4 111.76) (xy 279.4 114.3)
 		)
 		(stroke
@@ -8756,6 +9258,16 @@
 	)
 	(wire
 		(pts
+			(xy 246.38 147.32) (xy 246.38 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a8548c80-f790-4d35-aecf-9d2e24c35550")
+	)
+	(wire
+		(pts
 			(xy 152.4 142.24) (xy 144.78 142.24)
 		)
 		(stroke
@@ -8786,6 +9298,16 @@
 	)
 	(wire
 		(pts
+			(xy 269.24 173.99) (xy 269.24 175.26)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "aabdc43f-d93b-4acd-b4e3-abd59a03f881")
+	)
+	(wire
+		(pts
 			(xy 177.8 55.88) (xy 177.8 132.08)
 		)
 		(stroke
@@ -8793,6 +9315,16 @@
 			(type solid)
 		)
 		(uuid "ac557dcf-c6ae-4370-9080-c9cf61a7f8bd")
+	)
+	(wire
+		(pts
+			(xy 264.16 177.8) (xy 264.16 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "af015acd-633f-49b1-b4b2-e89cdd34adfc")
 	)
 	(wire
 		(pts
@@ -8883,6 +9415,16 @@
 			(type solid)
 		)
 		(uuid "b7005371-62fa-43e0-8a09-70b91f86e08e")
+	)
+	(wire
+		(pts
+			(xy 259.08 147.32) (xy 246.38 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b86ee937-fbd9-4e10-a0c8-05de15675281")
 	)
 	(wire
 		(pts
@@ -9173,6 +9715,16 @@
 			(type solid)
 		)
 		(uuid "e0e6d000-fc06-4db4-a9ed-5443d5dabd5c")
+	)
+	(wire
+		(pts
+			(xy 259.08 180.34) (xy 259.08 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e1b81312-4f28-4b79-8369-9377d4f68991")
 	)
 	(wire
 		(pts
@@ -11327,6 +11879,85 @@
 			(project ""
 				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
 					(reference "#GND9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "stm32H7_experimenter10-eagle-import:R-US_0204/5")
+		(at 269.24 168.91 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "23d48a93-68cd-48ae-b184-21edae5f9c13")
+		(property "Reference" "R14"
+			(at 270.7386 165.1 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "10k"
+			(at 265.938 165.1 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "stm32H7_experimenter10:0204_5"
+			(at 269.24 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 269.24 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 269.24 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "PARTNO" "RNMF14FTC10K0"
+			(at 269.24 168.91 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cb047b6d-89a1-41ae-86d4-d4cd1325f05e")
+		)
+		(pin "2"
+			(uuid "f595a742-6d79-4d57-88ed-0bb1fe55d820")
+		)
+		(instances
+			(project "stm32H7_experimenter10"
+				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
+					(reference "R14")
 					(unit 1)
 				)
 			)
@@ -13731,6 +14362,124 @@
 		)
 	)
 	(symbol
+		(lib_id "Snapeda:SJ1-3555NG")
+		(at 236.22 175.26 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5b9ecdaa-9a18-4d98-b93c-e6b06446ff41")
+		(property "Reference" "J1"
+			(at 236.22 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SJ1-3555NG"
+			(at 236.22 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Snapeda:CUI_SJ1-3555NG"
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "PARTREV" "1.05"
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "STANDARD" "Manufacturer Recommendations"
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" "10 mm"
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MANUFACTURER" "CUI Devices"
+			(at 236.22 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify bottom)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "be7f370f-d388-4610-8098-5bdf3f004207")
+		)
+		(pin "1"
+			(uuid "b81ec449-3c8f-43c5-8045-309115fd1955")
+		)
+		(pin "5"
+			(uuid "2478ec6d-4d97-4f62-8669-4e1aba02a5a7")
+		)
+		(pin "4"
+			(uuid "96f17ebe-6275-4176-988c-edce8f81b769")
+		)
+		(pin "2"
+			(uuid "5cc90114-c98d-4cc5-bfd1-14e557c56532")
+		)
+		(instances
+			(project ""
+				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
+					(reference "J1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "stm32H7_experimenter10-eagle-import:3V3")
 		(at 35.56 170.18 0)
 		(unit 1)
@@ -15084,72 +15833,6 @@
 		)
 	)
 	(symbol
-		(lib_id "stm32H7_experimenter10-eagle-import:3V3")
-		(at 233.68 142.24 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7b7a5b35-e205-4948-abd3-74484e6285de")
-		(property "Reference" "#U$27"
-			(at 233.68 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "3V3"
-			(at 232.664 138.684 0)
-			(effects
-				(font
-					(size 1.778 1.5113)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" ""
-			(at 233.68 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 233.68 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 233.68 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "62d13442-3d67-4244-a24b-f1085fd055c2")
-		)
-		(instances
-			(project ""
-				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
-					(reference "#U$27")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "stm32H7_experimenter10-eagle-import:LED3MM")
 		(at 154.94 73.66 0)
 		(unit 1)
@@ -15538,72 +16221,6 @@
 			(project ""
 				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
 					(reference "R8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "stm32H7_experimenter10-eagle-import:AGND")
-		(at 238.76 147.32 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "87fae67f-da67-4fba-ac65-b9420788676b")
-		(property "Reference" "#SUPPLY32"
-			(at 238.76 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "AGND"
-			(at 236.093 153.035 0)
-			(effects
-				(font
-					(size 1.778 1.5113)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" ""
-			(at 238.76 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 238.76 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 238.76 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "874d1d48-97ee-4946-be95-9ad826a12b87")
-		)
-		(instances
-			(project ""
-				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
-					(reference "#SUPPLY32")
 					(unit 1)
 				)
 			)
@@ -16840,89 +17457,6 @@
 		)
 	)
 	(symbol
-		(lib_id "stm32H7_experimenter10-eagle-import:PINHD-1X3")
-		(at 236.22 144.78 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "a91c8088-e198-4568-9490-b5a9b0e8c685")
-		(property "Reference" "JP14"
-			(at 242.57 150.495 0)
-			(effects
-				(font
-					(size 1.778 1.5113)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "PINHD-1X3"
-			(at 242.57 137.16 0)
-			(effects
-				(font
-					(size 1.778 1.5113)
-				)
-				(justify left bottom)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "stm32H7_experimenter10:1X03"
-			(at 236.22 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 236.22 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 236.22 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PARTNO" "*DNP"
-			(at 236.22 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right top)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3f389d48-1712-41a6-9bf9-dd229ffdc72e")
-		)
-		(pin "2"
-			(uuid "4969cbe7-ad02-45dd-bb16-f30b803ca6cd")
-		)
-		(pin "3"
-			(uuid "82700b1f-c487-4d95-b911-1047017e8543")
-		)
-		(instances
-			(project ""
-				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
-					(reference "JP14")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "stm32H7_experimenter10-eagle-import:AGND")
 		(at 226.06 142.24 0)
 		(unit 1)
@@ -18060,6 +18594,85 @@
 		)
 	)
 	(symbol
+		(lib_id "stm32H7_experimenter10-eagle-import:R-US_0204/5")
+		(at 269.24 180.34 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c6896c80-7ff0-43bd-8a3c-b0e1cbb0f7e0")
+		(property "Reference" "R13"
+			(at 270.7386 176.53 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "220R"
+			(at 265.938 176.53 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "stm32H7_experimenter10:0204_5"
+			(at 269.24 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 269.24 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 269.24 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "PARTNO" "RNMF14FTC10K0"
+			(at 269.24 180.34 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d564857e-aea5-403a-bdf5-27b429cd766a")
+		)
+		(pin "2"
+			(uuid "62a8f883-80f4-4a6d-bf4b-378c16915454")
+		)
+		(instances
+			(project "stm32H7_experimenter10"
+				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
+					(reference "R13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "stm32H7_experimenter10-eagle-import:+5V")
 		(at 121.92 48.26 0)
 		(unit 1)
@@ -18120,6 +18733,72 @@
 			(project ""
 				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
 					(reference "#P+3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "stm32H7_experimenter10-eagle-import:AGND")
+		(at 255.27 166.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c9f50d1f-a430-43d1-b759-de7b1a7b3959")
+		(property "Reference" "#SUPPLY016"
+			(at 255.27 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AGND"
+			(at 252.603 172.085 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" ""
+			(at 255.27 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 255.27 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 255.27 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "75a5e5aa-fd1a-4c72-bd9a-3c406cc1d458")
+		)
+		(instances
+			(project "stm32H7_experimenter10"
+				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
+					(reference "#SUPPLY016")
 					(unit 1)
 				)
 			)
@@ -20135,6 +20814,72 @@
 			(project ""
 				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
 					(reference "#GND6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "stm32H7_experimenter10-eagle-import:3V3")
+		(at 280.67 173.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f9de6a35-fee5-494a-bb4c-594819beb310")
+		(property "Reference" "#U$01"
+			(at 280.67 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "3V3"
+			(at 279.654 170.434 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" ""
+			(at 280.67 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 280.67 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 280.67 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e3e67a60-4ba9-4217-8e7a-f0e77cb51477")
+		)
+		(instances
+			(project "stm32H7_experimenter10"
+				(path "/490aeca9-6421-4538-a9ff-ec23cdbc5f12"
+					(reference "#U$01")
 					(unit 1)
 				)
 			)
