@@ -1,0 +1,5 @@
+/Users/josnyder/dev/lm/modules/SimpleNoiseModule.cpp:8:6:tSimpNoiseModule_init	24	static
+/Users/josnyder/dev/lm/modules/SimpleNoiseModule.cpp:13:6:tSimpNoiseModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/SimpleNoiseModule.cpp:24:6:tSimpNoiseModule_initToPool	40	static
+/Users/josnyder/dev/lm/modules/SimpleNoiseModule.cpp:51:6:tSimpNoiseModule_free	24	static
+/Users/josnyder/dev/lm/modules/SimpleNoiseModule.cpp:59:6:tSimpNoiseModule_tick	16	static

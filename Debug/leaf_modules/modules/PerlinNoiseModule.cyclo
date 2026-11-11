@@ -1,0 +1,8 @@
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:9:6:tPerlNoiseModule_init	2
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:19:6:tPerlNoiseModule_setParameter	5
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:37:6:tPerlNoiseModule_initToPool	2
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:67:6:tPerlNoiseModule_free	1
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:76:6:tPerlNoiseModule_tick	1
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:88:6:tPerlNoiseModule_setRate	1
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:94:6:tPerlNoiseModule_setEnergy	1
+/Users/josnyder/dev/lm/modules/PerlinNoiseModule.cpp:100:6:tPerlNoiseModule_setAmp	1

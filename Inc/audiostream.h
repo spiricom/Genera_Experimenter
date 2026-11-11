@@ -84,8 +84,7 @@ typedef enum BOOL {
 #define SAMPLE_RATE_DIV_PARAMS SAMPLE_RATE / 3
 #define SAMPLE_RATE_DIV_PARAMS_MS (SAMPLE_RATE_DIV_PARAMS / 1000.f)
 #define INV_SR_DIV_PARAMS_MS 1.f/SAMPLE_RATE_DIV_PARAMS_MS
-#define EXP_BUFFER_SIZE 2048
-#define DECAY_EXP_BUFFER_SIZE 4096
+
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTypeDef* hsaiIn);
@@ -106,8 +105,6 @@ void ctrlInput(int ctrl, int value);
 float mtofTableLookup(float tempMIDI);
 float dbToATableLookup(float in);
 
-extern float decayExpBuffer[DECAY_EXP_BUFFER_SIZE];
-extern float decayExpBufferSizeMinusOne;
 extern volatile uint8_t knobFrozen[20];
 extern tExpSmooth knobSmoothers[20];
 extern uint32_t resetStringInputs;
@@ -131,8 +128,8 @@ extern volatile uint8_t knobFrozen[20];
 extern float pedalScaled[10];
 extern volatile uint32_t newPluck;
 extern int32_t currentKnobFocus;
-extern tMempool mediumPool;
-extern tMempool largePool;
+extern tMempool* mediumPool;
+extern tMempool* largePool;
 extern int32_t writeKnobFlag;
 extern int32_t writeButtonFlag;
 extern int32_t writeActionFlag;

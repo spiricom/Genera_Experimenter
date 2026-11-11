@@ -1,0 +1,7 @@
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:10:6:tNoiseModule_init	24	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:20:6:tNoiseModule_setParameter	32	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:70:6:tNoiseModule_initToPool	48	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:109:6:tNoiseModule_free	24	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:120:6:tNoiseModule_setGlideOrigin	16	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:134:6:tNoiseModule_setPeakFreq	16	static
+/Users/josnyder/dev/lm/modules/NoiseModule.cpp:141:6:tNoiseModule_tick	24	static

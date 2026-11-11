@@ -1,0 +1,5 @@
+/Users/josnyder/dev/lm/modules/SoftClipModule.cpp:11:6:tSoftClipModule_init	24	static
+/Users/josnyder/dev/lm/modules/SoftClipModule.cpp:17:6:tSoftClipModule_free	24	static
+/Users/josnyder/dev/lm/modules/SoftClipModule.cpp:23:6:tSoftClipModule_tick	32	static
+/Users/josnyder/dev/lm/modules/SoftClipModule.cpp:55:6:tSoftClipModule_setParameter	32	static
+/Users/josnyder/dev/lm/modules/SoftClipModule.cpp:101:6:tSoftClipModule_initToPool	32	static

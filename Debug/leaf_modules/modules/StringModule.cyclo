@@ -1,0 +1,7 @@
+/Users/josnyder/dev/LEAF/leaf/Inc/leaf-math.h:882:21:mtof	3
+/Users/josnyder/dev/lm/modules/StringModule.cpp:7:6:tStringModule_init	1
+/Users/josnyder/dev/lm/modules/StringModule.cpp:12:6:tStringModule_free	1
+/Users/josnyder/dev/lm/modules/StringModule.cpp:17:6:tStringModule_initToPool	1
+/Users/josnyder/dev/lm/modules/StringModule.cpp:43:6:tStringModule_tick	1
+/Users/josnyder/dev/lm/modules/StringModule.cpp:51:6:tStringModule_onNoteOn	2
+/Users/josnyder/dev/lm/modules/StringModule.cpp:64:6:tStringModule_setParameter	14

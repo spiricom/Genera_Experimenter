@@ -24,6 +24,7 @@ C_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Drivers/STM32H7xx_HAL_Driver/Src \
+Inc \
 Middlewares/ST/STM32_USB_Host_Library/Class/AUDIO/Src \
 Middlewares/ST/STM32_USB_Host_Library/Core/Src \
 Middlewares/Third_Party/FatFs/src \
@@ -32,5 +33,6 @@ Src \
 Startup \
 leaf/Externals \
 leaf/Src \
-leaf \
+leaf_modules/modules \
+leaf_modules/processors \
 

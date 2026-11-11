@@ -33,6 +33,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "parameters.h"
+#include "mapping.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -79,7 +81,7 @@ extern  volatile int64_t cycleCountVals[4][3];
 
 extern volatile uint32_t loadingPreset;
 extern volatile uint32_t currentPreset;
-
+extern volatile uint32_t presetWaitingToParse;
 //simple cycle counter - writes to cycleCountVals: fills one of 16 slots with two numbers - the start count [0] and the time between start and end count [1].
 #define CYCLE_COUNT_START0 {cycleCountVals[0][2] = 0; cycleCountVals[0][0] = DWT->CYCCNT;}
 #define CYCLE_COUNT_START1 	{cycleCountVals[1][2] = 0;cycleCountVals[1][0] = DWT->CYCCNT;}
@@ -90,21 +92,21 @@ extern volatile uint32_t currentPreset;
 #define CYCLE_COUNT_END1 cycleCountVals[1][1] = DWT->CYCCNT - cycleCountVals[1][0];
 #define CYCLE_COUNT_END2 cycleCountVals[2][1] = DWT->CYCCNT - cycleCountVals[2][0];
 #define CYCLE_COUNT_END3 {if (!cycleCountVals[3][2]){cycleCountVals[3][1] = DWT->CYCCNT - cycleCountVals[3][0];} else {cycleCountVals[3][1] = -1;}}
-
+extern tFullPresetStateWithNameAndNumberUnion presetBuffer;
 #define MAX_NUM_PRESETS 64
 extern float midiKeyDivisor;
 extern float midiKeySubtractor;
 extern uint8_t effectsActive[4];
 extern volatile uint8_t currentActivePreset;
 #define NUM_PARAMS numParams
-#define MAX_NUM_MAPPINGS 32
+#define MAX_NUM_OLD_MAPPINGS 32
 extern param params[NUM_PARAMS];
 extern uint_fast8_t knobTicked[12];
 extern uint_fast8_t pedalTicked[10];
 extern uint8_t fxPre;
 extern volatile float audioMasterLevel;
 extern uint8_t numMappings;
-extern mapping mappings[MAX_NUM_MAPPINGS];
+extern mapping mappings[MAX_NUM_OLD_MAPPINGS];
 extern volatile uint32_t presetReady;
 extern int32_t volatile prevKnobByte[20];
 extern volatile uint32_t presetWaitingToLoad;

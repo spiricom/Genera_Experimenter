@@ -1,0 +1,7 @@
+/Users/josnyder/dev/LEAF/leaf/./Inc/leaf-math.h:114:25:LEAF_clip	3
+/Users/josnyder/dev/lm/processors/mapping.cpp:32:6:tMapping_init	1
+/Users/josnyder/dev/lm/processors/mapping.cpp:37:6:tMapping_initToPool	1
+/Users/josnyder/dev/lm/processors/mapping.cpp:46:6:tMapping_setParameter	16
+/Users/josnyder/dev/lm/processors/mapping.cpp:118:6:processMapping	2
+/Users/josnyder/dev/lm/processors/mapping.cpp:132:6:tMapping_free	1
+/Users/josnyder/dev/lm/processors/mapping.cpp:136:6:tMappingAdd_	2

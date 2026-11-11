@@ -24,7 +24,7 @@
 #include "gfx.h"
 #include "custom_fonts.h"
 #include "tunings.h"
-
+#include "string.h"
 
 unsigned char GFXbuffer[1024];
 GFX theGFX;

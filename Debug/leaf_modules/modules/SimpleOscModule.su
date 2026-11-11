@@ -1,0 +1,12 @@
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:13:6:tOscModule_init	24	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:18:6:tOscModule_setType	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:23:6:tOscModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:130:6:tOscModule_initToPool	40	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:207:6:tOscModule_free	24	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:213:6:tOscModule_setInputNote	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:219:6:tOscModule_setGain	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:227:6:tOscModule_tick	32	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:299:6:tOscModule_setShape	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:320:6:tOscModule_setGlideOrigin	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:326:6:tOscModule_setOctave	16	static
+/Users/josnyder/dev/lm/modules/SimpleOscModule.cpp:337:6:tOscModule_onNoteOn	16	static

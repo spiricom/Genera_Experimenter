@@ -1,0 +1,8 @@
+/Users/josnyder/dev/LEAF/leaf/./Inc/leaf-math.h:114:25:LEAF_clip	24	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:11:6:tSampleAndHoldModule_init	24	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:16:6:tSampleAndHoldModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:70:6:tSampleAndHoldModule_initToPool	32	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:101:6:tSampleAndHoldModule_free	24	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:107:6:tSampleAndHoldModule_onNoteOn	16	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:115:6:tSampleAndHoldModule_setBinLength	24	static
+/Users/josnyder/dev/lm/modules/SampleAndHoldModule.cpp:123:6:tSampleAndHoldModule_tick	24	static

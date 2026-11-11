@@ -1,0 +1,9 @@
+/Users/josnyder/dev/LEAF/leaf/./Inc/leaf-math.h:114:25:LEAF_clip	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:11:6:tSimpleEnvModule_init	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:16:6:tSimpleEnvModule_free	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:22:6:tSimpleEnvModule_tick	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:31:6:tSimpleEnvModule_onNoteOn	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:48:6:tSimpleEnvModule_setTimeScalingTableLocation	24	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:54:6:tSimpleEnvModule_setSampleRate	16	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:58:6:tSimpleEnvModule_setParameter	72	static
+/Users/josnyder/dev/lm/modules/SimpleEnvModule.cpp:136:6:tSimpleEnvModule_initToPool	32	static

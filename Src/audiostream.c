@@ -29,8 +29,8 @@ int32_t audioInBuffer[AUDIO_BUFFER_SIZE] __ATTR_RAM_D2_DMA;
 char small_memory[SMALL_MEM_SIZE];
 char medium_memory[MED_MEM_SIZE] __ATTR_RAM_D1;
 char large_memory[LARGE_MEM_SIZE] __ATTR_SDRAM;
-tMempool mediumPool;
-tMempool largePool;
+tMempool* mediumPool;
+tMempool* largePool;
 
 int32_t writeKnobFlag = 0;
 int32_t writeButtonFlag = 0;
@@ -48,7 +48,7 @@ uint32_t bendData = 8192;
 
 volatile uint32_t newPluck = 0 ;
 
-tOversampler downSampler;
+//tOversampler downSampler;
 
 BOOL bufferCleared = TRUE;
 
@@ -86,9 +86,7 @@ union breakFloat{
 	float f;
 	uint8_t b[4];
 };
-//envelope tables
-float decayExpBuffer[DECAY_EXP_BUFFER_SIZE];
-float decayExpBufferSizeMinusOne;
+
 
 
 LEAF leaf;
@@ -108,7 +106,7 @@ float knobScaled[20];
 volatile uint8_t knobFrozen[20];
 float pedalScaled[10];
 
-tSimplePoly myPoly;
+tSimplePoly* myPoly;
 
 /**********************************************/
 
@@ -171,6 +169,7 @@ float FORCE_INLINE mtofTableLookup(float tempMIDI)
 
 void knobTest(int32_t newByte, int32_t currentKnobToTest)
 {
+	/*
 	//if this knob is the one we're already displaying, then update it every time it is different
 	if ((newByte != prevKnobByte[currentKnobToTest]) && (currentKnobFocus == currentKnobToTest))
 	{
@@ -195,6 +194,7 @@ void knobTest(int32_t newByte, int32_t currentKnobToTest)
 		tExpSmooth_setDest(knobSmoothers[currentKnobToTest], (newByte * 0.003921568627451f)); //scaled 0.0 to 1.0
 		prevKnobByte[currentKnobToTest] = newByte;
 	}
+	*/
 
 }
 void processKnobs()
@@ -222,12 +222,14 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 	LEAF_init(&leaf, SAMPLE_RATE, small_memory, SMALL_MEM_SIZE, &randomNumber);
 
 	LEAF_setErrorCallback(&leaf, LEAF_myError);
-
-
-
+	leaf.clearOnAllocation = 1;
 	tMempool_init (&mediumPool, medium_memory, MED_MEM_SIZE, &leaf);
-
 	tMempool_init (&largePool, large_memory, LARGE_MEM_SIZE, &leaf);
+	initSynth();
+
+
+
+
 
 	//synthInit();
 
@@ -235,18 +237,23 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 	for (int i = 0; i < 6; i++)
 	{
-		tExpSmooth_init(&adc[i],0.0f, 0.3f,&leaf);
+		//tExpSmooth_create(&leaf.mempool, &adc[i]);
+		tExpSmooth_init(&leaf, &adc[i],0.0f, 0.3f);
 	}
 
 	for (int i = 0; i < 20; i++)
 		{
-			tExpSmooth_init(&knobSmoothers[i],0.0f,0.001f, &leaf);
+			//tExpSmooth_create(&leaf.mempool, &knobSmoothers[i]);
+			tExpSmooth_init(&leaf, &knobSmoothers[i],0.0f,0.001f);
 		}
 		for (int i = 0; i < 10; i++)
 		{
 			//tExpSmooth_init(&pedalSmoothers[i],0.0f,0.001f,&leaf);
 		}
-		tSimplePoly_init(&myPoly, 1, &leaf);
+		tSimplePoly_create(&leaf.mempool,&myPoly);
+		tSimplePoly_init(&leaf, myPoly, 1);
+
+		/*
 	LEAF_generate_exp(decayExpBuffer, 0.001f, 0.0f, 1.0f, -0.0008f, DECAY_EXP_BUFFER_SIZE); // exponential decay buffer falling from 1 to 0
 		decayExpBufferSizeMinusOne = DECAY_EXP_BUFFER_SIZE - 1;
 
@@ -260,6 +267,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 		LEAF_generate_mtof(mtofTable, -163.8375f, 163.8375f,  MTOF_TABLE_SIZE); //mtof table for fast calc
 	HAL_Delay(10);
+	*/
 
 
 
@@ -269,8 +277,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 
 			audioOutBuffer[ i] = (int32_t)(0.0f * TWO_TO_23);
 	}
-	audioInitSynth();
-	audioSwitchToSynth();
+
 	HAL_Delay(1);
 
 	// set up the I2S driver to send audio data to the codec (and retrieve input as well)
@@ -296,6 +303,8 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
     //GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     //GPIO_InitStruct.Pull = GPIO_PULLUP;
     //HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+
 }
 
 volatile int frameCount = 0;
@@ -331,13 +340,13 @@ void audioFrame(uint16_t buffer_offset)
 		{
 			ProcessReceivedMidiDatas();
 		}
-		if (presetReady)
-		{
+		//if (presetReady)
+		//{
 			//cycleCountVals[1][2] = 0;
 			processKnobs();
 			processButtons();
 			audioFrameSynth(buffer_offset);
-		}
+		//}
 
 #if 0
 
@@ -555,11 +564,12 @@ void noteOn(int key, int velocity)
 
 
 
-	stringInputs[0] = tSimplePoly_getVelocity(myPoly, 0) * 512;
-	stringMIDIPitches[0] = tSimplePoly_getPitch(myPoly, 0);
-	newPluck = 1;
-	prevStringMIDIPitches[0] = stringMIDIPitches[0];
-	if (stringInputs[0] > 0)
+	voiceAmp = tSimplePoly_getVelocity(myPoly, 0) * 0.00787402f; //divide by 127 to get 0-1
+	voiceMIDIPitch = tSimplePoly_getPitch(myPoly, 0);
+	processNoteOn(voiceAmp);
+
+	prevVoiceMIDIPitch = voiceMIDIPitch;
+	if (voiceAmp > 0)
 	{
 		setLED_2(1);
 	}
@@ -574,14 +584,14 @@ void noteOff(int key, int velocity)
 	tSimplePoly_noteOff(myPoly, key);
 
 
-	stringInputs[0] = tSimplePoly_getVelocity(myPoly, 0) * 512;
-	stringMIDIPitches[0] = tSimplePoly_getPitch(myPoly, 0);
-	if ((prevStringMIDIPitches[0] != stringMIDIPitches[0]) || (stringInputs[0] == 0))
+	voiceAmp = tSimplePoly_getVelocity(myPoly, 0) * 0.00787402f; //divide by 127 to get 0-1
+	voiceMIDIPitch = tSimplePoly_getPitch(myPoly, 0);
+	if ((prevVoiceMIDIPitch != voiceMIDIPitch) || (voiceAmp == 0))
 	{
-		newPluck = 1;
+		processNoteOn(voiceAmp);
 	}
-	prevStringMIDIPitches[0] = stringMIDIPitches[0];
-	if (stringInputs[0] > 0)
+	prevVoiceMIDIPitch = voiceMIDIPitch;
+	if (voiceAmp > 0)
 	{
 		setLED_2(1);
 	}

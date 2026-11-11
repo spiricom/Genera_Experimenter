@@ -41,7 +41,7 @@
 #include "MIDI_application.h"
 #include "synth.h"
 #include "oled.h"
-
+#include "mapping.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,13 +69,15 @@ FLASH_OBProgramInitTypeDef OBInit;
 uint16_t VarDataTab = 0;
 uint16_t VarValue = 0;
 
+#define SYSEX_BUFFER_SIZE 8192
 
+tFullPresetStateWithNameAndNumberUnion presetBuffer;
 
 volatile uint32_t receivingSysex = 0;
 volatile uint32_t parsingSysex = 0;
 
 volatile uint32_t uartTest = 0;
-uint32_t sysexPointerMask = 4095;
+uint32_t sysexPointerMask = SYSEX_BUFFER_SIZE - 1;
 uint32_t sysexWritePointer = 0;
 uint32_t sysexReadPointer = 0;
 uint32_t lastBufferStuff = 0;
@@ -138,9 +140,10 @@ FILINFO fno;
 FIL fdst;
 DIR dir;
 
-uint8_t sysexBuffer[4096];
+
+uint8_t sysexBuffer[SYSEX_BUFFER_SIZE];
 uint32_t sysexPointer = 0;
-uint8_t buffer[4096] __ATTR_RAM_D2;
+uint8_t buffer[SYSEX_BUFFER_SIZE] __ATTR_RAM_D2;
 volatile uint16_t bufferPos = 0;
 FRESULT res;
 const TCHAR path = 0;
@@ -163,7 +166,7 @@ float loadedKnobParams[20];
 uint_fast8_t knobTicked[12];
 
 param params[NUM_PARAMS];
-mapping mappings[MAX_NUM_MAPPINGS];
+//mapping mappings[MAX_NUM_MAPPINGS];
 uint8_t numMappings = 0;
 
 uint8_t effectsActive[4] = {0,0,0,0};
@@ -395,9 +398,9 @@ int main(void)
     }
 
 
-    LEAF_generate_table_skew_non_sym(resTable, 0.01f, 10.0f, 0.5f, SCALE_TABLE_SIZE);
-    LEAF_generate_table_skew_non_sym(envTimeTable, 0.0f, 20000.0f, 4000.0f, SCALE_TABLE_SIZE);
-    LEAF_generate_table_skew_non_sym(lfoRateTable, 0.0f, 30.0f, 2.0f, SCALE_TABLE_SIZE);
+    //LEAF_generate_table_skew_non_sym(resTable, 0.01f, 10.0f, 0.5f, SCALE_TABLE_SIZE);
+    //LEAF_generate_table_skew_non_sym(envTimeTable, 0.0f, 20000.0f, 4000.0f, SCALE_TABLE_SIZE);
+    //LEAF_generate_table_skew_non_sym(lfoRateTable, 0.0f, 30.0f, 2.0f, SCALE_TABLE_SIZE);
     HAL_Delay(10);
 
 
@@ -414,7 +417,7 @@ int main(void)
   presetNumberToLoad = currentPreset;
   presetWaitingToLoad = 1;
 
-  OLED_init(&hi2c2, 1); // 1 for plug on bottom, 0 for plug on top orientation
+  OLED_init(&hi2c2, 0); // 1 for plug on bottom, 0 for plug on top orientation
 
   OLED_writePreset();
 
@@ -1248,6 +1251,9 @@ void  parsePreset(int size, int presetNumber)
 {
 	//turn off the volume while changing parameters
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+
+#if 0
+
 	volatile uint32_t tempCountParse = DWT->CYCCNT;
 	uint16_t presetVersionNumber = 0;
 	currentPresetSize = size;
@@ -1277,6 +1283,7 @@ void  parsePreset(int size, int presetNumber)
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
 	diskBusy = 0;
 	//receivingI2C = 0;
+#endif
 
 }
 
@@ -1289,6 +1296,58 @@ void  parsePreset(int size, int presetNumber)
 
 void parseSysexPreset()
 {
+	uint32_t presetSize7bit = (sysexWritePointer - sysexReadPointer - 2) & sysexPointerMask; // should check that this works when wrapping around
+
+	uint32_t eightBitSize = roundf(presetSize7bit * (7.0f/8.0f) + 0.5f);
+
+
+
+	uint32_t eightBitByteCount = 0;
+	uint32_t eightBitBitCount = 0;
+
+	sysexReadPointer += 2; //skip past the type tag and test byte for now
+
+	uint8_t tempByte = 0;
+	//split the 7-bit bytes up and pack them in 8-bit bytes
+	for (uint32_t inputByte = 0; inputByte < presetSize7bit; inputByte++)
+	{
+		for (uint8_t bit = 0; bit < 7; bit++)
+		{
+
+			uint8_t valueOfCurrentBit = (sysexBuffer[(inputByte + sysexReadPointer) & sysexPointerMask] >> bit) & 1; //get the value of the bit we're reading from the 7-bit byte
+			tempByte |= (valueOfCurrentBit << eightBitBitCount); //plop it in the 8-bit byte in the position where it needs to be.
+
+			//count which bit you're on in the 8-bit word (different from "bit" in the 8-bit word)
+			eightBitBitCount++;
+			//roll over the 8-bit byte if you reached the end
+			if (eightBitBitCount >= 8)
+			{
+				presetBuffer.bytes[eightBitByteCount] = tempByte;
+				eightBitBitCount = 0;
+				tempByte = 0;
+				eightBitByteCount++;
+			}
+		}
+	}
+	sysexReadPointer = (presetSize7bit + sysexReadPointer) & sysexPointerMask;
+	presetNumberToWrite = presetBuffer.data.presetNumber;
+	for (int i = 0; i < 14; i++)
+	{
+		if (presetBuffer.data.name[i] != 0)
+		{
+			presetNamesArray[presetNumberToWrite][i] = presetBuffer.data.name[i];
+		}
+		else
+		{
+			presetNamesArray[presetNumberToWrite][i] = 32;
+		}
+	}
+	currentPreset = presetNumberToWrite;
+	OLED_writePreset();
+	presetWaitingToParse = 1;
+	//parseFullPreset();
+
+#if 0
 	parsingSysex = 1;
 	presetReady = 0;
 	uint32_t messageStart = sysexMessageStartPoints[sysexMessageStartPointsReadPosition];
@@ -1466,6 +1525,8 @@ void parseSysexPreset()
 
         }
     }
+#endif
+
 }
 
 void parseSingleParameterChange()
@@ -1546,7 +1607,7 @@ void parseSingleMappingChange()
 uint32_t currentUARTBufferPos = 0;
 uint32_t uartParseCount = 0;
 
-void UART_buffer_parse(uint32_t size)
+void UART_buffer_parse(uint32_t offset)
 {
 #if 0
 	for (int i = 0; i < size; i++)
@@ -1556,105 +1617,130 @@ void UART_buffer_parse(uint32_t size)
 
 		uint32_t offset = currentUARTBufferPos++ & UART_BUFFER_MASK;
 #endif
-		uint32_t offset = size;
+#if 0
 		if (receivingSysex)
-		    {
+		{
 
-				if (UART_buffer[offset] < 128)
+			if (UART_buffer[offset] < 128)
+			{
+				sysexBuffer[(sysexWritePointer++) & sysexPointerMask] = UART_buffer[offset];
+				lastBufferStuff = masterTimer;
+				sysexReset = 0;
+			}
+			else
+			{
+				if (UART_buffer[offset] == 0xf7)
 				{
-					sysexBuffer[(sysexWritePointer++) & sysexPointerMask] = UART_buffer[offset];
-					lastBufferStuff = masterTimer;
-		            sysexReset = 0;
+					receivingSysex = 0;
+					lastEndReceive = masterTimer;
+
+					//parseSysex();
+					return;
+				 }
+			}
+		}
+
+		else if (newSysexStart)
+		{
+			if (!parsingSysex)
+			{
+				if (UART_buffer[offset] == 126) // special message saying that sysex multi-chunk transmission is finished. Parse it!
+				{
+
+					switch (sysexBuffer[sysexMessageStartPoints[sysexMessageStartPointsWritePosition] & sysexPointerMask])
+					{
+						case 0://new preset
+							parseThatMF = 1;
+							parsingSysex = 1;
+							break;
+						case 3: //real-time parameter change
+							waitingToParseSingleParameterChange = 1;
+							break;
+						case 4: //real-time mapping change
+							waitingToParseSingleMappingChange = 1;
+							break;
+						default:
+							break;
+					}
+
+
+					prevLastParseCall = lastParseCall;
+					lastParseCall = masterTimer;
+					sysexReset = 1;
+
+					sysexMessageStartPointsWritePosition = (sysexMessageStartPointsWritePosition + 1) & 255;
+					sysexMessageStartPoints[sysexMessageStartPointsWritePosition] = sysexWritePointer;
+					newSysexStart = 0;
+					//sysexPointer = 0;
 				}
 				else
 				{
-					if (UART_buffer[offset] == 0xf7)
+					if (sysexHeaderCount == 2) //first byte after start byte
 					{
-						receivingSysex = 0;
-						lastEndReceive = masterTimer;
 
-						//parseSysex();
-						return;
-					 }
+						if (UART_buffer[offset] == 0 || UART_buffer[offset] == 1 || UART_buffer[offset] == 2 || UART_buffer[offset] == 3 || UART_buffer[offset] == 4)
+						{
+							// if this is the first chunk, put in the first and second elements (following chunks need this data stripped until the final message gets sent)
+							prevLastBufferBegin[0] = lastBufferBegin[0];
+							prevLastBufferBegin[1] = lastBufferBegin[1];
+							lastBufferBegin[0] = masterTimer;
+							lastBufferBegin[1] = UART_buffer[offset];
+						}
+					}
+					//only store the two header bytes in the first chonk of a multi-chonk transmission
+					// if this is the first sysex chunk of a multi-chonk transmission
+					if ((sysexReset == 1) && (sysexHeaderCount > 0))
+					{
+						sysexBuffer[sysexWritePointer++ & sysexPointerMask] = UART_buffer[offset];
+					}
+					sysexHeaderCount--;
+					//if you got past the first two bytes after the start byte, start just filling the buffer
+					if (sysexHeaderCount == 0)
+					{
+						receivingSysex = 1;
+						newSysexStart = 0;
+					}
 				}
-		    }
-
-		    else if (newSysexStart)
-		    {
-		    	if (!parsingSysex)
-		        {
-		        	if (UART_buffer[offset] == 126) // special message saying that sysex multi-chunk transmission is finished. Parse it!
-		            {
-
-		        		switch (sysexBuffer[sysexMessageStartPoints[sysexMessageStartPointsWritePosition] & sysexPointerMask])
-		        		{
-							case 0://new preset
-								parseThatMF = 1;
-								parsingSysex = 1;
-								break;
-							case 3: //real-time parameter change
-								waitingToParseSingleParameterChange = 1;
-								break;
-							case 4: //real-time mapping change
-								waitingToParseSingleMappingChange = 1;
-								break;
-							default:
-								break;
-		        		}
 
 
-		                prevLastParseCall = lastParseCall;
-		                lastParseCall = masterTimer;
-		                sysexReset = 1;
-
-		                sysexMessageStartPointsWritePosition = (sysexMessageStartPointsWritePosition + 1) & 255;
-		                sysexMessageStartPoints[sysexMessageStartPointsWritePosition] = sysexWritePointer;
-		                newSysexStart = 0;
-		                //sysexPointer = 0;
-		            }
-		        	else
-		        	{
-		        		if (sysexHeaderCount == 2) //first byte after start byte
-		        		{
-
-							if (UART_buffer[offset] == 0 || UART_buffer[offset] == 1 || UART_buffer[offset] == 2 || UART_buffer[offset] == 3 || UART_buffer[offset] == 4)
-							{
-								// if this is the first chunk, put in the first and second elements (following chunks need this data stripped until the final message gets sent)
-								prevLastBufferBegin[0] = lastBufferBegin[0];
-								prevLastBufferBegin[1] = lastBufferBegin[1];
-								lastBufferBegin[0] = masterTimer;
-								lastBufferBegin[1] = UART_buffer[offset];
-							}
-		        		}
-		        		//only store the two header bytes in the first chonk of a multi-chonk transmission
-		        		// if this is the first sysex chunk of a multi-chonk transmission
-						if ((sysexReset == 1) && (sysexHeaderCount > 0))
-						{
-							sysexBuffer[sysexWritePointer++ & sysexPointerMask] = UART_buffer[offset];
-						}
-						sysexHeaderCount--;
-						//if you got past the first two bytes after the start byte, start just filling the buffer
-						if (sysexHeaderCount == 0)
-						{
-							receivingSysex = 1;
-							newSysexStart = 0;
-						}
-		        	}
-
-
-		        }
-		    }
-
-			else if (UART_buffer[offset] == 0xf0) //got a start byte
-			{
-				newSysexStart = 1;
-				sysexHeaderCount = 2; //how many header bytes will follow (save them in first chonk and drop the ones in following chonks)
 			}
+		}
 
-		    masterTimer++;
-//#endif
+		else if (UART_buffer[offset] == 0xf0) //got a start byte
+		{
+			newSysexStart = 1;
+			sysexHeaderCount = 2; //how many header bytes will follow (save them in first chonk and drop the ones in following chonks)
+		}
+#endif
+	if (receivingSysex)
+	{
 
-	//}
+		if (UART_buffer[offset] < 128)
+		{
+			sysexBuffer[(sysexWritePointer++) & sysexPointerMask] = UART_buffer[offset];
+			lastBufferStuff = masterTimer;
+			sysexReset = 0;
+		}
+		else
+		{
+			if (UART_buffer[offset] == 0xf7)
+			{
+				receivingSysex = 0;
+				lastEndReceive = masterTimer;
+
+				parseSysexPreset();
+				return;
+			 }
+		}
+	}
+	else if (UART_buffer[offset] == 0xf0) //got a start byte
+	{
+		receivingSysex = 1;
+		//sysexReadPointer = masterTimer & sysexPointerMask;
+	}
+
+
+	masterTimer++;
 
 }
 

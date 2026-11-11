@@ -1,0 +1,6 @@
+/Users/josnyder/dev/lm/modules/SineModule.cpp:12:6:tSineModule_init	24	static
+/Users/josnyder/dev/lm/modules/SineModule.cpp:17:6:tSineModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/SineModule.cpp:36:6:tSineModule_initToPool	40	static
+/Users/josnyder/dev/lm/modules/SineModule.cpp:75:6:tSineModule_free	24	static
+/Users/josnyder/dev/lm/modules/SineModule.cpp:94:6:tSineModule_tick	24	static
+/Users/josnyder/dev/lm/modules/SineModule.cpp:117:6:tSineModule_setSampleRate	16	static

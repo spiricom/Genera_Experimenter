@@ -1,0 +1,9 @@
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:10:6:tDelayModule_init	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:31:6:tDelayModule_setDelay	16	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:59:6:tDelayModule_setGain	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:94:6:tDelayModule_initToPool	48	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:147:6:tDelayModule_free	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:174:6:tDelayModule_tick	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:206:6:tDelayModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:227:6:tDelayModule_setDBtoATableLocation	24	static
+/Users/josnyder/dev/lm/modules/DelayModule.cpp:235:6:tDelayModule_setSampleRate	16	static

@@ -1,0 +1,8 @@
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:10:6:splitUint8To7bit	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:14:7:splitFloatTo7bit	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:25:6:splitUint32To7bit	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:34:6:splitInt32To7bit	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:44:10:unsplitUint32	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:56:9:unsplitInt32	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:67:7:unsplitFloat	1
+/Users/josnyder/dev/lm/processors/sysex_chunks.cpp:81:9:unsplitUint8	1

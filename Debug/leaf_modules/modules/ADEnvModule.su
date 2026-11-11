@@ -1,0 +1,9 @@
+/Users/josnyder/dev/LEAF/leaf/./Inc/leaf-math.h:114:25:LEAF_clip	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:8:6:tADEnvModule_init	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:13:6:tADEnvModule_free	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:20:6:tADEnvModule_tick	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:29:6:tADEnvModule_onNoteOn	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:41:6:tADEnvModule_setTimeScalingTableLocation	24	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:47:6:tADEnvModule_setSampleRate	16	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:51:6:tADEnvModule_setParameter	56	static
+/Users/josnyder/dev/lm/modules/ADEnvModule.cpp:95:6:tADEnvModule_initToPool	32	static
