@@ -229,6 +229,7 @@ enum ParamNames
 {
 	MIDIKeyMax,
 	MIDIKeyMin,
+#if 0
 	Master,
 	M1,
 	M2,
@@ -383,6 +384,7 @@ enum ParamNames
 	OutputTone,
 	FXOrder,
 	PedalControlsMaster,
+#endif
 	numParams
 };
 

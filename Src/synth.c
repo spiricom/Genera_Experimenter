@@ -12,6 +12,7 @@
 #include "FilterModule.h"
 #include "EnvModule.h"
 #include "LFOModule.h"
+#include "NoiseModule.h"
 #include "ADEnvModule.h"
 #include "StringModule.h"
 #include "SampleAndHoldModule.h"
@@ -181,6 +182,18 @@ void parseFullPreset()
 					{
 						tEnvModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
 						moduleArray[currentModuleNumber++].type = ModuleTypeEnvModule;
+					}
+					break;
+				case ModuleTypeLFOModule:
+					{
+						tLFOModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeLFOModule;
+					}
+					break;
+				case ModuleTypeNoiseModule:
+					{
+						tNoiseModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeNoiseModule;
 					}
 					break;
 				default:
@@ -422,7 +435,7 @@ void initSynth()
     {
     	tLookupTable_create(&mediumPool, &leaf.mtofTable);
     	tLookupTable_init (&leaf, leaf.mtofTable, 0.f, 0.f, 0.f, 16384);
-    	LEAF_generate_mtof (leaf.mtofTable->table, 0, 127, 16384);
+    	LEAF_generate_mtof (leaf.mtofTable->table, 0, 136, 16384);
     }
     if (leaf.gainAmpTable == NULL)
     {
@@ -526,6 +539,12 @@ float audioTickSynth()
 				break;
 			case ModuleTypeEnvModule:
 				tEnvModule_tick((tEnvModule)moduleArray[i].module);
+				break;
+			case ModuleTypeLFOModule:
+				tLFOModule_tick((tLFOModule)moduleArray[i].module);
+				break;
+			case ModuleTypeNoiseModule:
+				tNoiseModule_tick((tNoiseModule)moduleArray[i].module);
 				break;
 			default:
 				break;
