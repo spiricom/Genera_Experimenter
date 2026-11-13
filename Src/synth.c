@@ -204,6 +204,11 @@ void parseFullPreset()
 					tSampleAndHoldModule_free(&moduleArray[i].module);
 				}
 				break;
+			case ModuleTypeSineModule:
+				{
+					tSineModule_free(&moduleArray[i].module);
+				}
+				break;
 			default:
 				break;
 		}
@@ -311,6 +316,12 @@ void parseFullPreset()
 					{
 						tSampleAndHoldModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
 						moduleArray[currentModuleNumber++].type = ModuleTypeSampleAndHoldModule;
+					}
+					break;
+				case ModuleTypeSineModule:
+					{
+						tSineModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeSineModule;
 					}
 					break;
 				default:
@@ -689,6 +700,7 @@ float audioTickSynth()
 				tSimpleEnvModule_tick((tSimpleEnvModule)moduleArray[i].module);
 				break;
 			case ModuleTypeSineModule:
+				tSineModule_setParameter((tSineModule)moduleArray[i].module, SinePitch, voiceMIDIPitch / 127.0f);
 				tSineModule_tick((tSineModule)moduleArray[i].module);
 				break;
 			case ModuleTypeSoftClipModule:

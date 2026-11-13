@@ -195,8 +195,8 @@ void knobTest(int32_t newByte, int32_t currentKnobToTest)
 		prevKnobByte[currentKnobToTest] = newByte;
 	}
 	*/
-
 }
+
 void processKnobs()
 {
 	for (int i = 0; i < 8; i++)
@@ -210,7 +210,6 @@ void processKnobs()
 		int32_t myByte = ADC_values[i-8] >> 8;
 		knobTest(myByte, i);
 	}
-
 }
 
 
@@ -219,7 +218,7 @@ void audioInit(I2C_HandleTypeDef* hi2c, SAI_HandleTypeDef* hsaiOut, SAI_HandleTy
 {
 	// Initialize LEAF.
 
-	LEAF_init(&leaf, SAMPLE_RATE, small_memory, SMALL_MEM_SIZE, &randomNumber);
+	LEAF_init(&leaf, SAMPLE_RATE, small_memory, SMALL_MEM_SIZE);
 
 	LEAF_setErrorCallback(&leaf, LEAF_myError);
 	leaf.clearOnAllocation = 1;
@@ -322,31 +321,18 @@ void audioFrame(uint16_t buffer_offset)
 	if (codecReady)
 	{
 
-		//volatile uint32_t tempCount5 = 0;
-		//volatile uint32_t tempCount6 = 0;
+
 		int i;
-		//int32_t current_sample;
-		uint32_t clipCatcher = 0;
 
-		//tempCount5 = DWT->CYCCNT;
-
-
-		//adcCheck(&vocodec);
-
-		// if the USB write pointer has advanced (indicating unread data is in the buffer),
-		// or the overflow bit is set, meaning that the write pointer wrapped around and the read pointer hasn't caught up to it yet
-		// then process that new data this frame
 		if ((myUSB_FIFO_overflowBit) || (myUSB_FIFO_writePointer > myUSB_FIFO_readPointer))
 		{
 			ProcessReceivedMidiDatas();
 		}
-		//if (presetReady)
-		//{
-			//cycleCountVals[1][2] = 0;
-			processKnobs();
-			processButtons();
-			audioFrameSynth(buffer_offset);
-		//}
+
+		processKnobs();
+		processButtons();
+		audioFrameSynth(buffer_offset);
+
 
 #if 0
 

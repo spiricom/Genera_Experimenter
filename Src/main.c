@@ -734,13 +734,6 @@ void SDRAM_Initialization_sequence(void)
 
 }
 
-// Simple LCG random number generator — no stdlib dependency.
-// Returns a value in [0, 1).
-static uint32_t _leaf_lcg_state = 1664525u;
-float randomNumber(void) {
-    _leaf_lcg_state = _leaf_lcg_state * 1664525u + 1013904223u;
-    return (_leaf_lcg_state >> 8) * (1.0f / 16777216.0f);
-}
 
 
 uint8_t BSP_SD_IsDetected(void)

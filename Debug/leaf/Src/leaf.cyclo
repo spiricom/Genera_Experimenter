@@ -1,7 +1,8 @@
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:62:6:LEAF_defaultErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:64:7:LEAF_defaultRandomNumber	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:69:6:LEAF_defaultErrorCallback	1
 /Users/josnyder/dev/LEAF/leaf/Src/leaf.c:21:6:LEAF_init	1
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:50:6:LEAF_setSampleRate	1
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:57:7:LEAF_getSampleRate	1
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:68:6:LEAF_internalErrorCallback	1
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:74:6:LEAF_setErrorCallback	1
-/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:79:14:getNextUuid	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:51:6:LEAF_setSampleRate	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:58:7:LEAF_getSampleRate	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:75:6:LEAF_internalErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:81:6:LEAF_setErrorCallback	1
+/Users/josnyder/dev/LEAF/leaf/Src/leaf.c:86:14:getNextUuid	1
