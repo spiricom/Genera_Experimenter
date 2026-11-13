@@ -4,10 +4,10 @@
 /Users/josnyder/dev/lm/modules/FilterModule.cpp:84:6:tFiltModule_setRes	24	static
 /Users/josnyder/dev/lm/modules/FilterModule.cpp:149:13:tFiltModule_resetNonlinearState	96	static
 /Users/josnyder/dev/lm/modules/FilterModule.cpp:214:6:tFiltModule_initToPool	48	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:332:6:tFiltModule_free	24	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:396:6:tFiltModule_tick	24	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:468:6:tFiltModule_setParameter	24	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:507:6:tFiltModule_setFreq	16	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:544:6:tFiltModule_setMix	16	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:549:6:tFiltModule_setType	16	static
-/Users/josnyder/dev/lm/modules/FilterModule.cpp:645:6:tFiltModule_setSampleRate	16	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:340:6:tFiltModule_free	24	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:404:6:tFiltModule_tick	32	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:487:6:tFiltModule_setParameter	24	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:526:6:tFiltModule_setFreq	16	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:563:6:tFiltModule_setMix	16	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:568:6:tFiltModule_setType	16	static
+/Users/josnyder/dev/lm/modules/FilterModule.cpp:664:6:tFiltModule_setSampleRate	16	static

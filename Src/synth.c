@@ -16,6 +16,13 @@
 #include "ADEnvModule.h"
 #include "StringModule.h"
 #include "SampleAndHoldModule.h"
+#include "PerlinNoiseModule.h"
+#include "SimpleEnvModule.h"
+#include "SimpleNoiseModule.h"
+#include "SineModule.h"
+#include "SoftClipModule.h"
+#include "VCAModule.h"
+#include "DelayModule.h"
 #include "event_emitter.h"
 #include "stdbool.h"
 #include "defs.h"
@@ -141,6 +148,62 @@ void parseFullPreset()
 					tEnvModule_free(&moduleArray[i].module);
 				}
 				break;
+
+			case ModuleTypeLFOModule:
+				{
+					tLFOModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeNoiseModule:
+				{
+					tNoiseModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeADEnvModule:
+				{
+					tADEnvModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeDelayModule:
+				{
+					tDelayModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypePerlNoiseModule:
+				{
+					tPerlNoiseModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeSimpNoiseModule:
+				{
+					tSimpNoiseModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeSimpleEnvModule:
+				{
+					tSimpleEnvModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeSoftClipModule:
+				{
+					tSoftClipModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeStringModule:
+				{
+					tStringModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeVCAModule:
+				{
+					tVCAModule_free(&moduleArray[i].module);
+				}
+				break;
+			case ModuleTypeSampleAndHoldModule:
+				{
+					tSampleAndHoldModule_free(&moduleArray[i].module);
+				}
+				break;
 			default:
 				break;
 		}
@@ -194,6 +257,60 @@ void parseFullPreset()
 					{
 						tNoiseModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
 						moduleArray[currentModuleNumber++].type = ModuleTypeNoiseModule;
+					}
+					break;
+				case ModuleTypeADEnvModule:
+					{
+						tADEnvModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeADEnvModule;
+					}
+					break;
+				case ModuleTypeDelayModule:
+					{
+						tDelayModule_initToPool((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &largePool);
+						moduleArray[currentModuleNumber++].type = ModuleTypeDelayModule;
+					}
+					break;
+				case ModuleTypePerlNoiseModule:
+					{
+						tPerlNoiseModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypePerlNoiseModule;
+					}
+					break;
+				case ModuleTypeSimpNoiseModule:
+					{
+						tSimpNoiseModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeSimpNoiseModule;
+					}
+					break;
+				case ModuleTypeSimpleEnvModule:
+					{
+						tSimpleEnvModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeSimpleEnvModule;
+					}
+					break;
+				case ModuleTypeSoftClipModule:
+					{
+						tSoftClipModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeSoftClipModule;
+					}
+					break;
+				case ModuleTypeStringModule:
+					{
+						tStringModule_initToPool((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &largePool);
+						moduleArray[currentModuleNumber++].type = ModuleTypeStringModule;
+					}
+					break;
+				case ModuleTypeVCAModule:
+					{
+						tVCAModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeVCAModule;
+					}
+					break;
+				case ModuleTypeSampleAndHoldModule:
+					{
+						tSampleAndHoldModule_init((void **)&moduleArray[currentModuleNumber].module, presetBuffer.data.fullstate.modules[i].params, presetBuffer.data.fullstate.modules[i].uuid, &leaf);
+						moduleArray[currentModuleNumber++].type = ModuleTypeSampleAndHoldModule;
 					}
 					break;
 				default:
@@ -435,8 +552,16 @@ void initSynth()
     {
     	tLookupTable_create(&mediumPool, &leaf.mtofTable);
     	tLookupTable_init (&leaf, leaf.mtofTable, 0.f, 0.f, 0.f, 16384);
-    	LEAF_generate_mtof (leaf.mtofTable->table, 0, 136, 16384);
+    	LEAF_generate_mtof (leaf.mtofTable->table, 0, LEAF_MODULE_MAX_MIDI_NOTE, 16384);
     }
+
+    if (leaf.ftomTable == NULL)
+    {
+    	tLookupTable_create(&mediumPool, &leaf.ftomTable);
+    	tLookupTable_init (&leaf, leaf.ftomTable, 0.f, 0.f, 0.f, 16384);
+    	LEAF_generate_ftom (leaf.ftomTable->table, 0.f, 20000.0f, 16384);
+    }
+
     if (leaf.gainAmpTable == NULL)
     {
     	tLookupTable_create(&mediumPool, &leaf.gainAmpTable);
@@ -462,8 +587,15 @@ void initSynth()
     if (leaf.filtFreqTable == NULL)
     {
     	tLookupTable_create(&mediumPool, &leaf.filtFreqTable);
-    	tLookupTable_init (&leaf, leaf.filtFreqTable, 20.0f, 20000.f, 1000.f, 16384);
+    	tLookupTable_init (&leaf, leaf.filtFreqTable, 0.0f, 20000.f, 1000.f, 16384);
     }
+/*
+    if(leaf.delayTimeTable == NULL)
+    {
+        tLookupTable_create(&mediumPool, &leaf.delayTimeTable);
+        tLookupTable_init(&leaf, leaf.delayTimeTable,  0.0f, 2250.0f, 200.0f, 2048);
+    }
+    */
 }
 
 void processNoteOn(float velocity)
@@ -545,6 +677,33 @@ float audioTickSynth()
 				break;
 			case ModuleTypeNoiseModule:
 				tNoiseModule_tick((tNoiseModule)moduleArray[i].module);
+				break;
+			case ModuleTypePerlNoiseModule:
+				tPerlNoiseModule_tick((tPerlNoiseModule)moduleArray[i].module);
+				break;
+			case ModuleTypeSimpNoiseModule:
+				tSimpNoiseModule_tick((tSimpNoiseModule)moduleArray[i].module);
+				break;
+			case ModuleTypeSimpleEnvModule:
+				tSimpleEnvModule_tick((tSimpleEnvModule)moduleArray[i].module);
+				break;
+			case ModuleTypeSineModule:
+				tSineModule_tick((tSineModule)moduleArray[i].module);
+				break;
+			case ModuleTypeSoftClipModule:
+				tSoftClipModule_tick((tSoftClipModule)moduleArray[i].module);
+				break;
+			case ModuleTypeDelayModule:
+				tDelayModule_tick((tDelayModule)moduleArray[i].module);
+				break;
+			case ModuleTypeStringModule:
+				tStringModule_tick((tStringModule)moduleArray[i].module);
+				break;
+			case ModuleTypeVCAModule:
+				tVCAModule_tick((tVCAModule)moduleArray[i].module);
+				break;
+			case ModuleTypeADEnvModule:
+				tADEnvModule_tick((tADEnvModule)moduleArray[i].module);
 				break;
 			default:
 				break;
