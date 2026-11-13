@@ -37,7 +37,7 @@
 float voiceAmp = 0.0f;
 float voiceMIDIPitch = 60.0f;
 float prevVoiceMIDIPitch = 60.0f;
-
+uint32_t clearingAudioBuffer = 0;
 tFullPresetStateUnion preset;
 tEnvModule masterEnv;
 
@@ -526,6 +526,7 @@ void parseFullPreset()
 		}
 	}
 	numAudioConnections = currentAudioConnectionNumber;
+	clearingAudioBuffer = 0;
 	presetWaitingToParse = 0;
 	presetReady = 1;
 }
@@ -732,7 +733,21 @@ void audioFrameSynth(uint32_t bufferOffset)
 	uint32_t tempCountFrame = DWT->CYCCNT;
 	if (presetWaitingToParse)
 	{
-		parseFullPreset();
+		clearingAudioBuffer++;
+		if (clearingAudioBuffer == 3)
+		{
+			parseFullPreset();
+		}
+	}
+	if (clearingAudioBuffer > 0)
+	{
+		for (int i = 0; i < HALF_BUFFER_SIZE; i+=2)
+		{
+			int iplusbuffer = bufferOffset + i;
+			float outVal = 0.0f;
+			audioOutBuffer[iplusbuffer] = (int32_t)(outVal * TWO_TO_23);
+			audioOutBuffer[iplusbuffer + 1] = (int32_t)(outVal * TWO_TO_23);
+		}
 	}
 	for (int i = 0; i < HALF_BUFFER_SIZE; i+=2)
 	{

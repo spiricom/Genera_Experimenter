@@ -2,7 +2,7 @@
 /Users/josnyder/dev/lm/modules/EnvModule.cpp:16:6:tEnvModule_free	1
 /Users/josnyder/dev/lm/modules/EnvModule.cpp:22:6:tEnvModule_tick	1
 /Users/josnyder/dev/lm/modules/EnvModule.cpp:31:6:tEnvModule_onNoteOn	2
-/Users/josnyder/dev/lm/modules/EnvModule.cpp:47:6:tEnvModule_setExpTableLocation	1
-/Users/josnyder/dev/lm/modules/EnvModule.cpp:57:6:tEnvModule_setSampleRate	1
-/Users/josnyder/dev/lm/modules/EnvModule.cpp:61:6:tEnvModule_setParameter	8
-/Users/josnyder/dev/lm/modules/EnvModule.cpp:130:6:tEnvModule_initToPool	4
+/Users/josnyder/dev/lm/modules/EnvModule.cpp:58:6:tEnvModule_setExpTableLocation	1
+/Users/josnyder/dev/lm/modules/EnvModule.cpp:68:6:tEnvModule_setSampleRate	1
+/Users/josnyder/dev/lm/modules/EnvModule.cpp:72:6:tEnvModule_setParameter	8
+/Users/josnyder/dev/lm/modules/EnvModule.cpp:141:6:tEnvModule_initToPool	4

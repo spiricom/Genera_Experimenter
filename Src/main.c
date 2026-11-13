@@ -143,7 +143,7 @@ DIR dir;
 
 uint8_t sysexBuffer[SYSEX_BUFFER_SIZE];
 uint32_t sysexPointer = 0;
-uint8_t buffer[SYSEX_BUFFER_SIZE] __ATTR_RAM_D2;
+//uint8_t buffer[SYSEX_BUFFER_SIZE] __ATTR_RAM_D2;
 volatile uint16_t bufferPos = 0;
 FRESULT res;
 const TCHAR path = 0;
@@ -392,11 +392,12 @@ int main(void)
   {
 	  prevKnobByte[i] = 256;//to give a clearly wrong value for the knobs to see when they haven't been initialized with real 0-255 numbers yet
   }
+  /*
   for (int i = 0; i < 4096; i++)
     {
-  	  buffer[i] = 0;
+  	  //buffer[i] = 0;
     }
-
+*/
 
     //LEAF_generate_table_skew_non_sym(resTable, 0.01f, 10.0f, 0.5f, SCALE_TABLE_SIZE);
     //LEAF_generate_table_skew_non_sym(envTimeTable, 0.0f, 20000.0f, 4000.0f, SCALE_TABLE_SIZE);
@@ -447,7 +448,7 @@ int main(void)
 
     if (presetWaitingToLoad > 0)
     {
-    	//checkForSDCardPreset(presetNumberToLoad);
+    	checkForSDCardPreset(presetNumberToLoad);
     }
 
     if (parseThatMF > 0)
@@ -456,7 +457,7 @@ int main(void)
     }
     if (presetWaitingToWrite > 0)
     {
-    	//writePresetToSDCard(presetWaitingToWrite);
+    	writePresetToSDCard(presetWaitingToWrite);
     }
     if (presetWaitingToParse > 0)
     {
@@ -970,8 +971,9 @@ void getPresetNamesFromSDCard(void)
 				{
 					if(f_open(&SDFile, fno.fname, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
 					{
-						f_read(&SDFile, &buffer, f_size(&SDFile), &bytesRead);
+						f_read(&SDFile, &presetBuffer.bytes, f_size(&SDFile), &bytesRead);
 						f_close(&SDFile);
+						/*
 						uint16_t bufferIndex = 0;
 						//skip the first 4 bytes if there is a version number stored in the preset
 						if (buffer[bufferIndex] == 17)
@@ -1002,6 +1004,7 @@ void getPresetNamesFromSDCard(void)
 								bufferIndex++;
 							}
 						}
+						*/
 					}
 				}
 			}
@@ -1054,12 +1057,12 @@ static int checkForSDCardPreset(uint8_t numberToLoad)
 				finalString[2] = charBuf[1];
 				finalString[1] = charBuf[0];
 				finalString[0] = '0';
-				strcat(finalString, "*.ebp");
+				strcat(finalString, "*.esp");
 			}
 
 			else
 			{
-				strcat(charBuf, "*.ebp");
+				strcat(charBuf, "*.esp");
 				strcpy(finalString, charBuf);
 			}
 
@@ -1069,7 +1072,7 @@ static int checkForSDCardPreset(uint8_t numberToLoad)
 			{
 				if(f_open(&SDFile, fno.fname, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
 				{
-					f_read(&SDFile, &buffer, f_size(&SDFile), &bytesRead);
+					f_read(&SDFile, &presetBuffer.bytes, f_size(&SDFile), &bytesRead);
 					presetWaitingToParse = bytesRead;
 					f_close(&SDFile);
 					found = 1;
@@ -1086,6 +1089,7 @@ static int checkForSDCardPreset(uint8_t numberToLoad)
 		prevPreset = numberToLoad;
 		currentPreset = numberToLoad;
 	}
+	OLED_writePreset();
 	diskBusy = 0;
 	checkCount = DWT->CYCCNT - tempCountCheck;
 	__enable_irq();
@@ -1134,12 +1138,12 @@ static void writePresetToSDCard(int fileSize)
 					finalStringC[2] = charBufC[1];
 					finalStringC[1] = charBufC[0];
 					finalStringC[0] = '0';
-					strcat(finalStringC, "*.ebp");
+					strcat(finalStringC, "*.esp");
 				}
 
 				else
 				{
-					strcat(charBufC, "*.ebp");
+					strcat(charBufC, "*.esp");
 					strcpy(finalStringC, charBufC);
 				}
 
@@ -1168,14 +1172,14 @@ static void writePresetToSDCard(int fileSize)
 				{
 					finalString[21] = 0;
 					finalString[20] = 'p';
-					finalString[19] = 'b';
+					finalString[19] = 's';
 					finalString[18] = 'e';
 					finalString[17] = '.';
 					for (int i = 0; i < 14; i++)
 					{
-						finalString[i+3] = buffer[i+4];
+						finalString[i+3] = presetBuffer.data.name[i];
 						//replace spaces with underscores for filename
-						if (finalString[i+3] == 32)
+						if (finalString[i+3] <= 32)
 						{
 							finalString[i+3] = '_';
 						}
@@ -1190,14 +1194,14 @@ static void writePresetToSDCard(int fileSize)
 				{
 					finalString[21] = 0;
 					finalString[20] = 'p';
-					finalString[19] = 'b';
+					finalString[19] = 's';
 					finalString[18] = 'e';
 					finalString[17] = '.';
 					for (int i = 0; i < 14; i++)
 					{
-						finalString[i+3] = buffer[i+4];
+						finalString[i+3] = presetBuffer.data.name[i];
 						//replace spaces with underscores for filename
-						if (finalString[i+3] == 32)
+						if (finalString[i+3] <= 32)
 						{
 							finalString[i+3] = '_';
 						}
@@ -1212,7 +1216,7 @@ static void writePresetToSDCard(int fileSize)
 				if(f_open(&SDFile, finalString, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 				{
 					unsigned int bytesRead;
-					f_write(&SDFile, &buffer, fileSize, &bytesRead);
+					f_write(&SDFile, &presetBuffer.bytes, fileSize, &bytesRead);
 					f_close(&SDFile);
 				}
 
@@ -1222,6 +1226,7 @@ static void writePresetToSDCard(int fileSize)
 	}
 	presetWaitingToWrite = 0;
 	currentPreset = presetNumberToWrite;
+	presetWaitingToParse = 1;
 	diskBusy = 0;
 	__enable_irq();
 }
@@ -1291,8 +1296,8 @@ void  parsePreset(int size, int presetNumber)
 
 
 
-//translate that preset! this is to take the complete multi-chunk sysex midi message that has been received and stored
-// and format it in the binary EBP (electrobass preset) format. Most of the 7-bit messages have to be reconstructed into floats and then stored as 16-bit ints.
+//translate that preset! this is to take the complete sysex midi message that has been received and stored
+// and format it in the binary ESP (electrosynth preset) format. It comes in as 7bit words, turn it back into 8-bit
 
 void parseSysexPreset()
 {
@@ -1344,7 +1349,8 @@ void parseSysexPreset()
 	}
 	currentPreset = presetNumberToWrite;
 	OLED_writePreset();
-	presetWaitingToParse = 1;
+	presetWaitingToWrite = eightBitSize;
+	//presetWaitingToParse = 1;
 	//parseFullPreset();
 
 #if 0
@@ -1736,7 +1742,6 @@ void UART_buffer_parse(uint32_t offset)
 	else if (UART_buffer[offset] == 0xf0) //got a start byte
 	{
 		receivingSysex = 1;
-		//sysexReadPointer = masterTimer & sysexPointerMask;
 	}
 
 
